@@ -1,0 +1,18 @@
+version: 2
+
+updates:
+  # Actions are pinned by major version, which means a bad release inside a major version
+  # arrives here without anybody asking for it. This is the thing that tells us it happened.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps"

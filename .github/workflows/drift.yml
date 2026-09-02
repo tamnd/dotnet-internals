@@ -1,0 +1,40 @@
+name: drift
+
+on:
+  schedule:
+    # Weekly. Upstream moves whether or not anybody is looking, and the point of this job is
+    # that the noise arrives here on a Monday rather than in a reader's issue.
+    - cron: "23 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Two heads, because two repositories are pinned. The failure worth catching is the one where
+  # a Roslyn change and a runtime change are individually harmless and together break a lesson.
+  upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # No issue is opened while the pin is still null, because every run would open the same
+      # one. This writes to the job summary until the pin lands, and the step that files an
+      # issue arrives with M0, together with the citations it would be reporting on.
+      - name: Compare the pin against upstream
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## Pin against upstream"
+            echo
+            echo "| Repository | Pinned | Latest upstream release |"
+            echo "|---|---|---|"
+            for repo in dotnet/runtime dotnet/roslyn; do
+              key=$(basename "$repo")
+              pinned=$(jq -r --arg k "$key" '.[$k].tag // "not pinned yet"' pin.json)
+              latest=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || echo "no release feed")
+              echo "| \`$repo\` | $pinned | $latest |"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"

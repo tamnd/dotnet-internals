@@ -1,0 +1,36 @@
+name: An open question
+description: A decision that has to be made by measurement before work depends on it.
+labels: ["kind/open-question", "status/needs-decision"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A question belongs here when the answer changes something concrete: a milestone, a
+        tier, a lesson's position, or a claim on the front page. A question that is merely
+        interesting is a discussion.
+  - type: textarea
+    id: question
+    attributes:
+      label: The question
+    validations:
+      required: true
+  - type: textarea
+    id: blocks
+    attributes:
+      label: What it blocks
+      description: Name the milestone, and what changes in each direction.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed answer
+      description: What you would do if forced to decide today with no further information. This is not the answer. It is written down so that when somebody measures it, there is something specific to contradict.
+    validations:
+      required: true
+  - type: textarea
+    id: measurement
+    attributes:
+      label: The measurement that would settle it
+    validations:
+      required: true

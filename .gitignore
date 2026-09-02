@@ -1,0 +1,14 @@
+bin/
+obj/
+build/
+artifacts/
+vendor/
+*.user
+*.suo
+*.mch
+*.mc
+*.nupkg
+.vs/
+.vscode/
+.idea/
+.DS_Store

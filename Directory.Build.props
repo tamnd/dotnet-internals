@@ -1,0 +1,39 @@
+<Project>
+
+  <!--
+    The pin moves to net11.0 when .NET 11 is generally available on 10 November 2026, which is
+    also when every citation, every layout and every disassembly listing in this repository is
+    regenerated. Until then the tooling targets the current release, because a tool that only
+    builds on a preview is a tool nobody can run.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!--
+    A warning here is a defect somebody will otherwise scroll past. There is no legacy code in
+    this repository to grandfather in, so the strict setting costs nothing today and never gets
+    cheaper to turn on later.
+  -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!--
+    Deterministic builds mean two runs of the same commit produce the same bytes, which is the
+    same argument this project makes about lesson output one level down.
+  -->
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

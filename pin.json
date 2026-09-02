@@ -1,0 +1,23 @@
+{
+  "note": "The one pinned tuple. Every citation, every layout and every disassembly listing in this repository is written against exactly this and nothing else. A commit of null means the pin has not landed yet.",
+  "runtime": {
+    "repo": "dotnet/runtime",
+    "tag": null,
+    "commit": null
+  },
+  "roslyn": {
+    "repo": "dotnet/roslyn",
+    "tag": null,
+    "commit": null
+  },
+  "sdk": {
+    "band": "11.0.1xx",
+    "version": null
+  },
+  "standard": {
+    "name": "ECMA-335",
+    "edition": "6th, June 2012",
+    "augments": "runtime:docs/design/specs/Ecma-335-Augments.md",
+    "augmentsCommit": null
+  }
+}

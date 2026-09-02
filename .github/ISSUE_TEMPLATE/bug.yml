@@ -1,0 +1,31 @@
+name: Something is wrong, stale or mis-cited
+description: A claim that is not true, a citation that no longer resolves, or a lesson that does not run.
+labels: ["kind/bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A claim in this repository is true of one pinned runtime and of nothing else, so the
+        environment below is not paperwork. It is usually the answer.
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The page, the lesson id, the blueprint id, or the file and line.
+      placeholder: T05, or BP-METHODTABLE section 4
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What it says, and what is actually true
+    validations:
+      required: true
+  - type: textarea
+    id: banner
+    attributes:
+      label: The environment banner
+      description: Paste the output of `xray banner`, or the banner printed at the top of the lesson.
+      render: text
+    validations:
+      required: false

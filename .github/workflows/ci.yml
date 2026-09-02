@@ -1,0 +1,85 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Read only by default, and a job that needs more says so itself. Nothing here writes to the
+# repository, so a compromised action in a pull request cannot either.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The prose rules, run before anything expensive. Three of the rules a reviewer would
+  # otherwise have to be the person who mentions, and a fourth that is the house style on
+  # words that lie to a reader about how hard something is.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet run --project tools/xray -- lint
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet format ClrXray.slnx --verify-no-changes --severity warn
+
+  # Four platforms, because a lesson verified on one is a lesson that prints a reduced platform
+  # list on its own page. Two of them are arm64, which is where the codegen lessons stop being a
+  # single listing and start being a comparison.
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: ubuntu-24.04-arm
+            rid: linux-arm64
+          - os: windows-latest
+            rid: win-x64
+          - os: macos-latest
+            rid: osx-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet build ClrXray.slnx --configuration Release
+      # The banner is the tool proving it can answer the question every lesson opens with. It
+      # runs on all four platforms because the interesting part of the answer is the part that
+      # differs between them, and a banner that only works on Linux would hide exactly that.
+      - run: dotnet run --project tools/xray --configuration Release --no-build -- banner
+
+  # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
+  # answers, on every pull request, whether the tooling still builds on the preview it is going
+  # to be pinned to. It is allowed to fail, because a broken preview is not a broken repository.
+  preview:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "11.0.x"
+          dotnet-quality: preview
+      # global.json is what makes everybody else see the same compiler, so it has to go for the
+      # one job whose entire purpose is to use a different one. Removing it here rather than
+      # loosening it there keeps the pin honest for every other job and for every reader.
+      - run: rm global.json
+      - run: dotnet --info
+      - run: dotnet build ClrXray.slnx --configuration Release

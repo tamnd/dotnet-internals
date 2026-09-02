@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.{cs,csproj,props,targets}]
+indent_size = 4
+
+[*.md]
+# Two trailing spaces are a line break in markdown, and this repository does not use them,
+# because a paragraph here is one line and a break is a blank line.
+trim_trailing_whitespace = true
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+dotnet_sort_system_directives_first = true
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+
+# An unused using is dead weight in a file somebody is going to read as a specification.
+dotnet_diagnostic.IDE0005.severity = warning

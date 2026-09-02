@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>xray</AssemblyName>
+    <RootNamespace>ClrXray</RootNamespace>
+    <!--
+      The tool has to be able to say what runtime it is running on, and that answer is worthless
+      if it was trimmed or single filed into something the reader cannot identify. It ships as a
+      framework dependent binary on purpose.
+    -->
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+</Project>
