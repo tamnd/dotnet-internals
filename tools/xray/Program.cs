@@ -14,6 +14,8 @@ internal static class Program
         {
             "banner" => Banner.Run(),
             "lint" => Lint.Run(args.Length > 1 ? args[1] : "."),
+            "build" => LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: true),
+            "check" => LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: false),
             "--help" or "-h" or "help" => Usage(),
             _ => Unknown(args[0]),
         };
@@ -25,6 +27,8 @@ internal static class Program
         Console.WriteLine();
         Console.WriteLine("  xray banner        Print the environment every claim on a page depends on.");
         Console.WriteLine("  xray lint [path]   Check the prose rules across every markdown file under path.");
+        Console.WriteLine("  xray build [path]  Run every lesson under path and write its output and its page.");
+        Console.WriteLine("  xray check [path]  Run every lesson under path and fail if the committed files differ.");
         return 0;
     }
 

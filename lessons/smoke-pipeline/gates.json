@@ -1,0 +1,24 @@
+[
+  {
+    "id": "capture",
+    "question": "The program runs once, from top to bottom, and every block prints to standard output. The third block is marked capture=drop. What ends up in the repository for it?",
+    "options": [
+      {
+        "text": "An expected file, the same as the first two blocks get.",
+        "correct": false,
+        "why": "There is no expected file for it. The two lines it prints are a runtime identifier and a framework description, and both are different on each of the four platforms, so a file holding one of them would fail on the other three."
+      },
+      {
+        "text": "Nothing. It runs, it prints, and the output is thrown away.",
+        "correct": true,
+        "why": "It runs because a later block might depend on what it did. The output is dropped because no single value would be correct everywhere, and a page that cannot show the output has to describe it in prose instead."
+      },
+      {
+        "text": "Nothing, because the block is skipped and never runs.",
+        "correct": false,
+        "why": "Skipping it would change the program. A block is a region of one file that runs as one program, and pulling a region out of the middle is how you get a lesson whose fourth block reports on a state the third one never reached."
+      }
+    ],
+    "after": "There is a third setting, capture=none, and the difference is worth holding on to. Dropping the output still marks the block. Setting none does not mark it at all, which is the only way a block can hold a type or a helper, because the marker is a statement and a statement cannot follow a declaration in a file of top level statements."
+  }
+]

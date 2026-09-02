@@ -8,6 +8,7 @@ vendor/
 *.mch
 *.mc
 *.nupkg
+.xray/
 .vs/
 .vscode/
 .idea/
