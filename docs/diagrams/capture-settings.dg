@@ -1,0 +1,9 @@
+# The three capture settings, which is the one part of the lesson format that is not obvious
+# from reading a lesson.
+
+title The three capture settings
+size 900 340
+
+strip c 60 80 260 120 "capture=stdout|stored on disk|the page may quote it" "capture=drop|runs, then discarded|for output that varies" "capture=none|no marker at all|for a block holding a type"
+
+note why 60 240 780 60 "A marker is a statement, and a statement cannot come after a declaration" "in a file of top level statements. That is the only reason the third setting exists."

@@ -33,14 +33,23 @@ internal static class LessonCommand
 
     internal static int Run(string path, bool write)
     {
+        // Diagrams first. They are cheap, they fail fast, and a lesson that quotes a picture wants
+        // the picture to exist before the page is assembled around it.
+        var problems = Diagrams.Run(path, write, out var drawings);
+
         var lessons = Discover(path);
         if (lessons.Count == 0)
         {
-            Console.Error.WriteLine($"xray: no lesson under {path}, a lesson is a directory holding {SourceName}");
+            // A path holding diagrams and no lessons is a normal thing, because the docs
+            // directory is exactly that. A path holding neither is somebody's typo.
+            if (drawings > 0)
+            {
+                return problems == 0 ? 0 : 1;
+            }
+
+            Console.Error.WriteLine($"xray: nothing to build under {path}, a lesson is a directory holding {SourceName}");
             return 2;
         }
-
-        var problems = 0;
 
         foreach (var lesson in lessons)
         {
@@ -105,14 +114,14 @@ internal static class LessonCommand
             }
 
             problems += Machine(directory, name, block.Id, output);
-            problems += Settle(Path.Combine(directory, ExpectedDirectory, block.Id + ".txt"), output, write);
+            problems += Generated.Settle(Path.Combine(directory, ExpectedDirectory, block.Id + ".txt"), output, write);
         }
 
         var prosePath = Path.Combine(directory, ProseName);
         if (File.Exists(prosePath))
         {
             var page = Render(directory, prosePath, blocks, captured);
-            problems += Settle(Path.Combine(directory, PageName), page, write);
+            problems += Generated.Settle(Path.Combine(directory, PageName), page, write);
         }
 
         return problems;
@@ -194,7 +203,7 @@ internal static class LessonCommand
         var stderr = process.StandardError.ReadToEndAsync();
         process.WaitForExit();
 
-        return (process.ExitCode, Normalise(stdout.GetAwaiter().GetResult()), Normalise(stderr.GetAwaiter().GetResult()));
+        return (process.ExitCode, Generated.Normalise(stdout.GetAwaiter().GetResult()), Generated.Normalise(stderr.GetAwaiter().GetResult()));
     }
 
     /// <summary>
@@ -364,69 +373,4 @@ internal static class LessonCommand
                 throw new LessonException($"{prosePath}: '{kind}' is not a kind of transclusion");
         }
     }
-
-    /// <summary>
-    /// Writes the file, or reports the first place it differs from what is on disk.
-    /// </summary>
-    private static int Settle(string path, string content, bool write)
-    {
-        var relative = Path.GetRelativePath(Directory.GetCurrentDirectory(), path);
-
-        if (write)
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            var before = File.Exists(path) ? Normalise(File.ReadAllText(path)) : null;
-            if (before != content)
-            {
-                File.WriteAllText(path, content);
-                Console.WriteLine($"  wrote {relative}");
-            }
-
-            return 0;
-        }
-
-        if (!File.Exists(path))
-        {
-            Console.Error.WriteLine($"{relative}: missing, run: dotnet run --project tools/xray -- build lessons");
-            return 1;
-        }
-
-        var actual = Normalise(File.ReadAllText(path));
-        if (actual == content)
-        {
-            return 0;
-        }
-
-        Console.Error.WriteLine($"{relative}: does not match what the code produces");
-        Report(content, actual);
-        return 1;
-    }
-
-    private static void Report(string wanted, string found)
-    {
-        var a = wanted.Split('\n');
-        var b = found.Split('\n');
-        var shown = 0;
-
-        for (var i = 0; i < Math.Max(a.Length, b.Length) && shown < 3; i++)
-        {
-            var left = i < a.Length ? a[i] : "(end of file)";
-            var right = i < b.Length ? b[i] : "(end of file)";
-            if (left == right)
-            {
-                continue;
-            }
-
-            Console.Error.WriteLine($"  line {i + 1} produced: {left}");
-            Console.Error.WriteLine($"  line {i + 1} on disk:  {right}");
-            shown++;
-        }
-    }
-
-    /// <summary>
-    /// One line ending, everywhere. Windows would otherwise disagree with the other three
-    /// platforms about every line of every expected file, which is a real difference about
-    /// nothing.
-    /// </summary>
-    private static string Normalise(string text) => text.Replace("\r\n", "\n", StringComparison.Ordinal);
 }

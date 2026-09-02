@@ -11,6 +11,8 @@ A lesson is a directory. Everything in it is either something a person wrote or 
 | `expected/*.txt` | The tool | What each block printed, one file per block. |
 | `lesson.md` | The tool | The page. This is what a reader opens. |
 
+![How a lesson becomes a page](diagrams/lesson-pipeline.svg)
+
 Two commands do all of it.
 
 ```
@@ -49,6 +51,8 @@ Running each block in a separate process would be tidier and would be wrong. A l
 Everything printed before the first marker is discarded, so a cold restore that writes to standard output cannot corrupt the first block.
 
 ## The three capture settings
+
+![The three capture settings](diagrams/capture-settings.svg)
 
 `capture=stdout` is the normal one. The block is marked, its output is stored in `expected/<id>.txt`, and the page can quote it. Use it when the output is the same on every machine that runs it.
 

@@ -1,0 +1,25 @@
+# How a lesson becomes a page. Coordinates are chosen by eye and mean nothing except that
+# the written things are at the top and the produced things are at the bottom.
+
+title How a lesson becomes a page
+size 980 640
+
+box src   40  60 260 110 "lesson.cs" "one program, with named" "regions in it called blocks"
+box prose 330 60 300 110 "lesson.src.md" "prose with holes in it, where" "the code and the output go"
+box gates 660 60 280 110 "gates.json" "the question asked before" "the answer is shown"
+
+box  tool 320 250 340 90 "xray build" "runs the program once, then cuts" "the output at the markers"
+note chk   40 250 240 90 "xray check" "the same code, one flag," "fails on a stale file"
+
+box out1  40 430 260 100 "expected/*.txt" "what each block printed," "one file per block"
+box out2 330 430 300 100 "lesson.md" "the page a reader opens" "and never edits"
+box out3 660 430 280 100 "diagram.svg" "the picture, generated" "from a .dg file"
+
+note foot 40 555 900 44 "The top row is written by a person. The bottom row is produced. No file is both."
+
+arrow src tool
+arrow prose tool
+arrow gates tool
+arrow tool out1
+arrow tool out2
+arrow tool out3
