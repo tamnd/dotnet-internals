@@ -1,0 +1,16 @@
+# The two shapes a reader has to be able to tell apart on sight. Both heaps hold text, and they
+# store it in two different encodings with two different ways of saying where a string stops.
+
+title Two heaps, two ways of ending a string
+
+size 980 600
+
+box names 40 70 320 60 "#Strings holds Catalogue" "UTF-8, then a zero byte"
+
+strip s 40 155 88 70 "43|C" "61|a" "74|t" "61|a" "6C|l" "6F|o" "67|g" "75|u" "65|e" "00|the end"
+
+box lits 40 285 320 60 "#US holds heap" "UTF-16, and the length comes first"
+
+strip u 40 370 145 70 "09|the length" "68 00|h" "65 00|e" "61 00|a" "70 00|p" "00|flag byte"
+
+note count 40 480 900 70 "The 9 counts the bytes after it, which is four characters at two bytes each plus the flag byte." "So a string of n characters stores 2n plus 1, and the flag says whether any character needs more than a byte."

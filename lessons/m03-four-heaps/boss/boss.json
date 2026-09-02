@@ -1,0 +1,18 @@
+{
+  "title": "Walk the user string heap properly",
+  "brief": "The walk in the lesson cheated. It read every length prefix as a single byte, which is true for every string in this assembly and false in general. A length in a heap is a compressed unsigned integer: one byte, two bytes or four, and the top bits of the first byte say which. The rule is in ECMA-335 II.23.2 and it is four lines long. Write it, walk #US with it, and answer the three questions below. Your answers are about the fixture assembly next door, so they are the same numbers whether you cheat or not, and the point is the code that got you there.",
+  "questions": [
+    {
+      "key": "count",
+      "ask": "How many strings are in the #US heap?"
+    },
+    {
+      "key": "longest",
+      "ask": "Which of them is the longest, in characters?"
+    },
+    {
+      "key": "bytes",
+      "ask": "How many bytes does that longest entry take up in the heap, counting its length prefix and its trailing flag byte?"
+    }
+  ]
+}

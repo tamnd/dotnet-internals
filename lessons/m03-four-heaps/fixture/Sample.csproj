@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The thing the lesson looks at. It is a project rather than a committed dll, because a
+    committed dll is a number typed by a human in the one format nobody can review.
+
+    Nothing in here is arbitrary. Every name and every literal was picked to be visible in one of
+    the four heaps, and the lesson points at each one by name.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Sample</AssemblyName>
+    <RootNamespace>Sample</RootNamespace>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+</Project>

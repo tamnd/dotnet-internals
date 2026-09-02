@@ -1,0 +1,4 @@
+the literal, as UTF-8, inside #Strings:   False
+the literal, as UTF-16, inside #US:       True
+the type name, as UTF-8, inside #Strings: True
+the type name, as UTF-16, inside #US:     False

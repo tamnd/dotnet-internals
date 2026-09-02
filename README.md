@@ -2,7 +2,9 @@
 
 A complete teardown of .NET 11, taught from zero, where every claim is something you watch happen on a runtime you installed with one command. The same work produces a second artifact: a specification precise enough to write a garbage collector the real CLR loads, or your own runtime from scratch, with a conformance scorecard that says how far you got.
 
-**Status: M0, not started.** The plan is in the [milestones](https://github.com/tamnd/dotnet-internals/milestones), the decisions that have not been made yet are in the [open questions](https://github.com/tamnd/dotnet-internals/issues?q=is%3Aissue+label%3Akind%2Fopen-question), and M0 exists to try to kill the project cheaply before anything expensive is built.
+**Status: M0, under way.** The plan is in the [milestones](https://github.com/tamnd/dotnet-internals/milestones), the decisions that have not been made yet are in the [open questions](https://github.com/tamnd/dotnet-internals/issues?q=is%3Aissue+label%3Akind%2Fopen-question), and M0 exists to try to kill the project cheaply before anything expensive is built.
+
+The pilot lesson is [M03, the four heaps](lessons/m03-four-heaps/lesson.md). Every listing on that page is a region of a program that runs, every output under it is what that program printed, and CI regenerates the whole page on four platforms and fails if what it produces is not what is committed.
 
 ## Who this is for
 

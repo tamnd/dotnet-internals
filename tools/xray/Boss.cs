@@ -111,16 +111,25 @@ internal static class Boss
     /// Runs the reader's file and tells them what is wrong with it, without telling them the
     /// answer.
     /// </summary>
-    internal static int Grade(string lesson)
+    internal static int Grade(string path)
     {
-        if (!Has(lesson))
+        if (!Has(path))
         {
-            Console.Error.WriteLine($"xray boss: no boss fight in {lesson}");
+            Console.Error.WriteLine($"xray boss: no boss fight in {path}");
             return 2;
         }
 
+        // Everything below runs a program with the lesson as its working directory, so a relative
+        // path from wherever the reader is standing has to become an absolute one first.
+        var lesson = Path.GetFullPath(path);
         var fight = Load(lesson);
         var expected = Expected(lesson);
+
+        // A fight usually reads the lesson's fixture, and somebody arriving here has not
+        // necessarily run the build. Building it costs a second when it is already up to date and
+        // saves a confusing missing file message when it is not.
+        LessonCommand.BuildFixture(lesson);
+
         var attempt = Answer(lesson, Stub);
 
         Console.WriteLine(fight.Title);

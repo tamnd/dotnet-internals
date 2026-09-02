@@ -1,0 +1,4 @@
+bytes at that offset: 436174616C6F677565
+the byte after them:  00
+decoded as UTF-8:     Catalogue
+and the reader says:  Catalogue
