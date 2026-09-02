@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>BrowserProbe</RootNamespace>
+  </PropertyGroup>
+
+  <!-- The same Probe.cs the browser app compiles, so the two columns in the writeup are the
+       same checks and not two lists that only look alike. -->
+  <ItemGroup>
+    <Compile Include="../Probe.cs" />
+    <EmbeddedResource Include="../Sample/bin/Release/netstandard2.0/Sample.dll" LogicalName="BrowserProbe.Sample.dll" />
+  </ItemGroup>
+
+</Project>
