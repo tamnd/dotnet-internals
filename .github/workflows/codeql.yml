@@ -26,7 +26,7 @@ jobs:
       actions: read
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       # Buildless analysis. This repository has one small tool in it and no build secrets, so
       # there is nothing to gain from compiling twice.
       - uses: github/codeql-action/init@v4

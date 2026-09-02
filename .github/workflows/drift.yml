@@ -16,7 +16,7 @@ jobs:
   upstream:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # No issue is opened while the pin is still null, because every run would open the same
       # one. This writes to the job summary until the pin lands, and the step that files an
