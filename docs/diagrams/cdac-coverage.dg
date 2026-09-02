@@ -1,0 +1,23 @@
+# Three sources feed one section, and the three things missing from all of them are not a
+# ragged edge. They are the tail of a structure, the policy inside a heuristic, and the inside
+# of the compiler, and each is missing for a different reason.
+
+title Where a blueprint section 2 gets its facts
+
+size 980 640
+
+box types   40  90 280 110 "the data descriptor" "200 types, 807 fields," "real offsets, per build"
+box globals 350  90 280 110 "the globals table" "188 addresses and masks," "including flag values"
+box specs   660  90 280 110 "35 contract specs" "prose and pseudocode" "for reading all of it"
+
+box sec2    350 280 280 110 "blueprint section 2" "structures, sizes and" "invariants to build from"
+
+note score  660 280 280 110 "74 per cent of the names" "a blueprint needs are" "published. For the three" "betting on cDAC, 89."
+
+note tail   40 460 280 140 "Not published: the tail." "Vtable slots, optional" "members and the generic" "dictionary sit past the" "fixed header."
+note policy 350 460 280 140 "Not published: policy." "gc.cpp budgets, inlining" "decisions and the tier" "promotion thresholds are" "computed, not declared."
+note jit    660 460 280 140 "Not published: the JIT." "GenTree, the flow graph" "and the phase list are" "compiler internals and" "never sit in a heap."
+
+arrow types sec2
+arrow globals sec2
+arrow specs sec2
