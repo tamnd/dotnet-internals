@@ -1,0 +1,18 @@
+{
+  "title": "Read the lesson the way the tool reads it",
+  "brief": "The page above told you what a block is. This asks whether you can find them yourself. Open lesson.cs, work out the three answers below, and print each one from boss.cs. Read the file with code rather than counting by eye, because counting by eye stops working around lesson four and the habit is easier to build now.",
+  "questions": [
+    {
+      "key": "directives",
+      "ask": "How many blocks does lesson.cs declare?"
+    },
+    {
+      "key": "stored",
+      "ask": "How many of those blocks have their output stored in an expected file?"
+    },
+    {
+      "key": "first",
+      "ask": "What is the id of the first block in the file?"
+    }
+  ]
+}

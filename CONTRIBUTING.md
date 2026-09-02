@@ -22,7 +22,7 @@ A codegen or disassembly claim with no environment banner. Generated code is a f
 
 A blueprint section that says "see the chapter". A blueprint is read by somebody implementing from scratch who has not read the chapter and does not have to.
 
-A boss fight a human has to grade.
+A boss fight a human has to grade. There is a grader now, `xray boss`, and [the lesson format](docs/lesson-format.md) says what a fight is made of. A fight whose starting file already passes counts as no fight at all, and the build says so.
 
 A performance claim asserted as a test. Measure it, print it, discuss it. Never assert on a timing, because a reader on a slow laptop must not see a red failure that means their computer is slow.
 
@@ -47,6 +47,8 @@ dotnet run --project tools/xray -- lint
 Commit what that wrote, including `lesson.md` and everything under `expected/`. CI runs the same build on four platforms with `check` instead of `build`, so a generated file that is out of date fails the pull request rather than reaching a reader.
 
 If a lesson prints something that differs between two machines, mark the block `capture=drop` and describe the output in prose. Do not go looking for a way to make the expected file match on your laptop.
+
+If the lesson has a boss fight, write `boss/solution.cs` first and then take things out of it to make `boss/boss.cs`. Doing it the other way round produces a fight the solution does not quite answer, and you find that out from the build rather than from thinking about it.
 
 ## Prose rules
 

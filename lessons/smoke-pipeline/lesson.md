@@ -88,6 +88,22 @@ The output on the page is the output that region produced, on a machine you can 
 
 Changing the code and leaving the numbers alone is not possible, because the check that regenerates the page is the check that fails the build.
 
+## Boss fight: Read the lesson the way the tool reads it
+
+The page above told you what a block is. This asks whether you can find them yourself. Open lesson.cs, work out the three answers below, and print each one from boss.cs. Read the file with code rather than counting by eye, because counting by eye stops working around lesson four and the habit is easier to build now.
+
+- **directives** How many blocks does lesson.cs declare?
+- **stored** How many of those blocks have their output stored in an expected file?
+- **first** What is the id of the first block in the file?
+
+Open `boss/boss.cs`, fill in the parts marked as yours, and run this until it stops complaining.
+
+```
+dotnet run --project tools/xray -- boss lessons/smoke-pipeline
+```
+
+The grader names the answer that is wrong and shows you what you printed. It does not tell you what the answer is. The worked solution is in the same directory, and reading it is allowed and is a worse way to learn this.
+
 ## What it does not guarantee
 
 It says nothing about whether the lesson is true, useful or well written. A pipeline can only promise that the page and the program agree with each other. Everything else is the reviewer's job, and the rules for that are in [CONTRIBUTING.md](../../CONTRIBUTING.md).
