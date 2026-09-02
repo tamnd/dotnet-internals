@@ -73,7 +73,7 @@ Two repositories are pinned rather than one, which costs something. Every citati
 |---|---|
 | `tools/xray` | The command line tool. Prints the environment banner, lints the prose rules, builds and checks lessons |
 | `lessons` | One directory per lesson. The page in each one is generated, never edited |
-| `docs` | How the machinery works. Start with [the lesson format](docs/lesson-format.md) |
+| `docs` | How the machinery works. The [lesson format](docs/lesson-format.md) and the [diagram format](docs/diagram-format.md) |
 | `.github/workflows` | CI. Everything in this repository is checked by a machine or it is not checked |
 
 Blueprints, animations and the site arrive with the milestones that build them. Nothing is committed here as a placeholder.

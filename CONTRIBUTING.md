@@ -34,12 +34,13 @@ A lesson that needs a runtime build without saying so in the second block, in bo
 
 ## Working on a lesson
 
-Read [the lesson format](docs/lesson-format.md) once. It is short and it answers most of what you are about to ask.
+Read [the lesson format](docs/lesson-format.md) once, and [the diagram format](docs/diagram-format.md) if the lesson needs a picture. They are short and they answer most of what you are about to ask.
 
 Edit `lesson.cs` and `lesson.src.md`, then regenerate.
 
 ```
 dotnet run --project tools/xray -- build lessons
+dotnet run --project tools/xray -- build docs
 dotnet run --project tools/xray -- lint
 ```
 

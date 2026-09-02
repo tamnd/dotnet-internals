@@ -89,6 +89,9 @@ jobs:
         with:
           global-json-file: global.json
       - run: dotnet run --project tools/xray -- check lessons
+      # Diagrams are generated from a text source too, so a picture cannot drift from the page
+      # around it. This is cheap and it runs everywhere for the same reason the lessons do.
+      - run: dotnet run --project tools/xray -- check docs
 
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going
