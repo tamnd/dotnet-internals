@@ -20,7 +20,7 @@ A number typed into prose. If you want to say a structure is twenty four bytes, 
 
 A codegen or disassembly claim with no environment banner. Generated code is a function of the runtime version, the build configuration, the platform, the instruction set and the tier. A listing without all five is not evidence of anything.
 
-A blueprint section that says "see the chapter". A blueprint is read by somebody implementing from scratch who has not read the chapter and does not have to.
+A blueprint section that says "see the chapter". A blueprint is read by somebody implementing from scratch who has not read the chapter and does not have to, and `xray check blueprints` looks for the words that do this.
 
 A boss fight a human has to grade. There is a grader now, `xray boss`, and [the lesson format](docs/lesson-format.md) says what a fight is made of. A fight whose starting file already passes counts as no fight at all, and the build says so.
 
@@ -49,6 +49,23 @@ Commit what that wrote, including `lesson.md` and everything under `expected/`. 
 If a lesson prints something that differs between two machines, mark the block `capture=drop` and describe the output in prose. Do not go looking for a way to make the expected file match on your laptop.
 
 If the lesson has a boss fight, write `boss/solution.cs` first and then take things out of it to make `boss/boss.cs`. Doing it the other way round produces a fight the solution does not quite answer, and you find that out from the build rather than from thinking about it.
+
+## Working on a blueprint
+
+Read [the blueprint format](docs/blueprint-format.md) first. A blueprint is a directory, not a file, and the document in it is generated.
+
+Edit `blueprint.json`, `generate.cs` and `blueprint.src.md`, then regenerate.
+
+```
+dotnet run --project tools/xray -- build blueprints
+dotnet run --project tools/xray -- lint
+```
+
+Commit `blueprint.md` and everything under `generated/` along with what you changed. CI runs `check blueprints`, which runs the generator again and fails if one byte of a generated section differs from what is committed.
+
+Three rules the tool enforces and that are worth knowing before you write rather than after. The nine sections are fixed in name and in order, and a draft leaves the ones it has not done out rather than filling them. A blueprint never points at the teaching side of the book, so no sentence in one may say lesson, chapter, as we saw, recall that, earlier we, or you will remember. A blueprint claiming to be complete has to have all nine sections.
+
+If a table in a blueprint can be derived from something the runtime or the framework already publishes, derive it. A number typed into a blueprint is the same problem as a number typed into a lesson, and it is worse here because the reader of a blueprint is implementing from it.
 
 ## Prose rules
 

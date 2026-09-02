@@ -1,0 +1,23 @@
+# Three inputs, two outputs, and one command that is also the check. The point of the shape is
+# that nothing a person writes and nothing a program produces ever share a file.
+
+title How a blueprint is put together
+
+size 980 620
+
+box gen 40 70 280 100 "generate.cs" "a program whose output" "is markdown, not numbers"
+box src 350 70 280 100 "blueprint.src.md" "the sections a person writes," "with holes in them"
+box man 660 70 280 100 "blueprint.json" "id, status, and the" "list of sources"
+
+box tool 350 230 280 90 "xray build blueprints" "runs it, then fills the holes"
+
+box out 40 390 280 100 "generated/*.md" "committed, and compared" "on every pull request"
+box page 350 390 280 100 "blueprint.md" "the document, front matter" "and header included"
+
+note chk 660 390 280 100 "xray check blueprints" "the same code with one flag" "flipped, so a stale file fails"
+
+arrow gen tool
+arrow src tool
+arrow man tool
+arrow tool out
+arrow tool page

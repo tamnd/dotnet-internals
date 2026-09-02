@@ -73,12 +73,13 @@ Two repositories are pinned rather than one, which costs something. Every citati
 
 | Path | What is in it |
 |---|---|
-| `tools/xray` | The command line tool. Prints the environment banner, lints the prose rules, builds and checks lessons |
+| `tools/xray` | The command line tool. Prints the environment banner, lints the prose rules, builds and checks lessons, diagrams and blueprints |
 | `lessons` | One directory per lesson. The page in each one is generated, never edited |
-| `docs` | How the machinery works. The [lesson format](docs/lesson-format.md) and the [diagram format](docs/diagram-format.md) |
+| `blueprints` | One directory per blueprint. The document in each one is generated, and so are the sections that can be |
+| `docs` | How the machinery works. The [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md) and the [blueprint format](docs/blueprint-format.md) |
 | `.github/workflows` | CI. Everything in this repository is checked by a machine or it is not checked |
 
-Blueprints, animations and the site arrive with the milestones that build them. Nothing is committed here as a placeholder.
+The first blueprint is [BP-METADATA](blueprints/bp-metadata/blueprint.md), a draft with two of its subsections generated rather than typed. The animations and the site arrive with the milestones that build them. Nothing is committed here as a placeholder.
 
 ## Contributing
 

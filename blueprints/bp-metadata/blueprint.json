@@ -1,0 +1,10 @@
+{
+  "id": "BP-METADATA",
+  "title": "tables, heaps and tokens",
+  "part": "II",
+  "status": "draft",
+  "sources": [
+    "ECMA-335, 6th edition, June 2012, Partition II",
+    "System.Reflection.Metadata, from the SDK pinned in global.json"
+  ]
+}

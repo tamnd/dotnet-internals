@@ -29,7 +29,11 @@ internal static class Generated
 
         if (!File.Exists(path))
         {
-            Console.Error.WriteLine($"{relative}: missing, run: dotnet run --project tools/xray -- build lessons");
+            // The first segment of the path is the thing to rebuild, so the message names the
+            // command that produces this particular file rather than one that produces some of
+            // them and leaves somebody wondering why nothing happened.
+            var where = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[0];
+            Console.Error.WriteLine($"{relative}: missing, run: dotnet run --project tools/xray -- build {where}");
             return 1;
         }
 

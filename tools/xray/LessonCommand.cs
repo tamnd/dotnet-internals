@@ -28,20 +28,21 @@ internal static class LessonCommand
     private const string ProseName = "lesson.src.md";
     private const string PageName = "lesson.md";
     private const string ExpectedDirectory = "expected";
-    private const string RunDirectory = ".xray";
 
     internal static int Run(string path, bool write)
     {
         // Diagrams first. They are cheap, they fail fast, and a lesson that quotes a picture wants
         // the picture to exist before the page is assembled around it.
         var problems = Diagrams.Run(path, write, out var drawings);
+        problems += Blueprints.Run(path, write, out var blueprints);
 
         var lessons = Discover(path);
         if (lessons.Count == 0)
         {
-            // A path holding diagrams and no lessons is a normal thing, because the docs
-            // directory is exactly that. A path holding neither is somebody's typo.
-            if (drawings > 0)
+            // A path holding diagrams and no lessons is a normal thing, because the docs and
+            // blueprints directories are exactly that. A path holding none of the three is
+            // somebody's typo.
+            if (drawings > 0 || blueprints > 0)
             {
                 return problems == 0 ? 0 : 1;
             }
@@ -95,7 +96,7 @@ internal static class LessonCommand
 
         BuildFixture(directory);
 
-        var captured = Execute(directory, lines, blocks);
+        var captured = Blocks.Execute(directory, lines, blocks, "lesson");
         var problems = 0;
 
         foreach (var block in blocks)
@@ -151,84 +152,12 @@ internal static class LessonCommand
         }
     }
 
-    private static Dictionary<string, string> Execute(string directory, IReadOnlyList<string> lines, IReadOnlyList<Block> blocks)
-    {
-        var runDirectory = Path.Combine(directory, RunDirectory);
-        var runFile = Path.Combine(runDirectory, "run.cs");
-
-        try
-        {
-            Directory.CreateDirectory(runDirectory);
-            File.WriteAllText(runFile, Blocks.Rewrite(lines, blocks));
-
-            var (exit, stdout, stderr) = Runner.Dotnet(directory, ["run", Path.Combine(RunDirectory, "run.cs")]);
-            if (exit != 0)
-            {
-                throw new LessonException($"{Path.GetFileName(directory)}: the lesson exited with {exit}\n{stderr}");
-            }
-
-            return Split(stdout);
-        }
-        finally
-        {
-            if (Directory.Exists(runDirectory))
-            {
-                Directory.Delete(runDirectory, recursive: true);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Cuts one program's output into one piece per block. Everything before the first marker is
-    /// dropped, which is what makes build chatter from a cold restore harmless.
-    /// </summary>
-    private static Dictionary<string, string> Split(string stdout)
-    {
-        var captured = new Dictionary<string, string>(StringComparer.Ordinal);
-        var current = (string?)null;
-        var body = new List<string>();
-
-        foreach (var line in stdout.Split('\n'))
-        {
-            if (line.StartsWith(Blocks.MarkerPrefix, StringComparison.Ordinal))
-            {
-                Flush();
-                current = line[Blocks.MarkerPrefix.Length..].Trim();
-                body.Clear();
-                continue;
-            }
-
-            if (current is not null)
-            {
-                body.Add(line);
-            }
-        }
-
-        Flush();
-        return captured;
-
-        void Flush()
-        {
-            if (current is null)
-            {
-                return;
-            }
-
-            while (body.Count > 0 && body[^1].Length == 0)
-            {
-                body.RemoveAt(body.Count - 1);
-            }
-
-            captured[current] = body.Count == 0 ? string.Empty : string.Join('\n', body) + "\n";
-        }
-    }
-
     /// <summary>
     /// Rejects captured output that carries something about the machine that produced it. A path
     /// out of somebody's home directory in an expected file is a file that can only ever match on
     /// one laptop, and it fails on the fourth platform instead of in review.
     /// </summary>
-    private static int Machine(string directory, string name, string id, string output)
+    internal static int Machine(string directory, string name, string id, string output)
     {
         var problems = 0;
 

@@ -1,0 +1,22 @@
+# The one encoding a metadata reader is most often subtly wrong about. A column that can point at
+# several tables carries the row number and a small tag in the same value, and the number of bits
+# the tag takes depends on how many tables the column is allowed to name.
+
+title How one value names a table and a row
+
+size 980 620
+
+box value 40 90 260 100 "A MemberRefParent column" "holding 17" "in two bytes"
+
+strip split 340 90 180 100 "row 2|17 shifted right by 3" "tag 1|the low 3 bits"
+
+box look 740 90 200 100 "tag 1 is TypeRef" "the tag list is fixed"
+
+box result 340 290 340 100 "Row 2 of TypeRef" "which is where this column points"
+
+arrow value split.0
+arrow split.1 look
+arrow look result
+arrow split.0 result
+
+note why 40 440 900 120 "MemberRefParent can name five tables, so the tag needs three bits and the row number gets thirteen." "Assume the wrong number of tag bits and you read a plausible row from a plausible table." "Nothing in the value says which coded index it is. The column it sits in is what decides that."
