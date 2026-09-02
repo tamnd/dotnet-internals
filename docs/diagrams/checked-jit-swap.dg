@@ -1,0 +1,24 @@
+# The whole point of the picture is that only one box changes. The runtime, the app and the
+# installer are the ones a reader already has, and the swapped file is a single download.
+
+title Swapping the JIT under a runtime you did not build
+
+size 980 570
+
+box app 40 70 260 100 "your app" "an ordinary dll, built" "by an ordinary SDK"
+box host 350 70 280 100 "stock release runtime" "installed with one command," "nothing built from source"
+
+box stock 40 240 260 110 "libclrjit, shipped" "the release JIT, next to" "the runtime. No dump switches"
+box checked 350 240 280 110 "libclrjit_checked, added" "the checked JIT for the same" "release branch, one download"
+
+box var 680 240 260 110 "DOTNET_JitName" "names the file to load," "so nothing is overwritten"
+
+box dump 350 430 280 100 "DOTNET_JitDump works" "four thousand lines of phases" "for one named method"
+
+note cost 680 430 260 100 "about twice the JIT time" "and no change to the code" "the JIT produces"
+
+arrow app host
+arrow host stock
+arrow host checked
+arrow var checked
+arrow checked dump
