@@ -92,6 +92,11 @@ jobs:
       # Diagrams are generated from a text source too, so a picture cannot drift from the page
       # around it. This is cheap and it runs everywhere for the same reason the lessons do.
       - run: dotnet run --project tools/xray -- check docs
+      # The blueprints are the specification half of the project, and the claim they rest on is
+      # that their tables are produced rather than transcribed. This step is what makes that
+      # claim checkable: it runs the generators and fails if a single byte of a generated
+      # section differs from what is committed.
+      - run: dotnet run --project tools/xray -- check blueprints
 
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going

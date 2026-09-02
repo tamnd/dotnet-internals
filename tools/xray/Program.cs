@@ -51,7 +51,7 @@ internal static class Program
         Console.WriteLine();
         Console.WriteLine("  xray banner        Print the environment every claim on a page depends on.");
         Console.WriteLine("  xray lint [path]   Check the prose rules across every markdown file under path.");
-        Console.WriteLine("  xray build [path]  Draw every diagram and run every lesson under path, writing what they produce.");
+        Console.WriteLine("  xray build [path]  Draw the diagrams, run the lessons and regenerate the blueprints under path.");
         Console.WriteLine("  xray check [path]  The same work, and fail if the committed files differ from it.");
         Console.WriteLine("  xray boss <path>   Grade your answer to one lesson's boss fight.");
         return 0;

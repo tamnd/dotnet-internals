@@ -58,6 +58,7 @@ internal static class Blocks
 
     private const string Open = "//# block";
     private const string Close = "//# end";
+    private const string RunDirectory = ".xray";
 
     /// <summary>
     /// Parses a lesson source file. Throws <see cref="LessonException"/> on a malformed
@@ -165,6 +166,87 @@ internal static class Blocks
         }
 
         return text.ToString();
+    }
+
+    /// <summary>
+    /// Runs a block file once and hands back what each block printed.
+    /// </summary>
+    /// <remarks>
+    /// One process, not one per block, because the file is a program and the fourth block usually
+    /// depends on what the first one opened. The rewritten copy goes in a scratch directory that
+    /// is deleted afterwards, so a failed run does not leave something behind that the next run
+    /// picks up and nobody notices.
+    /// </remarks>
+    internal static Dictionary<string, string> Execute(string directory, IReadOnlyList<string> lines, IReadOnlyList<Block> blocks, string what)
+    {
+        var runDirectory = Path.Combine(directory, RunDirectory);
+        var runFile = Path.Combine(runDirectory, "run.cs");
+
+        try
+        {
+            System.IO.Directory.CreateDirectory(runDirectory);
+            File.WriteAllText(runFile, Rewrite(lines, blocks));
+
+            var (exit, stdout, stderr) = Runner.Dotnet(directory, ["run", Path.Combine(RunDirectory, "run.cs")]);
+            if (exit != 0)
+            {
+                throw new LessonException($"{Path.GetFileName(directory)}: the {what} exited with {exit}\n{stderr}");
+            }
+
+            return Split(stdout);
+        }
+        finally
+        {
+            if (System.IO.Directory.Exists(runDirectory))
+            {
+                System.IO.Directory.Delete(runDirectory, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Cuts one program's output into one piece per block. Everything before the first marker is
+    /// dropped, which is what makes build chatter from a cold restore harmless.
+    /// </summary>
+    private static Dictionary<string, string> Split(string stdout)
+    {
+        var captured = new Dictionary<string, string>(StringComparer.Ordinal);
+        var current = (string?)null;
+        var body = new List<string>();
+
+        foreach (var line in stdout.Split('\n'))
+        {
+            if (line.StartsWith(MarkerPrefix, StringComparison.Ordinal))
+            {
+                Flush();
+                current = line[MarkerPrefix.Length..].Trim();
+                body.Clear();
+                continue;
+            }
+
+            if (current is not null)
+            {
+                body.Add(line);
+            }
+        }
+
+        Flush();
+        return captured;
+
+        void Flush()
+        {
+            if (current is null)
+            {
+                return;
+            }
+
+            while (body.Count > 0 && body[^1].Length == 0)
+            {
+                body.RemoveAt(body.Count - 1);
+            }
+
+            captured[current] = body.Count == 0 ? string.Empty : string.Join('\n', body) + "\n";
+        }
     }
 
     private static string Capture(string path, int line, Dictionary<string, string> attributes)
