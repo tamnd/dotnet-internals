@@ -1,0 +1,26 @@
+# The loop a boss fight puts the reader in. The point of the picture is the arrow that goes back,
+# because every other part of the pipeline runs once and this is the part that repeats.
+#
+# The three files across the top are written before the reader arrives. The three boxes below are
+# what happens once they do.
+
+title How a boss fight is graded
+
+size 980 660
+
+box json  40  70 260 100 "boss.json" "the title, the brief and" "the answers, named"
+box sol  360  70 260 100 "solution.cs" "the worked answer, run on" "every build"
+box ans  680  70 260 100 "answers.txt" "one hash per answer," "generated, never typed"
+
+box stub   40 240 260 100 "boss.cs" "yours. print one line" "per answer and run it"
+box grade 400 240 260 100 "xray boss" "runs your file, hashes" "what it printed, compares"
+box says  400 400 260 100 "what you get back" "which answers are wrong" "and what you printed"
+
+arrow json sol
+arrow sol ans
+arrow ans grade "compared against"
+arrow stub grade
+arrow grade says
+arrow says stub "go again"
+
+note guard 40 530 900 70 "The build runs boss.cs too and requires it to fail. A file that already passes is a fight with nothing in it," "and that happens when a later edit to the solution quietly makes the stub right. A green build looks the same."

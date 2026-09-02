@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text;
 
 namespace ClrXray;
@@ -117,6 +116,11 @@ internal static class LessonCommand
             problems += Generated.Settle(Path.Combine(directory, ExpectedDirectory, block.Id + ".txt"), output, write);
         }
 
+        if (Boss.Has(directory))
+        {
+            problems += Boss.Build(directory, write);
+        }
+
         var prosePath = Path.Combine(directory, ProseName);
         if (File.Exists(prosePath))
         {
@@ -140,7 +144,7 @@ internal static class LessonCommand
             return;
         }
 
-        var (exit, _, stderr) = Start(directory, ["build", fixture, "--configuration", "Release", "--nologo", "--verbosity", "quiet"]);
+        var (exit, _, stderr) = Runner.Dotnet(directory, ["build", fixture, "--configuration", "Release", "--nologo", "--verbosity", "quiet"]);
         if (exit != 0)
         {
             throw new LessonException($"{Path.GetFileName(directory)}: the fixture did not build\n{stderr}");
@@ -157,7 +161,7 @@ internal static class LessonCommand
             Directory.CreateDirectory(runDirectory);
             File.WriteAllText(runFile, Blocks.Rewrite(lines, blocks));
 
-            var (exit, stdout, stderr) = Start(directory, ["run", Path.Combine(RunDirectory, "run.cs")]);
+            var (exit, stdout, stderr) = Runner.Dotnet(directory, ["run", Path.Combine(RunDirectory, "run.cs")]);
             if (exit != 0)
             {
                 throw new LessonException($"{Path.GetFileName(directory)}: the lesson exited with {exit}\n{stderr}");
@@ -172,38 +176,6 @@ internal static class LessonCommand
                 Directory.Delete(runDirectory, recursive: true);
             }
         }
-    }
-
-    private static (int Exit, string Out, string Error) Start(string directory, string[] arguments)
-    {
-        using var process = new Process();
-        process.StartInfo = new ProcessStartInfo("dotnet")
-        {
-            WorkingDirectory = directory,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-        };
-
-        foreach (var argument in arguments)
-        {
-            process.StartInfo.ArgumentList.Add(argument);
-        }
-
-        // A lesson's output is compared byte for byte across four platforms, so anything that
-        // formats a number differently on one of them has to be pinned here rather than argued
-        // about later. A lesson that is actually about culture will need a way to turn this off,
-        // and it can have one when it is written.
-        process.StartInfo.Environment["DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"] = "1";
-        process.StartInfo.Environment["DOTNET_NOLOGO"] = "1";
-        process.StartInfo.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
-
-        process.Start();
-        var stdout = process.StandardOutput.ReadToEndAsync();
-        var stderr = process.StandardError.ReadToEndAsync();
-        process.WaitForExit();
-
-        return (process.ExitCode, Generated.Normalise(stdout.GetAwaiter().GetResult()), Generated.Normalise(stderr.GetAwaiter().GetResult()));
     }
 
     /// <summary>
@@ -316,21 +288,26 @@ internal static class LessonCommand
 
             var inner = trimmed[2..^2].Trim();
             var colon = inner.IndexOf(':', StringComparison.Ordinal);
-            if (colon <= 0)
+
+            // Most holes name a thing, as in {{block:layout}}. The boss fight does not, because a
+            // lesson has one of those and naming it would only give somebody a second name for it
+            // to disagree with.
+            var kind = colon < 0 ? inner : inner[..colon];
+            var id = colon < 0 ? string.Empty : inner[(colon + 1)..];
+
+            if (kind.Length == 0)
             {
                 throw new LessonException($"{prosePath}: '{trimmed}' is not a transclusion");
             }
 
-            var kind = inner[..colon];
-            var id = inner[(colon + 1)..];
-
-            rendered.Append(Transclude(prosePath, kind, id, byId, captured, gates)).Append('\n');
+            rendered.Append(Transclude(directory, prosePath, kind, id, byId, captured, gates)).Append('\n');
         }
 
         return rendered.ToString().TrimEnd('\n') + "\n";
     }
 
     private static string Transclude(
+        string directory,
         string prosePath,
         string kind,
         string id,
@@ -368,6 +345,14 @@ internal static class LessonCommand
                 }
 
                 return Gates.Render(gate);
+
+            case "boss":
+                if (!Boss.Has(directory))
+                {
+                    throw new LessonException($"{prosePath}: the page asks for a boss fight and there is no {Boss.Directory} directory");
+                }
+
+                return Boss.Render(directory, Boss.Load(directory));
 
             default:
                 throw new LessonException($"{prosePath}: '{kind}' is not a kind of transclusion");

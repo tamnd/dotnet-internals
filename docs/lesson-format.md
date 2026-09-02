@@ -8,6 +8,10 @@ A lesson is a directory. Everything in it is either something a person wrote or 
 | `lesson.src.md` | You | The prose, with holes in it where the code and the output go. |
 | `gates.json` | You | The prediction gates, if the lesson has any. |
 | `fixture/` | You | An optional tiny project the lesson reads, built before the lesson runs. |
+| `boss/boss.json` | You | The boss fight: a title, a brief, and the list of things to work out. |
+| `boss/boss.cs` | You, then the reader | The starting file, with the parts the reader has to write left out. |
+| `boss/solution.cs` | You | The worked answer, which is also what generates the answer file. |
+| `boss/answers.txt` | The tool | A hash per answer, so the grader can be right without the answer being in a file. |
 | `expected/*.txt` | The tool | What each block printed, one file per block. |
 | `lesson.md` | The tool | The page. This is what a reader opens. |
 
@@ -62,13 +66,14 @@ Everything printed before the first marker is discarded, so a cold restore that 
 
 ## Transclusion
 
-`lesson.src.md` is ordinary markdown with three kinds of hole in it. A hole is a line of its own, and the whole line is replaced.
+`lesson.src.md` is ordinary markdown with four kinds of hole in it. A hole is a line of its own, and the whole line is replaced.
 
 | Hole | Becomes |
 |---|---|
 | `{{block:tables}}` | The source of that block, in a fenced C# listing. |
 | `{{output:tables}}` | What that block printed, in a fenced text listing. |
 | `{{gate:g1}}` | A prediction gate, folded so the answer is not visible until it is opened. |
+| `{{boss}}` | The boss fight, written out from `boss/boss.json`. It names nothing because a lesson has one. |
 
 There is no way to write output into the page by hand. There is no way to quote a block that does not exist. Both are errors that fail the build with the file and the name in the message.
 
@@ -92,6 +97,42 @@ A gate asks the reader what will happen before the output is shown to them. It l
 
 The rendered gate is a details element, so it folds on a plain GitHub page with no site build and no script. Every wrong option gets a real explanation, because a reader who picked one is the reader most likely to still be confused after the answer.
 
+## Boss fights
+
+A chapter that ends with "now try it yourself" ends with nothing, because the reader has no way to find out whether what they wrote is right, and the ones who most need to find out are the ones least able to tell. So every fight here is graded by a program.
+
+![How a boss fight is graded](diagrams/boss-fight.svg)
+
+A fight is a directory with three files in it that a person wrote. `boss.json` says what the fight is and lists the answers by name.
+
+```json
+{
+  "title": "Read the lesson the way the tool reads it",
+  "brief": "Open lesson.cs, work out the three answers below, and print each one from boss.cs.",
+  "questions": [
+    { "key": "directives", "ask": "How many blocks does lesson.cs declare?" },
+    { "key": "first", "ask": "What is the id of the first block in the file?" }
+  ]
+}
+```
+
+`boss.cs` is what the reader gets. `solution.cs` is the worked answer. Both are ordinary file based apps that run with the lesson directory as their working directory, and both report by printing one line per answer.
+
+```
+answer directives = 4
+answer first = blocks
+```
+
+The reader runs one command, as many times as it takes.
+
+```
+dotnet run --project tools/xray -- boss lessons/smoke-pipeline
+```
+
+The grader names each answer that is wrong, repeats the question, and shows what the reader printed. It does not say what the right answer is. `answers.txt` holds a hash rather than a value, which is not security and is not meant to be, since the worked solution is sitting in the same directory. It is there so the answer is not lying in plain sight in a generated file in front of somebody who has not decided to look it up yet.
+
+`build` and `check` both run `solution.cs`, regenerate `answers.txt`, and then run `boss.cs` and require it to fail. That last part is the one that earns its keep. A starting file that already passes is a fight with nothing in it, and the way that happens is never carelessness at the time, it is a later edit to the solution that quietly makes the stub correct. Nobody notices, because a green build looks the same either way.
+
 ## Fixtures
 
 A lesson that needs something to look at gets a `fixture/` directory holding a small project, and the tool builds it in Release before the lesson runs. The lesson then reads the built output by relative path.
@@ -107,6 +148,8 @@ A block that never printed its marker, which means the program exited before rea
 A gate with no correct option, or with two.
 
 A transclusion naming a block or a gate that does not exist, or asking for the output of a block that does not store any.
+
+A boss fight whose solution never prints one of the answers it promised, and a boss fight whose starting file already passes.
 
 ## Determinism
 

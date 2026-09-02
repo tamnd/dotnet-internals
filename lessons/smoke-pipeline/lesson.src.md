@@ -50,6 +50,8 @@ The output on the page is the output that region produced, on a machine you can 
 
 Changing the code and leaving the numbers alone is not possible, because the check that regenerates the page is the check that fails the build.
 
+{{boss}}
+
 ## What it does not guarantee
 
 It says nothing about whether the lesson is true, useful or well written. A pipeline can only promise that the page and the program agree with each other. Everything else is the reviewer's job, and the rules for that are in [CONTRIBUTING.md](../../CONTRIBUTING.md).
