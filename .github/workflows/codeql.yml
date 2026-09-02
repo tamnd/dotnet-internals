@@ -29,8 +29,8 @@ jobs:
       - uses: actions/checkout@v5
       # Buildless analysis. This repository has one small tool in it and no build secrets, so
       # there is nothing to gain from compiling twice.
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v4
         with:
           languages: csharp
           build-mode: none
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@v4
