@@ -18,9 +18,9 @@ Every chapter therefore produces two things. The chapter teaches, in prose and p
 
 ## What is different about it
 
-**The observation surface ships in the product.** `DOTNET_JitDisasm` has worked on the release runtime since .NET 7. `DOTNET_Interpreter` runs a method under the new IL interpreter. The event pipe, the counters and the data contracts are all in the binary you already have. A reader can watch the JIT compile their own method without building anything, and almost nobody teaches this.
+**The observation surface ships in the product.** `DOTNET_JitDisasm` has worked on the release runtime since .NET 7. `DOTNET_Interpreter` runs a method under the new IL interpreter. The event pipe, the counters and the data contracts are all in the binary you already have. A reader can watch the JIT compile their own method without building anything, and almost nobody teaches this. The one switch that is not in the release binary, `DOTNET_JitDump`, turns out to be [one download away rather than a build away](docs/probes/nightly-checked-jit.md).
 
-**The build lesson is number 97 of 99.** Ninety six lessons run on an SDK you install with one command. One bet holds that number up, and it is measured in M0 rather than assumed: whether a nightly checked JIT drops into a stock release runtime with `DOTNET_JitName=`. If it does not, the build lesson moves to number 49 and the README says so.
+**The build lesson is number 97 of 99.** Ninety six lessons run on an SDK you install with one command. One bet held that number up, and it has now been measured rather than assumed: a nightly checked JIT does drop into a stock release runtime with `DOTNET_JitName=`, on all four platforms, at about twice the JIT time. [The probe is written up here](docs/probes/nightly-checked-jit.md), including the condition nobody predicted, which is that the JIT has to come from the same release branch as the runtime.
 
 **You can replace subsystems of the shipping runtime without forking it.** There are three supported plug in points: a standalone collector behind `IGCHeap`, an alternative compiler behind `ICorJitCompiler`, and a profiler behind `ICorProfilerCallback`. The first capstone is a garbage collector, a JIT and a profiler that the production runtime loads, graded by the production runtime and by SuperPMI replay. This is not a toy runtime that pretends. It is your code inside the real one.
 
@@ -77,6 +77,7 @@ Two repositories are pinned rather than one, which costs something. Every citati
 | `lessons` | One directory per lesson. The page in each one is generated, never edited |
 | `blueprints` | One directory per blueprint. The document in each one is generated, and so are the sections that can be |
 | `docs` | How the machinery works. The [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md) and the [blueprint format](docs/blueprint-format.md) |
+| `docs/probes` | The measurements that decided something, with the script that produced each one |
 | `.github/workflows` | CI. Everything in this repository is checked by a machine or it is not checked |
 
 The first blueprint is [BP-METADATA](blueprints/bp-metadata/blueprint.md), a draft with two of its subsections generated rather than typed. The animations and the site arrive with the milestones that build them. Nothing is committed here as a placeholder.
