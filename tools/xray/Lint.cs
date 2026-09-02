@@ -64,10 +64,25 @@ internal static class Lint
         var fenced = false;
         var previousWasProse = false;
 
+        // Front matter opens on the first line and closes on the next line that is three dashes.
+        // It is the one place in a markdown file where three dashes are structure rather than a
+        // page break, so it is skipped rather than argued with.
+        var matter = lines.Length > 0 && lines[0].Trim() == "---";
+
         for (var i = 0; i < lines.Length; i++)
         {
             var line = lines[i];
             var trimmed = line.Trim();
+
+            if (matter)
+            {
+                if (i > 0 && trimmed == "---")
+                {
+                    matter = false;
+                }
+
+                continue;
+            }
 
             if (trimmed.StartsWith("```", StringComparison.Ordinal) || trimmed.StartsWith("~~~", StringComparison.Ordinal))
             {

@@ -1,0 +1,22 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!--
+    Lesson code is read before it is run, so it is written for a reader rather than for an
+    analyser. A lesson declares a variable to give it a name, prints an intermediate value it
+    could have inlined, and leaves the long form of a call in place because the long form is the
+    part being taught. None of that is worth failing a build over, and a lesson that has to be
+    contorted to satisfy a style rule stops being a lesson.
+
+    The rules that stay on are the ones about correctness. Nullable is still enabled, and the
+    analysers still run, they just do not fail the build.
+  -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <AnalysisMode>Default</AnalysisMode>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

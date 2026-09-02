@@ -65,6 +65,31 @@ jobs:
       # differs between them, and a banner that only works on Linux would hide exactly that.
       - run: dotnet run --project tools/xray --configuration Release --no-build -- banner
 
+  # Every lesson, run cold, on the same four platforms. This job is the reason no number in a
+  # lesson is typed by a person: it regenerates the output and the page from the lesson source and
+  # fails if either one differs from what is committed. A pull request that edits lesson code and
+  # leaves the numbers alone dies here rather than in review.
+  lessons:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: ubuntu-24.04-arm
+            rid: linux-arm64
+          - os: windows-latest
+            rid: win-x64
+          - os: macos-latest
+            rid: osx-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - run: dotnet run --project tools/xray -- check lessons
+
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going
   # to be pinned to. It is allowed to fail, because a broken preview is not a broken repository.

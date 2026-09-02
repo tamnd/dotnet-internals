@@ -32,6 +32,21 @@ The linter has to be told to ignore the line above, which is the only exemption 
 
 A lesson that needs a runtime build without saying so in the second block, in bold, with the time and the disk cost.
 
+## Working on a lesson
+
+Read [the lesson format](docs/lesson-format.md) once. It is short and it answers most of what you are about to ask.
+
+Edit `lesson.cs` and `lesson.src.md`, then regenerate.
+
+```
+dotnet run --project tools/xray -- build lessons
+dotnet run --project tools/xray -- lint
+```
+
+Commit what that wrote, including `lesson.md` and everything under `expected/`. CI runs the same build on four platforms with `check` instead of `build`, so a generated file that is out of date fails the pull request rather than reaching a reader.
+
+If a lesson prints something that differs between two machines, mark the block `capture=drop` and describe the output in prose. Do not go looking for a way to make the expected file match on your laptop.
+
 ## Prose rules
 
 Run `dotnet run --project tools/xray -- lint` before you push. It checks four things and CI runs the same command. The fourth is the banned word list above.

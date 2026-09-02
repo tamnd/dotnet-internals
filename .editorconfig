@@ -24,3 +24,7 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
 
 # An unused using is dead weight in a file somebody is going to read as a specification.
 dotnet_diagnostic.IDE0005.severity = warning
+
+# A type that only ever arrives out of a JSON file looks uninstantiated to the analyzer, because
+# the only call that builds one is inside the serializer. The gate model is exactly that.
+dotnet_diagnostic.CA1812.severity = none
