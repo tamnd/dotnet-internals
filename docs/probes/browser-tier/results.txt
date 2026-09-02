@@ -1,0 +1,179 @@
+Three runs of the same fifty one checks, 2 September 2026, SDK 10.0.400, .NET 10.0.11.
+Unedited apart from the headings and the blank lines between the columns.
+
+The browser column is Chrome on osx-arm64 against browser-wasm, read out of the page console.
+The desktop columns are the same Probe.cs compiled into a console app, on this laptop and on
+server1. Two desktops rather than one so that the desktop answers are CoreCLR's answers and not
+one operating system's.
+
+Addresses, hash codes, process ids and allocation counters differ every run and are not the
+point. The rows worth reading are the ones where the shape of the answer differs, and
+browser-tier.md next to this file goes through all sixteen of them.
+
+=== browser, browser-wasm ===
+
+PROBE|BEGIN
+PROBE|environment|FrameworkDescription|ok|.NET 10.0.11
+PROBE|environment|OSDescription|ok|Browser
+PROBE|environment|ProcessArchitecture|ok|Wasm
+PROBE|environment|RuntimeIdentifier|ok|browser-wasm
+PROBE|environment|is this Mono|ok|yes, Mono types are present
+PROBE|environment|IntPtr.Size|ok|4
+PROBE|environment|corelib assembly|ok|System.Private.CoreLib
+PROBE|metadata|open a PE image|ok|HasMetadata=True, sections=3
+PROBE|metadata|table row counts|ok|TypeDef=4, MethodDef=3, Field=4
+PROBE|metadata|read a name from the string heap|ok|Point,Box`1,Arithmetic
+PROBE|metadata|decode a method signature|ok|!0 (int32, string)
+PROBE|metadata|read a method body|ok|6 IL bytes, maxStack=8, first bytes 02 03 58 18 5a 2a
+PROBE|metadata|read the blob heap|ok|blob heap size 248 bytes, first typedef <Module>
+PROBE|metadata|assembly bytes served to the page|ok|Assembly.Location is empty
+PROBE|reflection|reflect over a framework type|ok|9 private instance fields
+PROBE|reflection|invoke a method by reflection|ok|42
+PROBE|reflection|load an assembly from a byte array|ok|Sample
+PROBE|reflection|a collectible load context|ok|loaded Sample into a collectible context and unloaded it
+PROBE|layout|Unsafe.SizeOf<Point>|ok|8
+PROBE|layout|Marshal.SizeOf<Point>|ok|8
+PROBE|layout|Marshal.OffsetOf Point.Y|ok|4
+PROBE|layout|pin an object|ok|pinned at 0x2950bac
+PROBE|layout|read the first word of an object|ok|0x0
+PROBE|layout|does that word equal the type handle|ok|no, object word 0x0 against type handle 0x2ee4390
+PROBE|layout|the words around a boxed value|ok| -8:0x2f5e180   -4:0x0    0:0x11111111    4:0x22222222
+PROBE|layout|string's private fields|ok|_stringLength,_firstChar
+PROBE|layout|unmanaged allocation|ok|wrote and read back 1234 at 0x2f7b828
+PROBE|layout|RuntimeHelpers.GetHashCode|ok|211636619
+PROBE|layout|stackalloc and pointer arithmetic|ok|span of 4, last 7
+PROBE|gc|GC.GetGeneration|ok|0
+PROBE|gc|GC.CollectionCount|ok|gen0=0, gen1=0, gen2=0
+PROBE|gc|force a collection|ok|gen0 count 0 then 0
+PROBE|gc|allocate 50 MB and look again|ok|gen0 count 0 then 13
+PROBE|gc|does a finalizer run|ok|no, the finalizer had not run when the check returned
+PROBE|gc|IsServerGC against the app switch|ok|GCSettings.IsServerGC=False, AppContext switch=True
+PROBE|gc|GCSettings.IsServerGC|ok|False
+PROBE|gc|GCSettings.LatencyMode|ok|Batch
+PROBE|gc|GC.GetGCMemoryInfo|ok|heap 823264 bytes, generations reported 5
+PROBE|gc|GC.GetTotalAllocatedBytes|ok|57854488
+PROBE|codegen|DynamicMethod and ILGenerator|ok|emitted and called, 20 + 22 = 42
+PROBE|codegen|a persisted assembly builder|ok|defined probe.dynamic
+PROBE|codegen|compile an expression tree|ok|compiled and called, 14 * 3 = 42
+PROBE|codegen|Vector128.IsHardwareAccelerated|ok|True
+PROBE|codegen|PackedSimd.IsSupported|ok|True
+PROBE|codegen|read a runtime knob|ok|DOTNET_TieredCompilation=(unset), System.GC.Server=true
+PROBE|observation|capture a stack trace|ok|15 frames, top <RunAll>b__0_45
+PROBE|observation|start a thread|threw|PlatformNotSupportedException: Arg_PlatformNotSupported
+PROBE|observation|Stopwatch resolution|ok|frequency 1000000000, highres True
+PROBE|observation|Environment.ProcessorCount|ok|1
+PROBE|observation|Process.GetCurrentProcess|threw|PlatformNotSupportedException: Process_PlatformNotSupported
+PROBE|observation|an EventSource with a listener|ok|listener saw 0 event(s)
+PROBE|END
+
+=== desktop, osx-arm64 ===
+
+PROBE|BEGIN
+PROBE|environment|FrameworkDescription|ok|.NET 10.0.11
+PROBE|environment|OSDescription|ok|macOS 15.8.0
+PROBE|environment|ProcessArchitecture|ok|Arm64
+PROBE|environment|RuntimeIdentifier|ok|osx-arm64
+PROBE|environment|is this Mono|ok|no Mono types found
+PROBE|environment|IntPtr.Size|ok|8
+PROBE|environment|corelib assembly|ok|System.Private.CoreLib
+PROBE|metadata|open a PE image|ok|HasMetadata=True, sections=3
+PROBE|metadata|table row counts|ok|TypeDef=4, MethodDef=3, Field=4
+PROBE|metadata|read a name from the string heap|ok|Point,Box`1,Arithmetic
+PROBE|metadata|decode a method signature|ok|!0 (int32, string)
+PROBE|metadata|read a method body|ok|6 IL bytes, maxStack=8, first bytes 02 03 58 18 5a 2a
+PROBE|metadata|read the blob heap|ok|blob heap size 248 bytes, first typedef <Module>
+PROBE|metadata|assembly bytes served to the page|ok|/private/tmp/wasmprobe/DesktopProbe/bin/Release/net10.0/DesktopProbe.dll
+PROBE|reflection|reflect over a framework type|ok|10 private instance fields
+PROBE|reflection|invoke a method by reflection|ok|42
+PROBE|reflection|load an assembly from a byte array|ok|Sample
+PROBE|reflection|a collectible load context|ok|loaded Sample into a collectible context and unloaded it
+PROBE|layout|Unsafe.SizeOf<Point>|ok|8
+PROBE|layout|Marshal.SizeOf<Point>|ok|8
+PROBE|layout|Marshal.OffsetOf Point.Y|ok|4
+PROBE|layout|pin an object|ok|pinned at 0x104cf58cc
+PROBE|layout|read the first word of an object|ok|0x301b41280
+PROBE|layout|does that word equal the type handle|ok|yes, both 0x301b41280, which is what CoreCLR does
+PROBE|layout|the words around a boxed value|ok|-16:0x0   -8:0x301b41280    0:0x2222222211111111    8:0x0
+PROBE|layout|string's private fields|ok|_stringLength,_firstChar
+PROBE|layout|unmanaged allocation|ok|wrote and read back 1234 at 0x6000025fc0d0
+PROBE|layout|RuntimeHelpers.GetHashCode|ok|33476626
+PROBE|layout|stackalloc and pointer arithmetic|ok|span of 4, last 7
+PROBE|gc|GC.GetGeneration|ok|0
+PROBE|gc|GC.CollectionCount|ok|gen0=0, gen1=0, gen2=0
+PROBE|gc|force a collection|ok|gen0 count 0 then 1
+PROBE|gc|allocate 50 MB and look again|ok|gen0 count 1 then 8
+PROBE|gc|does a finalizer run|ok|yes
+PROBE|gc|IsServerGC against the app switch|ok|GCSettings.IsServerGC=False, AppContext switch=False
+PROBE|gc|GCSettings.IsServerGC|ok|False
+PROBE|gc|GCSettings.LatencyMode|ok|Interactive
+PROBE|gc|GC.GetGCMemoryInfo|ok|heap 73264 bytes, generations reported 5
+PROBE|gc|GC.GetTotalAllocatedBytes|ok|60947608
+PROBE|codegen|DynamicMethod and ILGenerator|ok|emitted and called, 20 + 22 = 42
+PROBE|codegen|a persisted assembly builder|ok|defined probe.dynamic
+PROBE|codegen|compile an expression tree|ok|compiled and called, 14 * 3 = 42
+PROBE|codegen|Vector128.IsHardwareAccelerated|ok|True
+PROBE|codegen|PackedSimd.IsSupported|ok|False
+PROBE|codegen|read a runtime knob|ok|DOTNET_TieredCompilation=(unset), System.GC.Server=(unset)
+PROBE|observation|capture a stack trace|ok|4 frames, top <RunAll>b__0_45
+PROBE|observation|start a thread|ok|thread ran, counter 1
+PROBE|observation|Stopwatch resolution|ok|frequency 1000000000, highres True
+PROBE|observation|Environment.ProcessorCount|ok|10
+PROBE|observation|Process.GetCurrentProcess|ok|id 44597
+PROBE|observation|an EventSource with a listener|ok|listener saw 1 event(s)
+PROBE|END
+
+=== desktop, linux-x64 ===
+
+PROBE|BEGIN
+PROBE|environment|FrameworkDescription|ok|.NET 10.0.11
+PROBE|environment|OSDescription|ok|Ubuntu 24.04.4 LTS
+PROBE|environment|ProcessArchitecture|ok|X64
+PROBE|environment|RuntimeIdentifier|ok|linux-x64
+PROBE|environment|is this Mono|ok|no Mono types found
+PROBE|environment|IntPtr.Size|ok|8
+PROBE|environment|corelib assembly|ok|System.Private.CoreLib
+PROBE|metadata|open a PE image|ok|HasMetadata=True, sections=3
+PROBE|metadata|table row counts|ok|TypeDef=4, MethodDef=3, Field=4
+PROBE|metadata|read a name from the string heap|ok|Point,Box`1,Arithmetic
+PROBE|metadata|decode a method signature|ok|!0 (int32, string)
+PROBE|metadata|read a method body|ok|6 IL bytes, maxStack=8, first bytes 02 03 58 18 5a 2a
+PROBE|metadata|read the blob heap|ok|blob heap size 248 bytes, first typedef <Module>
+PROBE|metadata|assembly bytes served to the page|ok|/tmp/probe/DesktopProbe/bin/Release/net10.0/DesktopProbe.dll
+PROBE|reflection|reflect over a framework type|ok|10 private instance fields
+PROBE|reflection|invoke a method by reflection|ok|42
+PROBE|reflection|load an assembly from a byte array|ok|Sample
+PROBE|reflection|a collectible load context|ok|loaded Sample into a collectible context and unloaded it
+PROBE|layout|Unsafe.SizeOf<Point>|ok|8
+PROBE|layout|Marshal.SizeOf<Point>|ok|8
+PROBE|layout|Marshal.OffsetOf Point.Y|ok|4
+PROBE|layout|pin an object|ok|pinned at 0x7c3325c05b4c
+PROBE|layout|read the first word of an object|ok|0x7c3337320408
+PROBE|layout|does that word equal the type handle|ok|yes, both 0x7c3337320408, which is what CoreCLR does
+PROBE|layout|the words around a boxed value|ok|-16:0x0   -8:0x7c3337320408    0:0x2222222211111111    8:0x0
+PROBE|layout|string's private fields|ok|_stringLength,_firstChar
+PROBE|layout|unmanaged allocation|ok|wrote and read back 1234 at 0x5c7c155d8660
+PROBE|layout|RuntimeHelpers.GetHashCode|ok|33476626
+PROBE|layout|stackalloc and pointer arithmetic|ok|span of 4, last 7
+PROBE|gc|GC.GetGeneration|ok|0
+PROBE|gc|GC.CollectionCount|ok|gen0=0, gen1=0, gen2=0
+PROBE|gc|force a collection|ok|gen0 count 0 then 1
+PROBE|gc|allocate 50 MB and look again|ok|gen0 count 1 then 15
+PROBE|gc|does a finalizer run|ok|yes
+PROBE|gc|IsServerGC against the app switch|ok|GCSettings.IsServerGC=False, AppContext switch=False
+PROBE|gc|GCSettings.IsServerGC|ok|False
+PROBE|gc|GCSettings.LatencyMode|ok|Interactive
+PROBE|gc|GC.GetGCMemoryInfo|ok|heap 72464 bytes, generations reported 5
+PROBE|gc|GC.GetTotalAllocatedBytes|ok|60956136
+PROBE|codegen|DynamicMethod and ILGenerator|ok|emitted and called, 20 + 22 = 42
+PROBE|codegen|a persisted assembly builder|ok|defined probe.dynamic
+PROBE|codegen|compile an expression tree|ok|compiled and called, 14 * 3 = 42
+PROBE|codegen|Vector128.IsHardwareAccelerated|ok|True
+PROBE|codegen|PackedSimd.IsSupported|ok|False
+PROBE|codegen|read a runtime knob|ok|DOTNET_TieredCompilation=(unset), System.GC.Server=(unset)
+PROBE|observation|capture a stack trace|ok|4 frames, top <RunAll>b__0_45
+PROBE|observation|start a thread|ok|thread ran, counter 1
+PROBE|observation|Stopwatch resolution|ok|frequency 1000000000, highres True
+PROBE|observation|Environment.ProcessorCount|ok|4
+PROBE|observation|Process.GetCurrentProcess|ok|id 2877353
+PROBE|observation|an EventSource with a listener|ok|listener saw 1 event(s)
+PROBE|END

@@ -30,6 +30,8 @@ Every chapter therefore produces two things. The chapter teaches, in prose and p
 
 **Every mechanism has a switch on the same binary.** Legacy exception handling against the new managed one, DATAS on and off, Server and Workstation, tiering on and off, interpreter against JIT. A lesson that can turn a mechanism off and show you the difference does not have to ask you to take its word for anything.
 
+**Some lessons run in the browser, and the limit is not that things throw.** Fifty one checks were [run in a real page](docs/probes/browser-tier.md). Two throw. Sixteen more answer, and answer about Mono rather than about the runtime this book describes, and four of those do it without any sign that anything is wrong. Reading metadata, signatures and IL in the browser is exact, down to the byte. Reading an object header there gives you a different runtime's header with the two words in the other order, which is why the no install tier stops at Part III rather than Part IV.
+
 ## What "compatible" is allowed to mean
 
 Nobody has ever built a fully compatible CLI that is not CoreCLR, and a project that claims otherwise gets taken apart in an afternoon, so the tiers are here rather than in a footnote.

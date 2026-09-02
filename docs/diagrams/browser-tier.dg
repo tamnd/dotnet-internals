@@ -1,0 +1,23 @@
+# The header is two pointers wide on both runtimes and the two pointers are in opposite order,
+# which is why "one pointer back from the data" is a MethodTable in one place and a monitor slot
+# in the other. Coordinates picked so the two strips sit directly above each other and the offset
+# columns line up by eye even though the cells are different widths in bytes.
+
+title The word before an object, on two runtimes
+
+note code 40 70 920 60 "object boxed = new Point { X = 0x11111111, Y = 0x22222222 };" "Column 0 is where AddrOfPinnedObject points."
+
+box clrname 40 170 220 90 "osx-arm64" "CoreCLR" "eight byte words"
+strip clr 280 170 170 90 "-16|sync block|0x0" "-8|MethodTable|0x301b41280" "0|X and Y|packed" "+8|padding|0x0"
+
+box mononame 40 290 220 90 "browser-wasm" "Mono" "four byte words"
+strip mono 280 290 170 90 "-8|MonoVTable|0x2f5e180" "-4|monitor|0x0" "0|X|0x11111111" "+4|Y|0x22222222"
+
+arrow clr.1 mono.0 "the type pointer"
+
+note ask 40 430 440 130 "The code reads one pointer" "back from the data. On" "CoreCLR that is the" "MethodTable, which is what" "a layout lesson wants."
+note got 520 430 440 130 "Mono puts the same pointer" "one slot earlier. One back" "is the monitor slot, and" "it reads as zero. Nothing" "throws."
+
+note count 40 590 920 90 "51 checks in the page. 2 throw. 49 return a value." "16 of the 49 describe the browser, not the runtime the book teaches." "Four of those are silent: this read, GC.Collect, a finalizer, a listener."
+
+size 1000 700
