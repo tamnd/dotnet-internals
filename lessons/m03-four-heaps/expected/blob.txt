@@ -1,0 +1,7 @@
+int Count(string, int) is 5 bytes: 2002080E08
+  20  calling convention, the 0x20 bit is HASTHIS
+  02  parameter count
+  08  return type, ELEMENT_TYPE_I4
+  0E  first parameter, ELEMENT_TYPE_STRING
+  08  second parameter, ELEMENT_TYPE_I4
+3 getters, 1 signature blob between them

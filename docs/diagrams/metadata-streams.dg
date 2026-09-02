@@ -1,0 +1,21 @@
+# The picture M03 is built around. A row is fixed width, so nothing of variable length can be
+# inside it, and every name, signature and literal is an offset into a heap instead.
+#
+# The top strip is a MethodDef row because it is the row that reaches into the most heaps. The
+# ldstr box is underneath rather than beside them, because #US is the one heap no row points at.
+
+title What a metadata row actually holds
+
+size 980 720
+
+strip row 40 70 150 90 "RVA|where the IL is" "ImplFlags|2 bytes" "Flags|2 bytes" "Name|an offset" "Signature|an offset" "ParamList|a row number"
+
+strip heap 40 300 180 110 "#~|the tables|fixed width rows" "#Strings|names|UTF-8, null ended" "#US|your literals|UTF-16, length first" "#Blob|signatures|length first" "#GUID|16 bytes each|counts from 1"
+
+box ldstr 380 470 220 80 "ldstr 0x70000001" "an instruction reaches this" "heap, no row does"
+
+arrow row.3 heap.1
+arrow row.4 heap.3
+arrow ldstr heap.2
+
+note why 40 600 900 70 "A row has to be a fixed width, because finding row 400 has to be arithmetic rather than a search." "So a row holds numbers, and everything that varies in length lives in a heap with a number pointing at it."

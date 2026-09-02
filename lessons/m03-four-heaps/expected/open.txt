@@ -1,0 +1,5 @@
+metadata version: v4.0.30319
+type definitions: 3
+  <Module>
+  Sample.Catalogue
+  Sample.Shelf

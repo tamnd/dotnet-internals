@@ -1,0 +1,46 @@
+[
+  {
+    "id": "duplicate",
+    "question": "The fixture writes the literal \"the quick brown fox\" twice, in two different methods. How many entries does the #US heap have for it?",
+    "options": [
+      {
+        "text": "Two. Each ldstr instruction needs its own entry to point at.",
+        "correct": false,
+        "why": "Two instructions do point at it, and they point at the same place. An entry is a piece of storage, and nothing about the format says a piece of storage may only be named once."
+      },
+      {
+        "text": "One. The text is stored once and both instructions carry the same offset.",
+        "correct": true,
+        "why": "The writer keeps a map from text it has already written to the offset it wrote it at, and the second ldstr gets the offset back rather than a new one. This is why the two strings are reference equal at runtime, which is a fact most C# developers know as a rule and have never seen a reason for."
+      },
+      {
+        "text": "One, because the compiler rewrote the second method to call the first.",
+        "correct": false,
+        "why": "The compiler did not touch the methods. Deduplication happens in the writer, at the point of putting bytes into a heap, and it has no opinion about the code that will point at them."
+      }
+    ],
+    "after": "The same deduplication happens in #Strings and in #Blob, and you will see the blob one later in this lesson. What does not happen is deduplication across heaps, because they are separate byte arrays with separate offsets and nothing in the format connects them."
+  },
+  {
+    "id": "suffix",
+    "question": "The fixture has a property called Greeting, and the compiler generated a getter for it called get_Greeting. What is in #Strings?",
+    "options": [
+      {
+        "text": "Two entries. Greeting is not get_Greeting, so both get written.",
+        "correct": false,
+        "why": "This is the answer deduplication predicts, because the two names are not equal. It is still not what happens, and the reason is in the next option."
+      },
+      {
+        "text": "One entry, get_Greeting, and the property's name is an offset four bytes into it.",
+        "correct": true,
+        "why": "The heap is a byte array of null terminated strings, and a name is an offset into it. Nothing says an offset has to be the start of a string somebody wrote. Start reading four bytes in and you get Greeting, terminated by the same null byte, for free. The writer sorts names by their reversed text so it can spot exactly this."
+      },
+      {
+        "text": "One entry, Greeting, and the getter name is built at runtime by putting get_ in front of it.",
+        "correct": false,
+        "why": "Nothing in the metadata format builds a name at runtime. The method table row has to hold an offset to the full name, because a reader has to be able to look up get_Greeting without knowing that a property exists."
+      }
+    ],
+    "after": "This is worth holding on to because it explains a class of confusing sight. A name in #Strings can start in the middle of another name, so a program that walks the heap from the start and stops at every null byte does not see every name in it. It sees a subset, and the entries it misses are the shared tails."
+  }
+]

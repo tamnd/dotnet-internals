@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="600" viewBox="0 0 980 600">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .heading { font-size: 15px; font-weight: 600; fill: #1e1e1e; }
+    .body { font-size: 13px; fill: #495057; }
+    .cell-heading { font-size: 13px; font-weight: 600; fill: #1e1e1e; }
+    .cell-body { font-size: 11px; fill: #495057; }
+    .title { font-size: 18px; font-weight: 700; fill: #1e1e1e; }
+    .edge { font-size: 12px; fill: #495057; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+    .footer { font-size: 11px; fill: #868e96; }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#868e96"/>
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text class="title" x="24" y="32">Two heaps, two ways of ending a string</text>
+  <rect x="40" y="70" width="320" height="60" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="200" y="95.5">#Strings holds Catalogue</text>
+  <text class="body" text-anchor="middle" x="200" y="115.5">UTF-8, then a zero byte</text>
+  <rect x="40" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="84" y="186">43</text>
+  <text class="cell-body" text-anchor="middle" x="84" y="203">C</text>
+  <rect x="128" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="172" y="186">61</text>
+  <text class="cell-body" text-anchor="middle" x="172" y="203">a</text>
+  <rect x="216" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="260" y="186">74</text>
+  <text class="cell-body" text-anchor="middle" x="260" y="203">t</text>
+  <rect x="304" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="348" y="186">61</text>
+  <text class="cell-body" text-anchor="middle" x="348" y="203">a</text>
+  <rect x="392" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="436" y="186">6C</text>
+  <text class="cell-body" text-anchor="middle" x="436" y="203">l</text>
+  <rect x="480" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="524" y="186">6F</text>
+  <text class="cell-body" text-anchor="middle" x="524" y="203">o</text>
+  <rect x="568" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="612" y="186">67</text>
+  <text class="cell-body" text-anchor="middle" x="612" y="203">g</text>
+  <rect x="656" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="700" y="186">75</text>
+  <text class="cell-body" text-anchor="middle" x="700" y="203">u</text>
+  <rect x="744" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="788" y="186">65</text>
+  <text class="cell-body" text-anchor="middle" x="788" y="203">e</text>
+  <rect x="832" y="155" width="88" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="876" y="186">00</text>
+  <text class="cell-body" text-anchor="middle" x="876" y="203">the end</text>
+  <rect x="40" y="285" width="320" height="60" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="200" y="310.5">#US holds heap</text>
+  <text class="body" text-anchor="middle" x="200" y="330.5">UTF-16, and the length comes first</text>
+  <rect x="40" y="370" width="145" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="112.5" y="401">09</text>
+  <text class="cell-body" text-anchor="middle" x="112.5" y="418">the length</text>
+  <rect x="185" y="370" width="145" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="257.5" y="401">68 00</text>
+  <text class="cell-body" text-anchor="middle" x="257.5" y="418">h</text>
+  <rect x="330" y="370" width="145" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="402.5" y="401">65 00</text>
+  <text class="cell-body" text-anchor="middle" x="402.5" y="418">e</text>
+  <rect x="475" y="370" width="145" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="547.5" y="401">61 00</text>
+  <text class="cell-body" text-anchor="middle" x="547.5" y="418">a</text>
+  <rect x="620" y="370" width="145" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="692.5" y="401">70 00</text>
+  <text class="cell-body" text-anchor="middle" x="692.5" y="418">p</text>
+  <rect x="765" y="370" width="145" height="70" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="837.5" y="401">00</text>
+  <text class="cell-body" text-anchor="middle" x="837.5" y="418">flag byte</text>
+  <rect x="40" y="480" width="900" height="70" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="490" y="512">The 9 counts the bytes after it, which is four characters at two bytes each plus the flag byte.</text>
+  <text class="body" text-anchor="middle" x="490" y="529">So a string of n characters stores 2n plus 1, and the flag says whether any character needs more than a byte.</text>
+  <text class="footer" x="24" y="586">Generated by xray from heap-entries.dg. Edit that file, not this one.</text>
+</svg>

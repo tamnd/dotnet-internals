@@ -1,0 +1,3 @@
+#GUID holds 16 bytes, so 1 entry of 16
+the module's Mvid is entry number 1, and this heap counts from 1
+entry 0 is not a GUID, it is how a row says it has none

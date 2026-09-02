@@ -1,0 +1,3 @@
+the two offsets differ by 4
+bytes at the method's offset:   6765745F4772656574696E6700
+bytes at the property's offset: 4772656574696E6700

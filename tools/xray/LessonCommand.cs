@@ -136,7 +136,7 @@ internal static class LessonCommand
     /// rather than a binary committed to the repository, because a committed binary is a number
     /// typed by a human in the only format nobody can review.
     /// </summary>
-    private static void BuildFixture(string directory)
+    internal static void BuildFixture(string directory)
     {
         var fixture = Path.Combine(directory, "fixture");
         if (!Directory.Exists(fixture) || !Directory.EnumerateFiles(fixture, "*.csproj").Any())
