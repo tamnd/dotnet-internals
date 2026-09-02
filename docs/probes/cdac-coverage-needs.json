@@ -1,0 +1,606 @@
+{
+  "about": "The needs side of the cDAC coverage probe. One entry per runtime side blueprint, listing the structures and constants that blueprint's section 2 has to lay out for somebody implementing from it. This file is a human judgment and is meant to be argued with. The join against what the runtime publishes is mechanical and lives in cdac-coverage.sh.",
+  "rules": [
+    "A blueprint is runtime side if its section 2 describes something that exists in the memory of a running process. The file format and compiler blueprints are not in this file.",
+    "section2_source is where that blueprint's section 2 is meant to come from, taken from the generation table in the project plan. Only the cdac entries are a bet on cDAC. The others are here so the gap list is honest about what has another generator behind it.",
+    "kind is structure for something with a layout and constant for a number or a mask that section 2 has to state.",
+    "published_as is set only where the runtime's own name for a thing differs from the name the data descriptor uses. Every alias is reported by the script so a reviewer can check it."
+  ],
+  "blueprints": [
+    {
+      "id": "BP-HOST",
+      "part": "IV",
+      "section2_source": "none",
+      "structures": [
+        { "name": "hostfxr_initialize_parameters", "kind": "structure", "why": "what the host is told before the runtime exists" },
+        { "name": "corehost_context_contract", "kind": "structure", "why": "the function table hostfxr hands to hostpolicy" },
+        { "name": "host_startup_info_t", "kind": "structure", "why": "where the host looked and what it found" },
+        { "name": "deps_resolver_resolution_result", "kind": "structure", "why": "the resolved assembly list that becomes TRUSTED_PLATFORM_ASSEMBLIES" },
+        { "name": "coreclr_property_bag", "kind": "structure", "why": "the properties coreclr_initialize is started with" }
+      ]
+    },
+    {
+      "id": "BP-ALC",
+      "part": "IV",
+      "section2_source": "none",
+      "structures": [
+        { "name": "AssemblyBinder", "kind": "structure", "why": "the binder a load context is backed by" },
+        { "name": "Assembly", "kind": "structure", "why": "the runtime's record of one loaded assembly" },
+        { "name": "PEAssembly", "kind": "structure", "why": "the binding result bound to an image" },
+        { "name": "PEImage", "kind": "structure", "why": "one file on disk, possibly shared between contexts" },
+        { "name": "PEImageLayout", "kind": "structure", "why": "how that file is mapped, which differs by platform" },
+        { "name": "Module", "kind": "structure", "why": "the loaded module hanging off the assembly" },
+        { "name": "AssemblyLoadContext", "kind": "structure", "why": "the managed object a reader actually holds" }
+      ]
+    },
+    {
+      "id": "BP-TYPELOADER",
+      "part": "IV",
+      "section2_source": "none",
+      "structures": [
+        { "name": "MethodTable", "kind": "structure", "why": "the thing being built" },
+        { "name": "MethodTableAuxiliaryData", "kind": "structure", "why": "carries the load level, which is the whole subject" },
+        { "name": "EEClass", "kind": "structure", "why": "the cold half of a type" },
+        { "name": "EEClassOptionalFields", "kind": "structure", "why": "the parts most types do not have" },
+        { "name": "FieldDesc", "kind": "structure", "why": "instance and static field placement" },
+        { "name": "TypeDesc", "kind": "structure", "why": "types that are not method tables" },
+        { "name": "ParamTypeDesc", "kind": "structure", "why": "arrays, byrefs and pointers" },
+        { "name": "TypeVarTypeDesc", "kind": "structure", "why": "type and method parameters" },
+        { "name": "FnPtrTypeDesc", "kind": "structure", "why": "function pointer types" },
+        { "name": "EETypeHashTable", "kind": "structure", "why": "where a constructed type is found again" },
+        { "name": "ModuleLookupMap", "kind": "structure", "why": "token to runtime structure, per module" },
+        { "name": "DynamicStaticsInfo", "kind": "structure", "why": "where the statics of a type end up" },
+        { "name": "ThreadStaticsInfo", "kind": "structure", "why": "the same question for thread statics" },
+        { "name": "ClassLoader", "kind": "structure", "why": "the per module loader and its pending list" },
+        { "name": "MethodTableBuilder", "kind": "structure", "why": "the transient state the layout algorithm runs in" },
+        { "name": "PendingTypeLoadEntry", "kind": "structure", "why": "the level system's deadlock avoidance record" }
+      ]
+    },
+    {
+      "id": "BP-METHODTABLE",
+      "part": "IV",
+      "section2_source": "cdac",
+      "structures": [
+        { "name": "MethodTable", "kind": "structure", "why": "the fixed header every instance points at" },
+        { "name": "MethodTableAuxiliaryData", "kind": "structure", "why": "the part written after the type is built" },
+        { "name": "EEClass", "kind": "structure", "why": "the shared cold data" },
+        { "name": "EEClassOptionalFields", "kind": "structure", "why": "the optional tail" },
+        { "name": "InterfaceInfo", "kind": "structure", "published_as": "InterfaceEntry", "why": "one row of the interface map" },
+        { "name": "GenericsDictInfo", "kind": "structure", "why": "sits before a generic type's per instantiation info" },
+        { "name": "DictionaryLayout", "kind": "structure", "why": "the shape of the generic dictionary the method table points at" },
+        { "name": "DispatchMap", "kind": "structure", "why": "explicit implementations, which the slot table alone cannot express" },
+        { "name": "CGCDesc", "kind": "structure", "why": "the pointer series the collector reads to scan an instance" },
+        { "name": "CanonMethodTable", "kind": "constant", "why": "the shared canonical instantiation everything generic points at" },
+        { "name": "FreeObjectMethodTable", "kind": "constant", "why": "the method table the collector writes over dead space" }
+      ]
+    },
+    {
+      "id": "BP-METHODDESC",
+      "part": "IV",
+      "section2_source": "cdac",
+      "structures": [
+        { "name": "MethodDesc", "kind": "structure", "why": "the base record for every method" },
+        { "name": "MethodDescChunk", "kind": "structure", "why": "method descs are allocated in runs, and walking the run is the primitive" },
+        { "name": "MethodDescCodeData", "kind": "structure", "why": "where the current entry point lives" },
+        { "name": "MethodDescVersioningState", "kind": "structure", "why": "what rejit and tiering hang off" },
+        { "name": "InstantiatedMethodDesc", "kind": "structure", "why": "the generic method form" },
+        { "name": "DynamicMethodDesc", "kind": "structure", "why": "the dynamic method form" },
+        { "name": "StoredSigMethodDesc", "kind": "structure", "why": "the form that carries its own signature" },
+        { "name": "ArrayMethodDesc", "kind": "structure", "why": "array methods, which have no IL" },
+        { "name": "FCallMethodDesc", "kind": "structure", "why": "the fcall form" },
+        { "name": "PInvokeMethodDesc", "kind": "structure", "why": "the p/invoke form" },
+        { "name": "EEImplMethodDesc", "kind": "structure", "why": "runtime implemented methods" },
+        { "name": "CLRToCOMCallMethodDesc", "kind": "structure", "why": "the COM call form" },
+        { "name": "NonVtableSlot", "kind": "structure", "why": "an optional slot appended to a method desc" },
+        { "name": "MethodImpl", "kind": "structure", "why": "an optional slot appended to a method desc" },
+        { "name": "NativeCodeSlot", "kind": "structure", "why": "an optional slot appended to a method desc" },
+        { "name": "StubPrecodeData", "kind": "structure", "why": "the entry point form used before code exists" },
+        { "name": "FixupPrecodeData", "kind": "structure", "why": "the entry point form that is patched in place" },
+        { "name": "ThisPtrRetBufPrecodeData", "kind": "structure", "why": "the entry point form with an argument shuffle" },
+        { "name": "PrecodeMachineDescriptor", "kind": "structure", "why": "the per target sizes and encodings a reader needs to decode a precode" },
+        { "name": "InterpByteCodeStart", "kind": "structure", "why": "the interpreter's entry point form" },
+        { "name": "MethodDescAlignment", "kind": "constant", "why": "the granularity a chunk walk steps by" },
+        { "name": "MethodDescTokenRemainderBitCount", "kind": "constant", "why": "how the metadata token is split between the chunk and the desc" },
+        { "name": "ThePreStub", "kind": "constant", "why": "the address every unjitted method starts pointing at" }
+      ]
+    },
+    {
+      "id": "BP-GENERICS",
+      "part": "IV",
+      "section2_source": "none",
+      "structures": [
+        { "name": "InstantiatedMethodDesc", "kind": "structure", "why": "an instantiated method" },
+        { "name": "InstMethodHashTable", "kind": "structure", "why": "where an instantiated method is found again" },
+        { "name": "GenericsDictInfo", "kind": "structure", "why": "the dictionary header" },
+        { "name": "DictionaryLayout", "kind": "structure", "why": "what each dictionary slot means, which is the hard part" },
+        { "name": "Dictionary", "kind": "structure", "why": "the per instantiation storage itself" },
+        { "name": "TypeVarTypeDesc", "kind": "structure", "why": "the parameter being substituted" },
+        { "name": "ParamTypeDesc", "kind": "structure", "why": "constructed types that appear in instantiations" },
+        { "name": "CanonMethodTable", "kind": "constant", "why": "the sharing rule turns on this one value" }
+      ]
+    },
+    {
+      "id": "BP-DISPATCH",
+      "part": "V",
+      "section2_source": "none",
+      "structures": [
+        { "name": "MethodTable", "kind": "structure", "why": "the slot table lives in its tail" },
+        { "name": "InterfaceInfo", "kind": "structure", "published_as": "InterfaceEntry", "why": "the interface map" },
+        { "name": "DispatchMap", "kind": "structure", "why": "the explicit override table" },
+        { "name": "DispatchMapEntry", "kind": "structure", "why": "one override" },
+        { "name": "DispatchToken", "kind": "structure", "why": "what an interface call site actually carries" },
+        { "name": "MethodImpl", "kind": "structure", "why": "the methodimpl record on a method desc" },
+        { "name": "VirtualCallStubManager", "kind": "structure", "why": "where interface calls are resolved" },
+        { "name": "DispatchThisPtrMask", "kind": "constant", "why": "how the receiver is recovered at a dispatch stub" }
+      ]
+    },
+    {
+      "id": "BP-VSD",
+      "part": "V",
+      "section2_source": "none",
+      "structures": [
+        { "name": "VirtualCallStubManager", "kind": "structure", "why": "owns every stub kind and every cache" },
+        { "name": "DispatchStub", "kind": "structure", "why": "the monomorphic form" },
+        { "name": "ResolveStub", "kind": "structure", "why": "the polymorphic form" },
+        { "name": "LookupStub", "kind": "structure", "why": "the cold form" },
+        { "name": "VTableCallStub", "kind": "structure", "why": "the virtual slot form" },
+        { "name": "ResolveCacheElem", "kind": "structure", "why": "one entry of the global resolve cache" },
+        { "name": "BucketTable", "kind": "structure", "why": "the hash the manager keeps stubs in" },
+        { "name": "Bucket", "kind": "structure", "why": "one bucket of that hash" }
+      ]
+    },
+    {
+      "id": "BP-DELEGATE",
+      "part": "V",
+      "section2_source": "none",
+      "structures": [
+        { "name": "Delegate", "kind": "structure", "why": "the object layout, target and method pointer" },
+        { "name": "DelegateEEClass", "kind": "structure", "why": "the extra class data a delegate type carries" },
+        { "name": "VASigCookie", "kind": "structure", "why": "what a calli site carries" },
+        { "name": "FnPtrTypeDesc", "kind": "structure", "why": "the type of a function pointer" },
+        { "name": "MulticastDelegateMethodTable", "kind": "constant", "why": "the base every delegate type derives from" }
+      ]
+    },
+    {
+      "id": "BP-JITEE",
+      "part": "VI",
+      "section2_source": "header",
+      "structures": [
+        { "name": "CORINFO_METHOD_INFO", "kind": "structure", "why": "what the runtime hands the compiler" },
+        { "name": "CORINFO_SIG_INFO", "kind": "structure", "why": "a signature as the compiler sees it" },
+        { "name": "CORINFO_EE_INFO", "kind": "structure", "why": "the offsets the compiler is allowed to bake in" },
+        { "name": "CORINFO_CALL_INFO", "kind": "structure", "why": "how one call site is to be compiled" },
+        { "name": "ICorJitInfo", "kind": "structure", "why": "the callback table itself" }
+      ]
+    },
+    {
+      "id": "BP-TIERING",
+      "part": "VI",
+      "section2_source": "none",
+      "structures": [
+        { "name": "MethodDescVersioningState", "kind": "structure", "why": "the per method versioning record" },
+        { "name": "ILCodeVersioningState", "kind": "structure", "why": "the per module side of the same thing" },
+        { "name": "ILCodeVersionNode", "kind": "structure", "why": "one IL version" },
+        { "name": "NativeCodeVersionNode", "kind": "structure", "why": "one compiled version of one IL version" },
+        { "name": "MethodDescCodeData", "kind": "structure", "why": "the current entry point a tier transition rewrites" },
+        { "name": "CallCountingInfo", "kind": "structure", "why": "the counter that decides when to promote" },
+        { "name": "CallCountingManager", "kind": "structure", "why": "where those counters are allocated" },
+        { "name": "PatchpointInfo", "kind": "structure", "why": "the on stack replacement transfer record" },
+        { "name": "PortableEntryPoint", "kind": "structure", "why": "the entry point form on targets without precode" }
+      ]
+    },
+    {
+      "id": "BP-JITIR",
+      "part": "VI",
+      "section2_source": "none",
+      "structures": [
+        { "name": "Compiler", "kind": "structure", "why": "the per method compilation state" },
+        { "name": "GenTree", "kind": "structure", "why": "the node" },
+        { "name": "BasicBlock", "kind": "structure", "why": "the flow graph node" },
+        { "name": "LclVarDsc", "kind": "structure", "why": "one local, and where it ends up" },
+        { "name": "LIR", "kind": "structure", "why": "the late representation" }
+      ]
+    },
+    {
+      "id": "BP-INLINE",
+      "part": "VI",
+      "section2_source": "none",
+      "structures": [
+        { "name": "InlineContext", "kind": "structure", "why": "the inline tree for one method" },
+        { "name": "InlineResult", "kind": "structure", "why": "one decision and its reason" },
+        { "name": "InlinePolicy", "kind": "structure", "why": "the observations the decision is made from" },
+        { "name": "InlineCandidateInfo", "kind": "structure", "why": "what is known at the call site" }
+      ]
+    },
+    {
+      "id": "BP-PGO",
+      "part": "VI",
+      "section2_source": "none",
+      "structures": [
+        { "name": "PgoInstrumentationSchema", "kind": "structure", "why": "the schema of a profile buffer" },
+        { "name": "PgoSchemaElem", "kind": "structure", "why": "one entry of that schema" },
+        { "name": "HandleHistogram", "kind": "structure", "why": "the class profile guarded devirtualization reads" },
+        { "name": "PgoManager", "kind": "structure", "why": "where profile data is kept between tiers" }
+      ]
+    },
+    {
+      "id": "BP-GCINFO",
+      "part": "VI",
+      "section2_source": "header",
+      "structures": [
+        { "name": "GcInfoHeader", "kind": "structure", "why": "the encoded header" },
+        { "name": "GcSlotDescriptor", "kind": "structure", "why": "one reported slot" },
+        { "name": "InterruptibleRange", "kind": "structure", "why": "where a thread may be suspended" },
+        { "name": "GCInfoVersion", "kind": "constant", "why": "which encoding the reader is looking at" }
+      ]
+    },
+    {
+      "id": "BP-UNWIND",
+      "part": "VI",
+      "section2_source": "header",
+      "structures": [
+        { "name": "UnwindInfo", "kind": "structure", "why": "the windows form" },
+        { "name": "RuntimeFunction", "kind": "structure", "why": "the function table entry that points at it" },
+        { "name": "UNWIND_CODE", "kind": "structure", "why": "one prolog operation" },
+        { "name": "eh_frame", "kind": "structure", "why": "the unix form, with its CIE and FDE" }
+      ]
+    },
+    {
+      "id": "BP-INTRINSICS",
+      "part": "VI",
+      "section2_source": "header",
+      "structures": [
+        { "name": "HWIntrinsicInfo", "kind": "structure", "why": "one intrinsic and its shape" },
+        { "name": "NamedIntrinsic", "kind": "structure", "why": "the enumeration the compiler switches on" },
+        { "name": "SIMDVector", "kind": "structure", "why": "how a vector is laid out in memory" }
+      ]
+    },
+    {
+      "id": "BP-INTERP",
+      "part": "VII",
+      "section2_source": "none",
+      "structures": [
+        { "name": "InterpMethod", "kind": "structure", "why": "the compiled interpreter method" },
+        { "name": "InterpByteCodeStart", "kind": "structure", "why": "the entry point form" },
+        { "name": "InterpreterFrame", "kind": "structure", "why": "the frame the runtime sees" },
+        { "name": "InterpMethodContextFrame", "kind": "structure", "why": "the frame the interpreter itself walks" },
+        { "name": "InterpreterPrecodeData", "kind": "structure", "why": "how a method is routed into the interpreter" },
+        { "name": "InterpreterRealCodeHeader", "kind": "structure", "why": "the header in front of interpreter code" },
+        { "name": "InterpOpcode", "kind": "structure", "why": "the instruction set itself" }
+      ]
+    },
+    {
+      "id": "BP-ALLOC",
+      "part": "VIII",
+      "section2_source": "none",
+      "structures": [
+        { "name": "GCAllocContext", "kind": "structure", "why": "the bump pointer the fast path moves" },
+        { "name": "EEAllocContext", "kind": "structure", "why": "the runtime's wrapper around it" },
+        { "name": "Generation", "kind": "structure", "why": "where a new allocation context comes from" },
+        { "name": "HeapSegment", "kind": "structure", "why": "the memory the context is carved out of" },
+        { "name": "RegionFreeList", "kind": "structure", "why": "where a new region comes from" },
+        { "name": "GlobalAllocContext", "kind": "constant", "why": "the context used when there is no thread context" }
+      ]
+    },
+    {
+      "id": "BP-OBJECT",
+      "part": "VIII",
+      "section2_source": "cdac",
+      "structures": [
+        { "name": "Object", "kind": "structure", "why": "the method table pointer and the payload" },
+        { "name": "ObjectHeader", "kind": "structure", "why": "the word before the object" },
+        { "name": "String", "kind": "structure", "why": "the one variable sized type everybody meets first" },
+        { "name": "Array", "kind": "structure", "why": "the other one" },
+        { "name": "SyncBlock", "kind": "structure", "why": "what the header word can point at" },
+        { "name": "SyncTableEntry", "kind": "structure", "why": "the indirection from index to sync block" },
+        { "name": "TypedByRef", "kind": "structure", "why": "the odd case a layout section has to cover" },
+        { "name": "CGCDesc", "kind": "structure", "why": "the pointer series that says which words are references" },
+        { "name": "ArrayBaseSize", "kind": "constant", "why": "where array elements start" },
+        { "name": "SyncBlockIndexMask", "kind": "constant", "why": "how the header word is decoded" },
+        { "name": "SyncBlockIsHashCode", "kind": "constant", "why": "the bit that says the word is a hash and not an index" },
+        { "name": "ObjectToMethodTableUnmask", "kind": "constant", "why": "the bits the collector borrows from the method table pointer" }
+      ]
+    },
+    {
+      "id": "BP-GCHEAP",
+      "part": "VIII",
+      "section2_source": "none",
+      "structures": [
+        { "name": "GCHeap", "kind": "structure", "why": "the per heap state" },
+        { "name": "Generation", "kind": "structure", "why": "one generation of one heap" },
+        { "name": "HeapSegment", "kind": "structure", "why": "a segment or a region" },
+        { "name": "RegionFreeList", "kind": "structure", "why": "free regions waiting to be handed out" },
+        { "name": "CardTableInfo", "kind": "structure", "why": "the header in front of a card table" },
+        { "name": "OomHistory", "kind": "structure", "why": "what the heap records when it fails" },
+        { "name": "dynamic_data", "kind": "structure", "why": "the budgets and the survival rates, which are the policy" },
+        { "name": "brick_table", "kind": "structure", "why": "how an interior pointer is turned into an object start" },
+        { "name": "seg_mapping_table", "kind": "structure", "why": "address to segment, on the hot path" },
+        { "name": "alloc_list", "kind": "structure", "why": "the free lists a sweep builds" },
+        { "name": "MaxGeneration", "kind": "constant", "why": "how many generations there are" },
+        { "name": "NumHeaps", "kind": "constant", "why": "server mode heap count" },
+        { "name": "Heaps", "kind": "constant", "why": "where those heaps are" }
+      ]
+    },
+    {
+      "id": "BP-GCCYCLE",
+      "part": "VIII",
+      "section2_source": "none",
+      "structures": [
+        { "name": "GCHeap", "kind": "structure", "why": "every phase runs against it" },
+        { "name": "Generation", "kind": "structure", "why": "what is being condemned" },
+        { "name": "HeapSegment", "kind": "structure", "why": "what is being walked" },
+        { "name": "mark_list", "kind": "structure", "why": "the marked object list the plan phase sorts" },
+        { "name": "plug", "kind": "structure", "why": "the unit relocation moves" },
+        { "name": "gap", "kind": "structure", "why": "the space between plugs, and where the plug tree hides" },
+        { "name": "CFinalize", "kind": "structure", "why": "the finalization queue the cycle promotes out of" },
+        { "name": "CurrentGCState", "kind": "constant", "why": "which phase the heap is in right now" },
+        { "name": "GCGlobalMechanisms", "kind": "constant", "why": "what the last cycle actually did" }
+      ]
+    },
+    {
+      "id": "BP-WRITEBARRIER",
+      "part": "VIII",
+      "section2_source": "none",
+      "structures": [
+        { "name": "WriteBarrierManager", "kind": "structure", "why": "chooses and patches the barrier in use" },
+        { "name": "card_table", "kind": "structure", "why": "the table the barrier writes" },
+        { "name": "card_bundle_table", "kind": "structure", "why": "the second level of that table" },
+        { "name": "region_to_generation_table", "kind": "structure", "why": "the region barrier's lookup" },
+        { "name": "g_card_table", "kind": "constant", "why": "the address the barrier has baked in" },
+        { "name": "g_ephemeral_low", "kind": "constant", "why": "the low bound the barrier compares against" },
+        { "name": "g_ephemeral_high", "kind": "constant", "why": "the high bound" },
+        { "name": "GCLowestAddress", "kind": "constant", "why": "the range check the barrier does first" },
+        { "name": "GCHighestAddress", "kind": "constant", "why": "the other half of that check" }
+      ]
+    },
+    {
+      "id": "BP-BGC",
+      "part": "VIII",
+      "section2_source": "none",
+      "structures": [
+        { "name": "GCHeap", "kind": "structure", "why": "the background fields live on it" },
+        { "name": "mark_array", "kind": "structure", "why": "the concurrent mark bitmap" },
+        { "name": "c_mark_list", "kind": "structure", "why": "the concurrent mark stack" },
+        { "name": "GCHeapMarkArray", "kind": "constant", "why": "where that bitmap is" },
+        { "name": "GCHeapNextSweepObj", "kind": "constant", "why": "how far the sweep has got" },
+        { "name": "GCHeapBackgroundMinSavedAddr", "kind": "constant", "why": "the range the background collection froze" },
+        { "name": "GCHeapBackgroundMaxSavedAddr", "kind": "constant", "why": "the other end of it" },
+        { "name": "CurrentGCState", "kind": "constant", "why": "tells a reader a background collection is in progress" }
+      ]
+    },
+    {
+      "id": "BP-LIFETIME",
+      "part": "VIII",
+      "section2_source": "none",
+      "structures": [
+        { "name": "HandleTable", "kind": "structure", "why": "one table of handles" },
+        { "name": "HandleTableMap", "kind": "structure", "why": "how tables are found from a handle" },
+        { "name": "HandleTableBucket", "kind": "structure", "why": "the per heap grouping" },
+        { "name": "TableSegment", "kind": "structure", "why": "the block handles are allocated from" },
+        { "name": "CFinalize", "kind": "structure", "why": "the finalization queue and its pointers" },
+        { "name": "ObjectHandle", "kind": "structure", "why": "what a handle actually is" },
+        { "name": "DependentHandle", "kind": "structure", "why": "the two object form" },
+        { "name": "ConditionalWeakTable", "kind": "structure", "why": "the managed structure built on dependent handles" },
+        { "name": "HandleSegmentSize", "kind": "constant", "why": "needed to walk a segment" },
+        { "name": "HandlesPerBlock", "kind": "constant", "why": "needed to walk a block" }
+      ]
+    },
+    {
+      "id": "BP-THREADING",
+      "part": "IX",
+      "section2_source": "none",
+      "structures": [
+        { "name": "Thread", "kind": "structure", "why": "the runtime's record of a thread" },
+        { "name": "ThreadStore", "kind": "structure", "why": "the list of them and the counts" },
+        { "name": "RuntimeThreadLocals", "kind": "structure", "why": "the block the JIT reaches through" },
+        { "name": "ThreadLocalData", "kind": "structure", "why": "where managed thread statics live" },
+        { "name": "InFlightTLSData", "kind": "structure", "why": "thread statics that are still being created" },
+        { "name": "TLSIndex", "kind": "structure", "why": "how a thread static is addressed" },
+        { "name": "EEAllocContext", "kind": "structure", "why": "each thread carries one" },
+        { "name": "ThreadStaticsInfo", "kind": "structure", "why": "the per type side of thread statics" },
+        { "name": "OffsetOfCurrentThreadInfo", "kind": "constant", "why": "how generated code finds the current thread" }
+      ]
+    },
+    {
+      "id": "BP-SUSPEND",
+      "part": "IX",
+      "section2_source": "none",
+      "structures": [
+        { "name": "ThreadStore", "kind": "structure", "why": "the set of threads being brought to a stop" },
+        { "name": "Thread", "kind": "structure", "why": "the state word and the mode flag" },
+        { "name": "HijackFrame", "kind": "structure", "why": "what a hijacked return leaves behind" },
+        { "name": "HijackArgs", "kind": "structure", "why": "the registers a hijack has to preserve" },
+        { "name": "ResumableFrame", "kind": "structure", "why": "the frame a redirected thread resumes through" },
+        { "name": "g_TrapReturningThreads", "kind": "constant", "why": "the flag every return polls" },
+        { "name": "MaxHijackFunctions", "kind": "constant", "why": "bounds the hijack helper table" }
+      ]
+    },
+    {
+      "id": "BP-STACKWALK",
+      "part": "IX",
+      "section2_source": "none",
+      "structures": [
+        { "name": "Frame", "kind": "structure", "why": "the base of the explicit frame chain" },
+        { "name": "FramedMethodFrame", "kind": "structure", "why": "the frame that has arguments behind it" },
+        { "name": "TransitionBlock", "kind": "structure", "why": "the saved register block every transition writes" },
+        { "name": "InlinedCallFrame", "kind": "structure", "why": "the p/invoke transition frame" },
+        { "name": "ResumableFrame", "kind": "structure", "why": "redirected threads" },
+        { "name": "SoftwareExceptionFrame", "kind": "structure", "why": "the managed exception path" },
+        { "name": "FaultingExceptionFrame", "kind": "structure", "why": "the hardware fault path" },
+        { "name": "HijackFrame", "kind": "structure", "why": "suspension" },
+        { "name": "TailCallFrame", "kind": "structure", "why": "helper based tail calls" },
+        { "name": "StubDispatchFrame", "kind": "structure", "why": "interface dispatch" },
+        { "name": "ExternalMethodFrame", "kind": "structure", "why": "readytorun fixups" },
+        { "name": "PInvokeCalliFrame", "kind": "structure", "why": "unmanaged calli" },
+        { "name": "InterpreterFrame", "kind": "structure", "why": "interpreted code on the stack" },
+        { "name": "FuncEvalFrame", "kind": "structure", "why": "debugger function evaluation" },
+        { "name": "DynamicHelperFrame", "kind": "structure", "why": "runtime helper transitions" },
+        { "name": "CalleeSavedRegisters", "kind": "structure", "why": "what unwinding restores" },
+        { "name": "ArgumentRegisters", "kind": "structure", "why": "what argument inspection reads" },
+        { "name": "RuntimeFunction", "kind": "structure", "why": "the function table entry for managed code" },
+        { "name": "UnwindInfo", "kind": "structure", "why": "how one frame is unwound" },
+        { "name": "RangeSection", "kind": "structure", "why": "address to code range" },
+        { "name": "RangeSectionMap", "kind": "structure", "why": "the structure that lookup walks" },
+        { "name": "RangeSectionFragment", "kind": "structure", "why": "one node of it" },
+        { "name": "EEJitManager", "kind": "structure", "why": "owns jitted code ranges" },
+        { "name": "CodeHeap", "kind": "structure", "why": "where jitted code is allocated" },
+        { "name": "CodeHeapListNode", "kind": "structure", "why": "the list of those heaps" },
+        { "name": "RealCodeHeader", "kind": "structure", "why": "the header in front of one method's code" },
+        { "name": "frameType", "kind": "constant", "why": "how a frame's kind is told from its vtable" },
+        { "name": "StubCodeBlockLast", "kind": "constant", "why": "tells stub code from real code during a walk" }
+      ]
+    },
+    {
+      "id": "BP-EH",
+      "part": "IX",
+      "section2_source": "none",
+      "structures": [
+        { "name": "Exception", "kind": "structure", "why": "the managed exception object" },
+        { "name": "ExceptionInfo", "kind": "structure", "why": "the per dispatch tracker" },
+        { "name": "ExInfo", "kind": "structure", "why": "the same idea on the native aot side" },
+        { "name": "EEExceptionClause", "kind": "structure", "why": "one clause as the runtime reads it" },
+        { "name": "R2RExceptionClause", "kind": "structure", "why": "the readytorun encoding of the same" },
+        { "name": "ExceptionLookupTableEntry", "kind": "structure", "why": "finding the clause table for a method" },
+        { "name": "EEILException", "kind": "structure", "why": "the IL level clause form" },
+        { "name": "FaultingExceptionFrame", "kind": "structure", "why": "how a hardware fault enters dispatch" },
+        { "name": "SoftwareExceptionFrame", "kind": "structure", "why": "how a throw enters dispatch" },
+        { "name": "StackTraceArrayHeader", "kind": "structure", "why": "the captured trace" },
+        { "name": "StackTraceElement", "kind": "structure", "why": "one entry of it" },
+        { "name": "ExceptionMethodTable", "kind": "constant", "why": "the base type dispatch checks against" }
+      ]
+    },
+    {
+      "id": "BP-ASYNC",
+      "part": "IX",
+      "section2_source": "none",
+      "structures": [
+        { "name": "ContinuationObject", "kind": "structure", "why": "the object a suspended method becomes" },
+        { "name": "AsyncMethodData", "kind": "structure", "why": "the per method async record" },
+        { "name": "AsyncResumeInfo", "kind": "structure", "why": "how execution is resumed" },
+        { "name": "ContinuationMethodTable", "kind": "constant", "why": "the type continuations are allocated as" },
+        { "name": "ContinuationSingletonEEClass", "kind": "constant", "why": "the shared class data behind them" }
+      ]
+    },
+    {
+      "id": "BP-SYNCBLK",
+      "part": "IX",
+      "section2_source": "none",
+      "structures": [
+        { "name": "SyncBlock", "kind": "structure", "why": "the fat lock and everything else hung off an object" },
+        { "name": "SyncBlockCache", "kind": "structure", "why": "where sync blocks are allocated" },
+        { "name": "SyncTableEntry", "kind": "structure", "why": "index to sync block" },
+        { "name": "ObjectHeader", "kind": "structure", "why": "the word the thin lock lives in" },
+        { "name": "InteropSyncBlockInfo", "kind": "structure", "why": "the interop payload" },
+        { "name": "EnCSyncBlockInfo", "kind": "structure", "why": "the edit and continue payload" },
+        { "name": "AwareLock", "kind": "structure", "why": "the monitor itself" },
+        { "name": "SyncBlockIndexMask", "kind": "constant", "why": "decoding the header word" },
+        { "name": "SyncBlockMaskLockThreadId", "kind": "constant", "why": "the thin lock owner field" },
+        { "name": "SyncBlockRecursionLevelShift", "kind": "constant", "why": "the thin lock recursion field" },
+        { "name": "ThinlockThreadIdDispenser", "kind": "constant", "why": "where a thin lock thread id comes from" }
+      ]
+    },
+    {
+      "id": "BP-INTEROP",
+      "part": "IX",
+      "section2_source": "none",
+      "structures": [
+        { "name": "PInvokeMethodDesc", "kind": "structure", "why": "the method desc form for a native call" },
+        { "name": "InlinedCallFrame", "kind": "structure", "why": "the transition frame the stub pushes" },
+        { "name": "PInvokeCalliFrame", "kind": "structure", "why": "the unmanaged calli form" },
+        { "name": "VASigCookie", "kind": "structure", "why": "the signature a calli carries" },
+        { "name": "ILStubCache", "kind": "structure", "why": "where generated marshalling stubs are kept" },
+        { "name": "ComCallWrapper", "kind": "structure", "why": "managed object seen from COM" },
+        { "name": "SimpleComCallWrapper", "kind": "structure", "why": "the smaller form of the same" },
+        { "name": "ComMethodTable", "kind": "structure", "why": "the vtable handed out to COM" },
+        { "name": "ComInterfaceEntry", "kind": "structure", "why": "one interface of that wrapper" },
+        { "name": "RCW", "kind": "structure", "why": "COM object seen from managed" },
+        { "name": "RCWCleanupList", "kind": "structure", "why": "how those are released" },
+        { "name": "InteropSyncBlockInfo", "kind": "structure", "why": "how an object finds its wrappers" },
+        { "name": "ManagedObjectWrapperLayout", "kind": "structure", "why": "the ComWrappers form" },
+        { "name": "NativeObjectWrapperObject", "kind": "structure", "why": "the other direction of ComWrappers" },
+        { "name": "InternalComInterfaceDispatch", "kind": "structure", "why": "the dispatch block a ComWrappers vtable sits in" }
+      ]
+    },
+    {
+      "id": "BP-R2R",
+      "part": "X",
+      "section2_source": "header",
+      "structures": [
+        { "name": "ReadyToRunHeader", "kind": "structure", "why": "the image header" },
+        { "name": "ReadyToRunCoreHeader", "kind": "structure", "why": "the section table inside it" },
+        { "name": "ReadyToRunSection", "kind": "structure", "why": "one section" },
+        { "name": "ReadyToRunInfo", "kind": "structure", "why": "the runtime's view of a loaded r2r module" },
+        { "name": "ReadyToRunCoreInfo", "kind": "structure", "why": "the part shared with the composite case" },
+        { "name": "RuntimeFunction", "kind": "structure", "why": "the method entry point table" },
+        { "name": "ImageDataDirectory", "kind": "structure", "why": "how sections are located in the file" }
+      ]
+    },
+    {
+      "id": "BP-ILC",
+      "part": "X",
+      "section2_source": "none",
+      "structures": [
+        { "name": "MethodTable", "kind": "structure", "why": "the native aot type representation, which is not the coreclr one" },
+        { "name": "TypeManager", "kind": "structure", "why": "one compiled module at runtime" },
+        { "name": "TypeManagerEntry", "kind": "structure", "why": "the list of them" },
+        { "name": "RuntimeInstance", "kind": "structure", "why": "the whole native aot runtime state" },
+        { "name": "Thread", "kind": "structure", "why": "the native aot thread record" },
+        { "name": "ThreadStore", "kind": "structure", "why": "the native aot thread list" },
+        { "name": "GCAllocContext", "kind": "structure", "why": "allocation on the native aot side" },
+        { "name": "ExInfo", "kind": "structure", "why": "native aot exception dispatch state" }
+      ]
+    },
+    {
+      "id": "BP-TRIM",
+      "part": "X",
+      "section2_source": "none",
+      "structures": [
+        { "name": "DependencyGraph", "kind": "structure", "why": "what the trimmer actually computes" },
+        { "name": "ILLinkDescriptor", "kind": "structure", "why": "how a library says keep this" },
+        { "name": "FeatureSwitchTable", "kind": "structure", "why": "how a branch is removed before analysis" },
+        { "name": "AssemblyAction", "kind": "structure", "why": "the per assembly decision" }
+      ]
+    },
+    {
+      "id": "BP-EVENTS",
+      "part": "XI",
+      "section2_source": "manifest",
+      "structures": [
+        { "name": "EventPipeProvider", "kind": "structure", "why": "one provider" },
+        { "name": "EventPipeEvent", "kind": "structure", "why": "one event and its payload shape" },
+        { "name": "EventPipeSession", "kind": "structure", "why": "a subscription" },
+        { "name": "EventPipeBuffer", "kind": "structure", "why": "where events are staged" },
+        { "name": "NettraceFormat", "kind": "structure", "why": "the file that comes out" }
+      ]
+    },
+    {
+      "id": "BP-CONTRACTS",
+      "part": "XI",
+      "section2_source": "cdac",
+      "structures": [
+        { "name": "DotNetRuntimeContractDescriptor", "kind": "structure", "why": "the exported symbol everything starts from" },
+        { "name": "DataDescriptorBlob", "kind": "structure", "why": "the compact encoding it points at" },
+        { "name": "StressLog", "kind": "structure", "why": "the worked example, because it is self describing too" },
+        { "name": "StressLogChunk", "kind": "structure", "why": "one chunk of that log" },
+        { "name": "StressMsg", "kind": "structure", "why": "one message" },
+        { "name": "ThreadStressLog", "kind": "structure", "why": "the per thread ring" },
+        { "name": "StressLogModuleDesc", "kind": "structure", "why": "how a logged pointer is resolved to a module" },
+        { "name": "RecommendedReaderVersion", "kind": "constant", "why": "the compatibility rule the descriptor states" },
+        { "name": "SOSBreakingChangeVersion", "kind": "constant", "why": "the other half of that rule" }
+      ]
+    },
+    {
+      "id": "BP-PROFILER",
+      "part": "XI",
+      "section2_source": "none",
+      "structures": [
+        { "name": "ProfControlBlock", "kind": "structure", "why": "what the runtime checks before every callback" },
+        { "name": "ICorProfilerCallback", "kind": "structure", "why": "the callback table" },
+        { "name": "ICorProfilerInfo", "kind": "structure", "why": "the table going the other way" },
+        { "name": "InstrumentedILOffsetMapping", "kind": "structure", "why": "how rewritten IL is mapped back" },
+        { "name": "ILCodeVersionNode", "kind": "structure", "why": "what an IL rewrite creates" },
+        { "name": "ProfilerControlBlock", "kind": "constant", "why": "where that block is" }
+      ]
+    }
+  ]
+}
