@@ -73,7 +73,7 @@ The machine readable copy is [pin.json](pin.json), and the commits in it are nul
 
 Two repositories are pinned rather than one, which costs something. Every citation carries a repository prefix, the drift bot has two heads, and a version bump is two bumps that have to land together.
 
-Citations are checked by a machine rather than by a reviewer. `xray cite` takes each one apart, refuses anything pinned to a tag or a branch instead of a commit, fetches the file from the repository it names at the commit it names, checks the line is there and says what the citation claims it says, and then prints that line so a reviewer reading the log sees what was pointed at rather than a tick. The [format is here](docs/citation-format.md). Because the pin has not landed, the honest count of citations in this repository today is zero, which is also what a broken checker would report, so the gate proves it can go red: a self test resolves against two real commits in the two pinned repositories and checks that every citation that should be refused is refused for the right reason.
+Citations are checked by a machine rather than by a reviewer. `xray cite` takes each one apart, refuses anything pinned to a tag or a branch instead of a commit, fetches the file from the repository it names at the commit it names, checks the line is there and says what the citation claims it says, and then prints that line so a reviewer reading the log sees what was pointed at rather than a tick. The [format is here](docs/citation-format.md). Because the pin has not landed, the honest count of citations in this repository today is zero, which is also what a broken checker would report, so the gate proves it can go red: a self test resolves against two real commits in the two pinned repositories and checks that every citation that should be refused is refused for the right reason. What it fetches goes into [a cache](docs/the-cache.md) that records where each thing came from and the hash of what arrived, and refuses anything that has changed since, because the files a program writes while nobody is watching are not a category this repository makes an exception for.
 
 ## Layout
 
@@ -82,9 +82,10 @@ Citations are checked by a machine rather than by a reviewer. `xray cite` takes 
 | `tools/xray` | The command line tool. Prints the environment banner, lints the prose rules, and runs [the six step build](docs/the-build.md) over lessons, diagrams and blueprints |
 | `lessons` | One directory per lesson. The page in each one is generated, never edited |
 | `blueprints` | One directory per blueprint. The document in each one is generated, and so are the sections that can be |
-| `docs` | How the machinery works. [The build](docs/the-build.md), the [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md), the [blueprint format](docs/blueprint-format.md) and the [citation format](docs/citation-format.md) |
+| `docs` | How the machinery works. [The build](docs/the-build.md), [the cache](docs/the-cache.md), the [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md), the [blueprint format](docs/blueprint-format.md) and the [citation format](docs/citation-format.md) |
 | `docs/probes` | The measurements that decided something, with the script that produced each one |
 | `environments.json` | The three configurations a lesson is allowed to need, cheapest first. A block asking for anything else fails the build |
+| `pin.json` | The two repositories and the commits every citation resolves against |
 | `.github/workflows` | CI. Everything in this repository is checked by a machine or it is not checked |
 
 The first blueprint is [BP-METADATA](blueprints/bp-metadata/blueprint.md), a draft with two of its subsections generated rather than typed. The animations and the site arrive with the milestones that build them. Nothing is committed here as a placeholder.

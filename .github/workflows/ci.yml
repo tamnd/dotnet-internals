@@ -118,8 +118,39 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
+      # The tool says where its cache is and what to call it, rather than the two being typed here
+      # and drifting apart. The key carries the cache layout version, so changing the layout
+      # abandons the old cache instead of restoring it into a tool that would misread it, and it
+      # carries a hash of pin.json, because what this job is allowed to fetch is exactly what the
+      # pin names. A pull request reads the cache that the last run on main saved.
+      - id: cache
+        run: |
+          echo "path=$(dotnet run --project tools/xray -- cache path)" >> "$GITHUB_OUTPUT"
+          echo "key=$(dotnet run --project tools/xray -- cache key --repository dotnet-internals --tag ${{ hashFiles('pin.json') }} --platform any --configuration any --name cite)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.cache.outputs.path }}
+          key: ${{ steps.cache.outputs.key }}
       - run: dotnet run --project tools/xray -- cite
       - run: dotnet run --project tools/xray -- cite --selftest
+      # What this job fetched, and where each thing came from, in the log. A cache is a set of
+      # files a program wrote while nobody was looking, so the run that fills it is the run that
+      # ought to say what went in.
+      - run: dotnet run --project tools/xray -- cache list
+
+  # The cache the job above depends on. It has the failure mode that does not turn anything red:
+  # an entry that is still sitting there and is no longer what arrived, which every run after that
+  # reads and believes. So the cases here are mostly about refusing, and the two that matter most
+  # are an entry altered on disk and two keys that differ by one axis landing on top of each other.
+  # None of it touches the network, so it runs anywhere.
+  cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - run: dotnet run --project tools/xray -- cache --selftest
 
   # The gate behind the sentence the whole project rests on, which is that no number in a lesson is
   # typed by a person. It reads the lesson source rather than the generated page, and the rule with
