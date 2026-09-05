@@ -51,9 +51,33 @@ The directives are comments, so the file compiles and runs on its own. A reader 
 | Attribute | Default | What it means |
 |---|---|---|
 | `id` | required | The name the page uses to quote this block. Unique within the lesson. |
-| `env` | `E0` | `E0` is the stock SDK, `E1` needs a runtime built from source, `E2` needs a checked build. |
+| `env` | `E0` | Which configuration the block needs. The list is in `environments.json` and the section below explains it. |
 | `tags` | empty | A list in square brackets, used for indexing lessons later. |
 | `capture` | `stdout` | One of `stdout`, `drop` or `none`. See below. |
+
+## What a lesson is allowed to need
+
+![What a lesson is allowed to need](diagrams/environment-ladder.svg)
+
+The configurations are declared in `environments.json` at the top of the repository, cheapest first, and that file is the only copy. A block naming an id that is not in it fails the build.
+
+| Id | What it is | What it costs |
+|---|---|---|
+| `E0` | The stock SDK, installed the way anybody installs it. | One install. |
+| `E1` | The release runtime with a checked `clrjit` beside it, chosen with `DOTNET_JitName`. This is what `DOTNET_JitDump` needs. | One download of about thirty megabytes. |
+| `E2` | A clone of `dotnet/runtime` at the pinned commit, built. | Hours the first time, and tens of gigabytes of disk. |
+
+`E1` is a download rather than a build. That was a guess when the book was planned and it is now a measurement, written up in [the probe](probes/nightly-checked-jit.md), which is the reason the lesson that builds the runtime is number 97 of 99 rather than number 3.
+
+Run `dotnet run --project tools/xray -- env` to see which of them this machine has and, for each one it does not have, the reason. A job that has to have one asserts it with `--require E1` rather than finding out by watching lessons quietly not run.
+
+Three rules keep the declaration honest.
+
+A lesson whose blocks need something above `E0` has to say so on its own page, with `{{needs}}`, which writes out what the configuration is and what it costs. The front matter carries an `env` field naming the most expensive thing any block in the lesson asks for, and the tool checks it against the blocks, so the two cannot drift.
+
+A machine that does not have a configuration skips the lessons that need it. Skipping means the lesson is named in the log with the reason, and that it produces nothing at all, so the check step never compares a committed page against a run that did not happen.
+
+A skipped lesson has to have its page and its captured output already committed. Without that rule, a missing environment would be a way for a lesson nobody has ever built to sit in the repository looking fine.
 
 ## How a block is run, and why it is not run alone
 
@@ -131,6 +155,7 @@ dotnet run --project tools/xray -- assert --selftest
 | `{{gate:g1}}` | A prediction gate, folded so the answer is not visible until it is opened. |
 | `{{asserts:tables}}` | What is checked about that block's output, one bullet each. |
 | `{{boss}}` | The boss fight, written out from `boss/boss.json`. It names nothing because a lesson has one. |
+| `{{needs}}` | What this lesson costs a reader to follow, from `environments.json`. Required on any lesson that needs more than the stock SDK. |
 
 There is no way to write output into the page by hand. There is no way to quote a block that does not exist. Both are errors that fail the build with the file and the name in the message.
 
@@ -227,6 +252,10 @@ A transclusion naming a block or a gate that does not exist, or asking for the o
 A boss fight whose solution never prints one of the answers it promised, and a boss fight whose starting file already passes.
 
 A file under `expected/` that no block in the lesson produces any more, which is what a renamed block leaves behind. Nothing reads it and nothing compares it, so it sits there being a second answer to a question that has one.
+
+A block declaring an `env` that is not in `environments.json`, front matter naming a different configuration from the one the blocks add up to, and a lesson that needs more than the stock SDK without a `{{needs}}` on its page.
+
+A lesson skipped for a missing configuration that has no committed page or no committed captured output, because a lesson nobody has ever run anywhere is not the same thing as a lesson this particular machine cannot run.
 
 ## Determinism
 

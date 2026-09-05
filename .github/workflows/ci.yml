@@ -90,6 +90,11 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
+      # What this runner has, on the record, before anything is built with it. --require E0
+      # rather than nothing, because a job that prints what it found and carries on regardless is
+      # a job that goes green after quietly losing an environment. E0 is the only one the four
+      # hosted runners are set up for today, and this is the line that changes when that changes.
+      - run: dotnet run --project tools/xray -- env --require E0
       # No path, so it covers the whole repository: every lesson, every diagram and every
       # blueprint. Diagrams are generated from a text source too, so a picture cannot drift from
       # the page around it, and the blueprints are the specification half of the project whose

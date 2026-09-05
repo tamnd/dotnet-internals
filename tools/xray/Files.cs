@@ -45,6 +45,23 @@ internal static class Files
 
     internal static IEnumerable<string> Markdown(string root)
     {
+        // A build can be pointed at one file, as in a single diagram source. There is no markdown
+        // under a file, and asking the operating system for it throws rather than saying so.
+        if (File.Exists(root))
+        {
+            if (root.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            {
+                yield return root;
+            }
+
+            yield break;
+        }
+
+        if (!Directory.Exists(root))
+        {
+            yield break;
+        }
+
         foreach (var path in Directory.EnumerateFiles(root, "*.md", SearchOption.AllDirectories))
         {
             var relative = Path.GetRelativePath(root, path);

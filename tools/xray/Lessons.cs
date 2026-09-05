@@ -14,6 +14,7 @@ internal sealed record Ran(
     string Directory,
     string Name,
     IReadOnlyList<Block> Blocks,
+    IReadOnlyList<Configuration> Needs,
     IReadOnlyDictionary<string, Asserted> Asserts,
     Dictionary<string, string> Captured,
     string? BossAnswers);
@@ -68,12 +69,27 @@ internal static class Lessons
     /// printed holds every assertion made about it, and that none of it carries a path off this
     /// machine.
     /// </summary>
-    internal static Ran Execute(string directory, Plan plan)
+    internal static Ran? Execute(string directory, IReadOnlyList<Available> available, Plan plan)
     {
         var name = Path.GetFileName(directory);
         var sourcePath = Path.Combine(directory, SourceName);
         var lines = File.ReadAllLines(sourcePath);
         var blocks = Blocks.Parse(sourcePath, lines);
+
+        var needs = Needs(sourcePath, blocks, available, plan);
+        if (needs is null)
+        {
+            return null;
+        }
+
+        Announced(directory, name, needs, plan);
+
+        var missing = needs.Where(c => !available.First(a => a.Configuration.Id == c.Id).Present).ToList();
+        if (missing.Count > 0)
+        {
+            Skip(directory, name, blocks, missing, available, plan);
+            return null;
+        }
 
         // Loaded before the run, so a lesson with a broken assertions file says so in a second
         // rather than after it has built a fixture and executed a program.
@@ -115,7 +131,148 @@ internal static class Lessons
 
         var answers = Boss.Has(directory) ? Boss.Execute(directory, plan) : null;
 
-        return new Ran(directory, name, blocks, asserts, captured, answers);
+        return new Ran(directory, name, blocks, needs, asserts, captured, answers);
+    }
+
+    /// <summary>
+    /// The configurations this lesson needs, in ladder order, or nothing at all if a block names
+    /// one that does not exist.
+    /// </summary>
+    /// <remarks>
+    /// A block declaring <c>env=E7</c> used to be accepted in silence and run under the stock SDK,
+    /// which is how a page ends up quoting output from a runtime it says it did not use.
+    /// </remarks>
+    private static List<Configuration>? Needs(
+        string sourcePath,
+        IReadOnlyList<Block> blocks,
+        IReadOnlyList<Available> available,
+        Plan plan)
+    {
+        var declared = available.ToDictionary(a => a.Configuration.Id, a => a.Configuration, StringComparer.Ordinal);
+        var needs = new List<Configuration>();
+        var known = true;
+
+        foreach (var block in blocks)
+        {
+            if (!declared.TryGetValue(block.Env, out var configuration))
+            {
+                plan.Problem($"{sourcePath}:{block.DirectiveLine + 1}: block '{block.Id}' declares env={block.Env}, which is not in {Environments.FileName}");
+                known = false;
+                continue;
+            }
+
+            if (!needs.Any(c => c.Id == configuration.Id))
+            {
+                needs.Add(configuration);
+            }
+        }
+
+        if (!known)
+        {
+            return null;
+        }
+
+        // Ladder order rather than the order the blocks happen to be in, so the notice on the page
+        // reads the same way whichever block the author wrote first.
+        var order = available.Select(a => a.Configuration.Id).ToList();
+        needs.Sort((a, b) => order.IndexOf(a.Id).CompareTo(order.IndexOf(b.Id)));
+
+        return needs;
+    }
+
+    /// <summary>
+    /// A lesson that costs a reader more than an SDK install has to say so on its own page.
+    /// </summary>
+    /// <remarks>
+    /// This was a rule in CONTRIBUTING enforced by somebody remembering it in review. Checked here
+    /// rather than at assemble time, because the check has to happen on machines that are skipping
+    /// the lesson too, and a skipped lesson never reaches assemble.
+    /// </remarks>
+    private static void Announced(string directory, string name, List<Configuration> needs, Plan plan)
+    {
+        var prosePath = Path.Combine(directory, ProseName);
+        if (!File.Exists(prosePath))
+        {
+            return;
+        }
+
+        var prose = File.ReadAllText(prosePath);
+
+        // The front matter names one configuration for the whole lesson, which is the most
+        // expensive thing any of its blocks asks for. Two places saying what a lesson needs is
+        // fine as long as one of them is checked against the other.
+        var top = needs[^1].Id;
+        var stated = FrontMatter(prose, "env");
+
+        if (stated is null)
+        {
+            plan.Problem($"{name}/{ProseName}: no env in the front matter, so the page does not say what it costs to follow");
+        }
+        else if (stated != top)
+        {
+            plan.Problem($"{name}/{ProseName}: the front matter says env: {stated} and the most a block in this lesson asks for is {top}");
+        }
+
+        if (top != Environments.Stock && !prose.Contains("{{needs}}", StringComparison.Ordinal))
+        {
+            plan.Problem($"{name}/{ProseName}: this lesson needs {top} and the page never says so, put {{{{needs}}}} in the prose near the top");
+        }
+    }
+
+    /// <summary>One field out of the front matter, or nothing if the page does not have it.</summary>
+    private static string? FrontMatter(string prose, string key)
+    {
+        var lines = prose.Split('\n');
+        if (lines.Length == 0 || lines[0].Trim() != "---")
+        {
+            return null;
+        }
+
+        foreach (var line in lines.Skip(1).TakeWhile(l => l.Trim() != "---"))
+        {
+            if (line.StartsWith(key + ":", StringComparison.Ordinal))
+            {
+                return line[(key.Length + 1)..].Trim();
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Leaves out a lesson this machine cannot run, and insists that what is already committed for
+    /// it is complete.
+    /// </summary>
+    /// <remarks>
+    /// Without the second half, a missing environment would be a way of getting a green build for
+    /// a lesson that has never been run anywhere. The skip is allowed to mean "somebody else built
+    /// this and it is on disk". It is not allowed to mean "nobody has ever built this".
+    /// </remarks>
+    private static void Skip(
+        string directory,
+        string name,
+        IReadOnlyList<Block> blocks,
+        List<Configuration> missing,
+        IReadOnlyList<Available> available,
+        Plan plan)
+    {
+        var why = missing.Select(c => available.First(a => a.Configuration.Id == c.Id).Why);
+        Plan.Note($"{name} needs {string.Join(" and ", missing.Select(c => c.Id))}, not run here: {string.Join("; ", why)}");
+
+        var wanted = blocks
+            .Where(b => b.Capture == Blocks.Stdout)
+            .Select(b => Path.Combine(directory, ExpectedDirectory, b.Id + ".txt"))
+            .ToList();
+
+        if (File.Exists(Path.Combine(directory, ProseName)))
+        {
+            wanted.Add(Path.Combine(directory, PageName));
+        }
+
+        foreach (var file in wanted.Where(f => !File.Exists(f)))
+        {
+            plan.Problem($"{Path.GetRelativePath(Directory.GetCurrentDirectory(), file)}: this lesson was skipped because this machine has no {string.Join(" or ", missing.Select(c => c.Id))}, and it has no committed copy of this file either, so nothing has ever produced it");
+        }
     }
 
     /// <summary>
@@ -309,6 +466,9 @@ internal static class Lessons
                 }
 
                 return Gates.Render(gate);
+
+            case "needs":
+                return Environments.Notice(lesson.Needs, Files.Root(lesson.Directory), lesson.Directory);
 
             case "boss":
                 if (!Boss.Has(lesson.Directory))

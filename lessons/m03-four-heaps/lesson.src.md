@@ -12,7 +12,9 @@ Where do the strings and the blobs live?
 
 You have seen the metadata tables. A type is a row, a method is a row, a parameter is a row, and every row has a fixed set of columns. What you have not seen is where the actual text goes, because a row cannot hold text. This lesson is about the four places it goes instead, and about the fact that two of those places both hold strings and are not the same place.
 
-Everything here runs on a stock SDK. There is no runtime built from source, no debugger, and no privilege you do not already have. `System.Reflection.Metadata` ships in the box.
+{{needs}}
+
+There is no debugger here and no privilege you do not already have. `System.Reflection.Metadata` ships in the box.
 
 ## A row cannot hold a name
 

@@ -1,0 +1,19 @@
+# The three configurations a lesson is allowed to need, cheapest first, and the two rules that
+# keep the declaration honest.
+
+title What a lesson is allowed to need
+
+box e0 40 60 280 150 "E0  the stock SDK" "One install, the way anybody" "installs it. Ninety six of the" "ninety nine lessons live here."
+
+box e1 340 60 280 150 "E1  a checked JIT" "The release runtime with a" "checked clrjit dropped in beside" "it, chosen with DOTNET_JitName." "One download, and then" "DOTNET_JitDump works."
+
+box e2 640 60 280 150 "E2  built from source" "A clone of dotnet/runtime at the" "pinned commit, built. Hours and" "tens of gigabytes of disk. One" "lesson out of the ninety nine."
+
+note checked 40 250 420 170 "A block says which rung it needs, and" "the tool reads that now. Before, every" "block said E0 and nothing looked, so" "the first block to say E1 would have" "run under E0 anyway and the page would" "have quoted the wrong runtime while" "saying it had not."
+
+note skipped 500 250 420 170 "A machine without a rung skips the" "lessons that need it, by name, and" "produces nothing for them. The skip is" "allowed only when the page is already" "committed, so a missing environment" "cannot be the reason a lesson nobody" "has ever built looks fine."
+
+arrow e0 e1 "one download"
+arrow e1 e2 "hours"
+
+size 960 460

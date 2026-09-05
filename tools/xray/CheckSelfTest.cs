@@ -20,9 +20,8 @@ namespace ClrXray;
 /// object by name.
 /// </para>
 /// <para>
-/// The two cases that change nothing matter as much as the seven that break something. Without
-/// them a harness that failed on everything, including work that is correct, would report a clean
-/// sweep.
+/// The cases that change nothing matter as much as the ones that break something. Without them a
+/// harness that failed on everything, including work that is correct, would report a clean sweep.
 /// </para>
 /// </remarks>
 internal static class CheckSelfTest
@@ -88,6 +87,64 @@ internal static class CheckSelfTest
             "nothing saying what this build is pinned to",
             "the steps after that one did not run");
 
+        // The attribute every block has carried since the first lesson, and which until recently
+        // nothing read. A block naming a configuration nobody declared has to be refused, or the
+        // number in the page comes from a runtime the page says it did not use.
+        Case(
+            "a block declaring an environment nobody declared",
+            lesson,
+            (_, where) => Retype(Path.Combine(where, Lessons.SourceName), "env=E0", "env=E7"),
+            $"declares env=E7, which is not in {Environments.FileName}");
+
+        // The other half of that rule. A lesson this machine cannot run is left out rather than
+        // regenerated from a run that did not happen, and leaving it out is only allowed when
+        // somebody else has already built it and committed the result.
+        Case(
+            "a lesson skipped for a missing environment that has never been built",
+            lesson,
+            (repository, where) =>
+            {
+                Absent(repository);
+                Wants(where);
+                File.Delete(Path.Combine(where, "lesson.md"));
+            },
+            "no committed copy of this file either, so nothing has ever produced it");
+
+        // And the case that keeps the one above honest. Same missing environment, same skip, but
+        // the pages are on disk, so there is nothing to complain about.
+        Case(
+            "a lesson skipped for a missing environment whose pages are committed",
+            lesson,
+            (repository, where) =>
+            {
+                Absent(repository);
+                Wants(where);
+            });
+
+        // The rule that used to live in CONTRIBUTING and was enforced by somebody remembering it.
+        Case(
+            "a lesson that needs more than the stock SDK and never says so",
+            lesson,
+            (repository, where) =>
+            {
+                Absent(repository);
+                Wants(where);
+                Retype(Path.Combine(where, "lesson.src.md"), "{{needs}}", string.Empty);
+            },
+            "the page never says so");
+
+        // A lesson says what it needs in two places, and two places that are never compared is
+        // one place plus a decoration.
+        Case(
+            "front matter and blocks disagreeing about what a lesson needs",
+            lesson,
+            (repository, where) =>
+            {
+                Absent(repository);
+                Retype(Path.Combine(where, Lessons.SourceName), "env=E0", "env=E3");
+            },
+            "the front matter says env: E0 and the most a block in this lesson asks for is E3");
+
         Case("an untouched blueprint", blueprint, (_, _) => { });
 
         Case(
@@ -126,6 +183,18 @@ internal static class CheckSelfTest
         File.WriteAllText(Path.Combine(repository, "ClrXray.slnx"), string.Empty);
         File.Copy(Path.Combine(top, Resolve.PinName), Path.Combine(repository, Resolve.PinName), overwrite: true);
         File.Copy(Path.Combine(top, Resolve.GlobalName), Path.Combine(repository, Resolve.GlobalName), overwrite: true);
+        File.Copy(Path.Combine(top, Environments.FileName), Path.Combine(repository, Environments.FileName), overwrite: true);
+
+        // The declaration points at the documents that say how to get each configuration, and the
+        // build checks those exist. The copy needs them, as empty files, or every case below fails
+        // for a reason that has nothing to do with what the case is testing.
+        foreach (var how in Environments.Load(top).Select(c => c.How).Distinct(StringComparer.Ordinal))
+        {
+            var to = Path.Combine(repository, how);
+            Directory.CreateDirectory(Path.GetDirectoryName(to)!);
+            File.WriteAllText(to, string.Empty);
+        }
+
         Copy(source, where);
 
         var log = new StringWriter();
@@ -190,6 +259,57 @@ internal static class CheckSelfTest
         var builder = new StringBuilder(text);
         builder[at] = text[at] == '9' ? '8' : (char)(text[at] + 1);
         File.WriteAllText(path, builder.ToString());
+    }
+
+    /// <summary>
+    /// Makes the lesson need the rung that nothing on this machine provides, in both of the places
+    /// a lesson says what it needs.
+    /// </summary>
+    private static void Wants(string where)
+    {
+        Retype(Path.Combine(where, Lessons.SourceName), "env=E0", "env=E3");
+        Retype(Path.Combine(where, "lesson.src.md"), "env: E0", "env: E3");
+    }
+
+    /// <summary>Changes the first occurrence of something, which is one block rather than all of them.</summary>
+    private static void Retype(string path, string from, string to)
+    {
+        var text = File.ReadAllText(path);
+        var at = text.IndexOf(from, StringComparison.Ordinal);
+
+        if (at < 0)
+        {
+            throw new LessonException($"{path}: nothing here says '{from}', so this case cannot test what it says it tests");
+        }
+
+        File.WriteAllText(path, string.Concat(text.AsSpan(0, at), to, text.AsSpan(at + from.Length)));
+    }
+
+    /// <summary>
+    /// Declares a fourth configuration that this machine certainly does not have, because it is
+    /// found by an environment variable nothing sets. The rung has to be the next one up rather
+    /// than a number picked out of the air, since the ladder is checked for gaps.
+    /// </summary>
+    private static void Absent(string repository)
+    {
+        var path = Path.Combine(repository, Environments.FileName);
+        var rung = Environments.Load(repository).Count;
+
+        var entry = $$"""
+              {
+                "id": "E{{rung}}",
+                "name": "a configuration nothing on this machine provides",
+                "what": "Declared by the self test so that skipping can be tested at all.",
+                "cost": "Not obtainable, which is the point of it.",
+                "how": "README.md",
+                "here": {
+                  "kind": "pointed-at",
+                  "variable": "XRAY_SELFTEST_NEVER_SET"
+                }
+              }
+            """;
+
+        Retype(path, "\n  ]", ",\n" + entry + "\n  ]");
     }
 
     private static void Append(string path) =>

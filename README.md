@@ -84,6 +84,7 @@ Citations are checked by a machine rather than by a reviewer. `xray cite` takes 
 | `blueprints` | One directory per blueprint. The document in each one is generated, and so are the sections that can be |
 | `docs` | How the machinery works. [The build](docs/the-build.md), the [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md), the [blueprint format](docs/blueprint-format.md) and the [citation format](docs/citation-format.md) |
 | `docs/probes` | The measurements that decided something, with the script that produced each one |
+| `environments.json` | The three configurations a lesson is allowed to need, cheapest first. A block asking for anything else fails the build |
 | `.github/workflows` | CI. Everything in this repository is checked by a machine or it is not checked |
 
 The first blueprint is [BP-METADATA](blueprints/bp-metadata/blueprint.md), a draft with two of its subsections generated rather than typed. The animations and the site arrive with the milestones that build them. Nothing is committed here as a placeholder.
