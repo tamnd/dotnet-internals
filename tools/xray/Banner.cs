@@ -15,6 +15,12 @@ namespace ClrXray;
 /// </remarks>
 internal static class Banner
 {
+    /// <summary>How the runtime this tool is running on describes itself, as in .NET 10.0.4.</summary>
+    internal static string Framework => RuntimeInformation.FrameworkDescription;
+
+    /// <summary>The runtime identifier, which is the shortest true answer to which machine this is.</summary>
+    internal static string Platform => RuntimeInformation.RuntimeIdentifier;
+
     internal static int Run()
     {
         foreach (var (name, value) in Collect())
@@ -29,10 +35,10 @@ internal static class Banner
     {
         var rows = new List<(string, string)>
         {
-            ("runtime", RuntimeInformation.FrameworkDescription),
+            ("runtime", Framework),
             ("version", Environment.Version.ToString()),
             ("os", RuntimeInformation.OSDescription.Trim()),
-            ("platform", RuntimeInformation.RuntimeIdentifier),
+            ("platform", Platform),
             ("process arch", RuntimeInformation.ProcessArchitecture.ToString()),
             ("os arch", RuntimeInformation.OSArchitecture.ToString()),
 

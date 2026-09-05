@@ -12,39 +12,20 @@ namespace ClrXray;
 /// </remarks>
 internal static class Diagrams
 {
-    internal static int Run(string path, bool write, out int count)
+    /// <summary>
+    /// Step four for a picture. A diagram has nothing to execute, so it turns up whole in the
+    /// generate step and the two files it produces go into the plan with everything else.
+    /// </summary>
+    internal static void Generate(string source, Plan plan)
     {
-        var sources = Find(path);
-        var problems = 0;
-        count = sources.Count;
+        var name = Path.GetFileName(source);
+        var drawing = DrawingReader.Read(source);
+        var stem = Path.Combine(Path.GetDirectoryName(source)!, Path.GetFileNameWithoutExtension(source));
 
-        foreach (var source in sources)
-        {
-            try
-            {
-                var name = Path.GetFileName(source);
-                var drawing = DrawingReader.Read(source);
-                var stem = Path.Combine(Path.GetDirectoryName(source)!, Path.GetFileNameWithoutExtension(source));
+        Fits(name, drawing, plan);
 
-                problems += Fits(name, drawing);
-
-                problems += Generated.Settle(stem + ".svg", DrawingSvg.Write(drawing, name), write);
-                problems += Generated.Settle(stem + ".excalidraw", DrawingExcalidraw.Write(drawing, name), write);
-            }
-            catch (LessonException error)
-            {
-                Console.Error.WriteLine($"xray: {error.Message}");
-                problems++;
-            }
-        }
-
-        if (sources.Count > 0)
-        {
-            var verb = write ? "draw" : "check";
-            Console.WriteLine($"xray {verb}: {sources.Count} diagram(s), {problems} problem(s)");
-        }
-
-        return problems;
+        plan.Add(stem + ".svg", DrawingSvg.Write(drawing, name));
+        plan.Add(stem + ".excalidraw", DrawingExcalidraw.Write(drawing, name));
     }
 
     /// <summary>
@@ -57,16 +38,13 @@ internal static class Diagrams
     /// diagram that really does overflow, and the fix is a shorter line rather than a bigger
     /// coefficient.
     /// </remarks>
-    private static int Fits(string name, Drawing drawing)
+    private static void Fits(string name, Drawing drawing, Plan plan)
     {
-        var problems = 0;
-
         foreach (var shape in drawing.Shapes)
         {
             if (shape.X < 0 || shape.Y < 0 || shape.X + shape.Width > drawing.Width || shape.Y + shape.Height > drawing.Height)
             {
-                Console.Error.WriteLine($"{name}: '{shape.Id}' hangs off the canvas, which is {drawing.Width} by {drawing.Height}");
-                problems++;
+                plan.Problem($"{name}: '{shape.Id}' hangs off the canvas, which is {drawing.Width} by {drawing.Height}");
             }
 
             var cell = shape.Kind == ShapeKind.Cell;
@@ -85,16 +63,13 @@ internal static class Diagrams
                 var estimate = shape.Lines[i].Length * size * (heading ? 0.60 : 0.55);
                 if (estimate > shape.Width - 16)
                 {
-                    Console.Error.WriteLine($"{name}: '{shape.Id}' line {i + 1} is wider than the box, shorten it or widen the box");
-                    problems++;
+                    plan.Problem($"{name}: '{shape.Id}' line {i + 1} is wider than the box, shorten it or widen the box");
                 }
             }
         }
-
-        return problems;
     }
 
-    private static List<string> Find(string path)
+    internal static List<string> Discover(string path)
     {
         if (File.Exists(path))
         {

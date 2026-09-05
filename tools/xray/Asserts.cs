@@ -89,10 +89,10 @@ internal static class Asserts
     /// </remarks>
     internal static int Run(string root)
     {
-        var lessons = LessonCommand.Discover(root);
+        var lessons = Lessons.Discover(root);
         if (lessons.Count == 0)
         {
-            Console.Error.WriteLine($"xray assert: nothing to check under {root}, a lesson is a directory holding {LessonCommand.SourceName}");
+            Console.Error.WriteLine($"xray assert: nothing to check under {root}, a lesson is a directory holding {Lessons.SourceName}");
             return 2;
         }
 
@@ -119,7 +119,7 @@ internal static class Asserts
     private static int One(string directory, ref int problems)
     {
         var name = Path.GetFileName(directory);
-        var sourcePath = Path.Combine(directory, LessonCommand.SourceName);
+        var sourcePath = Path.Combine(directory, Lessons.SourceName);
         var lines = File.ReadAllLines(sourcePath);
         var blocks = Blocks.Parse(sourcePath, lines);
         var asserts = Load(directory, blocks);
@@ -129,7 +129,7 @@ internal static class Asserts
             return 0;
         }
 
-        LessonCommand.BuildFixture(directory);
+        Lessons.BuildFixture(directory);
         var captured = Blocks.Execute(directory, lines, blocks, "lesson");
         var counted = 0;
 
@@ -183,7 +183,7 @@ internal static class Asserts
 
                 if (!byId.TryGetValue(asserted.Block, out var block))
                 {
-                    throw new LessonException($"{path}: no block named '{asserted.Block}' in {LessonCommand.SourceName}");
+                    throw new LessonException($"{path}: no block named '{asserted.Block}' in {Lessons.SourceName}");
                 }
 
                 // A none block is never marked, so whatever it prints lands in the block above it.

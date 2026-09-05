@@ -1,0 +1,28 @@
+# The six steps of a build, what each one does, and the one place anything is written.
+# The second row runs right to left, so the arrows never cross.
+
+title The six step build
+
+box resolve 40 60 260 110 "1. resolve" "What is this build standing on?" "Reads pin.json and global.json." "Refuses if they disagree."
+
+box cite 340 60 260 110 "2. cite" "Does every citation still point" "where the page says it does?" "The one step needing the network."
+
+box execute 640 60 260 110 "3. execute" "Run every lesson and every" "generator, once each. Check the" "assertions against what printed."
+
+box check 40 230 260 110 "6. check" "The only step that touches disk." "build writes it. check compares" "and fails on any difference."
+
+box assemble 340 230 260 110 "5. assemble" "Fill every hole in the prose with" "the piece that belongs in it, and" "hand over the finished pages."
+
+box generate 640 230 260 110 "4. generate" "Turn what ran into files: captured" "output, blueprint sections," "pictures, boss fight answers."
+
+note stop 40 390 400 130 "A step that finds a problem is the" "last step that runs. Every step" "reads what the one before it made," "so output from a step built on a" "failed one is not a second opinion," "it is noise with a line number."
+
+note flag 480 390 420 130 "build and check are the same six" "steps with one flag flipped. Nothing" "is written until step six, so the two" "cannot drift apart, and a file the" "build no longer produces is reported" "rather than left lying there."
+
+arrow resolve cite ""
+arrow cite execute ""
+arrow execute generate ""
+arrow generate assemble ""
+arrow assemble check ""
+
+size 940 550

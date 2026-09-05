@@ -25,7 +25,7 @@ dotnet run --project tools/xray -- build lessons
 dotnet run --project tools/xray -- check lessons
 ```
 
-`build` runs every lesson and writes the generated files. `check` does exactly the same work and then fails if what it produced is not what is committed. CI runs `check` on linux-x64, linux-arm64, win-x64 and osx-arm64, which is what stops a lesson from being right on one machine and wrong on the page.
+`build` runs every lesson and writes the generated files. `check` does exactly the same work and then fails if what it produced is not what is committed. CI runs `check` on linux-x64, linux-arm64, win-x64 and osx-arm64, which is what stops a lesson from being right on one machine and wrong on the page. Drop the path and it covers the whole repository. Both of them are [the six step build](the-build.md), and the step names in the output are where to look when something goes red.
 
 Everything on a page therefore rests on that comparison, so there is a third command whose whole job is to distrust it.
 
@@ -33,7 +33,7 @@ Everything on a page therefore rests on that comparison, so there is a third com
 dotnet run --project tools/xray -- check --selftest
 ```
 
-That copies a real lesson and a real blueprint, hand edits the generated files in five different ways, and requires the check to object to each one by name. Two more cases change nothing and have to pass, because a harness that failed on everything would otherwise report a clean sweep. A comparison that always passed would look exactly like a repository where nobody had ever hand edited anything, and nobody would find out which one this is until a reader noticed a page saying something the program does not.
+That copies a real lesson and a real blueprint, breaks the copies in seven different ways, and requires the check to object to each one by name. Two more cases change nothing and have to pass, because a harness that failed on everything would otherwise report a clean sweep. A comparison that always passed would look exactly like a repository where nobody had ever hand edited anything, and nobody would find out which one this is until a reader noticed a page saying something the program does not.
 
 ## Blocks
 
@@ -225,6 +225,8 @@ A dropped block with nothing asserted about it, an assertion on a block that doe
 A transclusion naming a block or a gate that does not exist, or asking for the output of a block that does not store any.
 
 A boss fight whose solution never prints one of the answers it promised, and a boss fight whose starting file already passes.
+
+A file under `expected/` that no block in the lesson produces any more, which is what a renamed block leaves behind. Nothing reads it and nothing compares it, so it sits there being a second answer to a question that has one.
 
 ## Determinism
 

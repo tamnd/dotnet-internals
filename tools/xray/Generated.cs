@@ -1,5 +1,18 @@
 namespace ClrXray;
 
+/// <summary>What happened to one generated file at the end of a build.</summary>
+internal enum Settled
+{
+    /// <summary>What is on disk is what the code produces, and nothing was touched.</summary>
+    Same,
+
+    /// <summary>The file was written, because this was a build rather than a check.</summary>
+    Written,
+
+    /// <summary>The file is missing or says something other than what the code produces.</summary>
+    Wrong,
+}
+
 /// <summary>
 /// The half of a build that is the same whether the thing being generated is a lesson page, a
 /// captured run or a picture. Writing it and checking it are one method with one flag, which is
@@ -10,7 +23,7 @@ internal static class Generated
     /// <summary>
     /// Writes the file, or reports the first place it differs from what is on disk.
     /// </summary>
-    internal static int Settle(string path, string content, bool write)
+    internal static Settled Settle(string path, string content, bool write)
     {
         var relative = Path.GetRelativePath(Directory.GetCurrentDirectory(), path);
 
@@ -18,13 +31,14 @@ internal static class Generated
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             var before = File.Exists(path) ? Normalise(File.ReadAllText(path)) : null;
-            if (before != content)
+            if (before == content)
             {
-                File.WriteAllText(path, content);
-                Console.WriteLine($"  wrote {relative}");
+                return Settled.Same;
             }
 
-            return 0;
+            File.WriteAllText(path, content);
+            Console.WriteLine($"  wrote {relative}");
+            return Settled.Written;
         }
 
         if (!File.Exists(path))
@@ -34,18 +48,18 @@ internal static class Generated
             // them and leaves somebody wondering why nothing happened.
             var where = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[0];
             Console.Error.WriteLine($"{relative}: missing, run: dotnet run --project tools/xray -- build {where}");
-            return 1;
+            return Settled.Wrong;
         }
 
         var actual = Normalise(File.ReadAllText(path));
         if (actual == content)
         {
-            return 0;
+            return Settled.Same;
         }
 
         Console.Error.WriteLine($"{relative}: does not match what the code produces");
         Report(content, actual);
-        return 1;
+        return Settled.Wrong;
     }
 
     private static void Report(string wanted, string found)

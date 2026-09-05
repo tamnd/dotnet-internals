@@ -14,8 +14,8 @@ internal static class Program
         {
             "banner" => Banner.Run(),
             "lint" => Lint.Run(args.Length > 1 ? args[1] : "."),
-            "build" => LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: true),
-            "check" => args.Contains("--selftest") ? CheckSelfTest.Run(args.Length > 2 ? args[2] : ".") : LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: false),
+            "build" => Build.Run(Where(args), write: true, offline: args.Contains("--offline")),
+            "check" => args.Contains("--selftest") ? CheckSelfTest.Run(Where(args)) : Build.Run(Where(args), write: false, offline: args.Contains("--offline")),
             "boss" => Fight(args),
             "cite" => args.Contains("--selftest") ? CiteSelfTest.Run() : Cite.Run(args.Length > 1 ? args[1] : "."),
             "numbers" => args.Contains("--selftest") ? NumbersSelfTest.Run() : Numbers.Run(args.Length > 1 ? args[1] : "lessons"),
@@ -24,6 +24,14 @@ internal static class Program
             _ => Unknown(args[0]),
         };
     }
+
+    /// <summary>
+    /// The path a command was pointed at, which is the first argument after the command that is
+    /// not a flag. Everything defaults to the whole repository, because a build that quietly
+    /// covers half of it is how a generated file goes stale without anybody being told.
+    /// </summary>
+    private static string Where(string[] args) =>
+        args.Skip(1).FirstOrDefault(a => !a.StartsWith('-')) ?? ".";
 
     /// <summary>
     /// Grades a boss fight. This is the one command a reader runs at somebody, so it says which
@@ -54,8 +62,9 @@ internal static class Program
         Console.WriteLine();
         Console.WriteLine("  xray banner        Print the environment every claim on a page depends on.");
         Console.WriteLine("  xray lint [path]   Check the prose rules across every markdown file under path.");
-        Console.WriteLine("  xray build [path]  Draw the diagrams, run the lessons and regenerate the blueprints under path.");
-        Console.WriteLine("  xray check [path]  The same work, and fail if the committed files differ from it.");
+        Console.WriteLine("  xray build [path]  The six step build over path: resolve, cite, execute, generate, assemble, check.");
+        Console.WriteLine("  xray check [path]  The same six steps, and fail if the committed files differ from what they produce.");
+        Console.WriteLine("      --offline      Skip the cite step, which is the one step that needs the network.");
         Console.WriteLine("  xray check --selftest   Hand edit a generated file on purpose and prove the check objects.");
         Console.WriteLine("  xray boss <path>   Grade your answer to one lesson's boss fight.");
         Console.WriteLine("  xray cite [path]   Resolve every citation under path against the two pinned repositories.");

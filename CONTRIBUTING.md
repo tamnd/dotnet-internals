@@ -36,13 +36,12 @@ A lesson that needs a runtime build without saying so in the second block, in bo
 
 ## Working on a lesson
 
-Read [the lesson format](docs/lesson-format.md) once, and [the diagram format](docs/diagram-format.md) if the lesson needs a picture. They are short and they answer most of what you are about to ask.
+Read [the lesson format](docs/lesson-format.md) once, and [the diagram format](docs/diagram-format.md) if the lesson needs a picture. They are short and they answer most of what you are about to ask. [The build](docs/the-build.md) is worth ten minutes when something goes red and you want to know which of the six steps it was.
 
 Edit `lesson.cs` and `lesson.src.md`, then regenerate.
 
 ```
-dotnet run --project tools/xray -- build lessons
-dotnet run --project tools/xray -- build docs
+dotnet run --project tools/xray -- build
 dotnet run --project tools/xray -- lint
 ```
 
@@ -59,11 +58,11 @@ Read [the blueprint format](docs/blueprint-format.md) first. A blueprint is a di
 Edit `blueprint.json`, `generate.cs` and `blueprint.src.md`, then regenerate.
 
 ```
-dotnet run --project tools/xray -- build blueprints
+dotnet run --project tools/xray -- build
 dotnet run --project tools/xray -- lint
 ```
 
-Commit `blueprint.md` and everything under `generated/` along with what you changed. CI runs `check blueprints`, which runs the generator again and fails if one byte of a generated section differs from what is committed.
+Commit `blueprint.md` and everything under `generated/` along with what you changed. CI runs the same build with `check` instead of `build`, which runs the generator again and fails if one byte of a generated section differs from what is committed.
 
 Three rules the tool enforces and that are worth knowing before you write rather than after. The nine sections are fixed in name and in order, and a draft leaves the ones it has not done out rather than filling them. A blueprint never points at the teaching side of the book, so no sentence in one may say lesson, chapter, as we saw, recall that, earlier we, or you will remember. A blueprint claiming to be complete has to have all nine sections.
 

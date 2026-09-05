@@ -36,9 +36,10 @@ internal static class Boss
 {
     internal const string Directory = "boss";
 
+    internal const string Answers = "answers.txt";
+
     private const string Stub = "boss.cs";
     private const string Solution = "solution.cs";
-    private const string Answers = "answers.txt";
     private const string Prefix = "answer ";
 
     private static readonly JsonSerializerOptions Options = new()
@@ -65,8 +66,8 @@ internal static class Boss
     }
 
     /// <summary>
-    /// Regenerates the answer file from the reference solution, and then proves the fight is a
-    /// fight by running the stub and requiring it to lose.
+    /// Works out the answer file from the reference solution, and then proves the fight is a fight
+    /// by running the stub and requiring it to lose.
     /// </summary>
     /// <remarks>
     /// That second check matters more than it looks. A stub that already passes is a boss fight
@@ -74,11 +75,10 @@ internal static class Boss
     /// solution that quietly makes the starting file correct. Nobody notices, because a green
     /// build looks the same either way.
     /// </remarks>
-    internal static int Build(string lesson, bool write)
+    internal static string Execute(string lesson, Plan plan)
     {
         var name = Path.GetFileName(lesson);
         var fight = Load(lesson);
-        var problems = 0;
 
         var solved = Answer(lesson, Solution);
         foreach (var question in fight.Questions)
@@ -95,16 +95,13 @@ internal static class Boss
             file.Append(question.Key).Append(' ').Append(Digest(question.Key, solved[question.Key])).Append('\n');
         }
 
-        problems += Generated.Settle(Path.Combine(lesson, Directory, Answers), file.ToString(), write);
-
         var attempt = Answer(lesson, Stub);
         if (Wrong(fight, solved, attempt).Count == 0)
         {
-            Console.Error.WriteLine($"{name}: the starting file already passes its own boss fight, so there is nothing to work out");
-            problems++;
+            plan.Problem($"{name}: the starting file already passes its own boss fight, so there is nothing to work out");
         }
 
-        return problems;
+        return file.ToString();
     }
 
     /// <summary>
@@ -128,7 +125,7 @@ internal static class Boss
         // A fight usually reads the lesson's fixture, and somebody arriving here has not
         // necessarily run the build. Building it costs a second when it is already up to date and
         // saves a confusing missing file message when it is not.
-        LessonCommand.BuildFixture(lesson);
+        Lessons.BuildFixture(lesson);
 
         var attempt = Answer(lesson, Stub);
 

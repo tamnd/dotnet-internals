@@ -20,7 +20,7 @@ namespace ClrXray;
 /// object by name.
 /// </para>
 /// <para>
-/// The two cases that change nothing matter as much as the five that break something. Without
+/// The two cases that change nothing matter as much as the seven that break something. Without
 /// them a harness that failed on everything, including work that is correct, would report a clean
 /// sweep.
 /// </para>
@@ -28,6 +28,7 @@ namespace ClrXray;
 internal static class CheckSelfTest
 {
     private static int failures;
+    private static string top = ".";
 
     private const string Lesson = "lessons/smoke-pipeline";
     private const string Blueprint = "blueprints/bp-metadata";
@@ -35,9 +36,10 @@ internal static class CheckSelfTest
     internal static int Run(string root)
     {
         failures = 0;
+        top = Files.Root(root);
 
-        var lesson = Path.Combine(root, "lessons", "smoke-pipeline");
-        var blueprint = Path.Combine(root, "blueprints", "bp-metadata");
+        var lesson = Path.Combine(top, "lessons", "smoke-pipeline");
+        var blueprint = Path.Combine(top, "blueprints", "bp-metadata");
 
         if (!Directory.Exists(lesson) || !Directory.Exists(blueprint))
         {
@@ -47,38 +49,57 @@ internal static class CheckSelfTest
 
         // The control. Everything below tampers with a copy of this same lesson, so if the copy
         // does not pass untouched then none of the failures underneath it mean anything.
-        Case("an untouched lesson", lesson, _ => { }, null);
+        Case("an untouched lesson", lesson, (_, _) => { });
 
         Case(
             "a number changed by hand in a captured output",
             lesson,
-            where => Digit(Digits(Path.Combine(where, "expected"))),
+            (_, where) => Digit(Digits(Path.Combine(where, "expected"))),
             "does not match what the code produces");
 
         Case(
             "a captured output deleted",
             lesson,
-            where => File.Delete(First(Path.Combine(where, "expected"))),
+            (_, where) => File.Delete(First(Path.Combine(where, "expected"))),
             "missing, run");
 
         Case(
             "a sentence added by hand to a generated page",
             lesson,
-            where => Append(Path.Combine(where, "lesson.md")),
+            (_, where) => Append(Path.Combine(where, "lesson.md")),
             "lesson.md");
 
-        Case("an untouched blueprint", blueprint, _ => { }, null);
+        // A block gets renamed and its old captured output stays on disk. Nothing reads it and
+        // nothing compares it, so before the build kept a list of what it produces this was
+        // invisible.
+        Case(
+            "a captured output left behind by a block that no longer exists",
+            lesson,
+            (_, where) => File.WriteAllText(Path.Combine(where, "expected", "renamed-away.txt"), "42\n"),
+            "left over from a block that has been renamed or deleted");
+
+        // Not a tamper with a generated file at all. This one proves the first step of the build
+        // is load bearing, and that a build which cannot say what it is pinned to does not go on
+        // to produce five steps worth of output anyway.
+        Case(
+            "a build that cannot say what it is pinned to",
+            lesson,
+            (repository, _) => File.Delete(Path.Combine(repository, Resolve.PinName)),
+            "nothing saying what this build is pinned to",
+            "the steps after that one did not run");
+
+        Case("an untouched blueprint", blueprint, (_, _) => { });
 
         Case(
             "a number changed by hand in a generated blueprint section",
             blueprint,
-            where => Digit(Digits(Path.Combine(where, "generated"))),
+            (_, where) => Digit(Digits(Path.Combine(where, "generated"))),
             "does not match what the code produces");
 
         Case(
             "a sentence added by hand to a generated blueprint page",
             blueprint,
-            where => Append(Path.Combine(where, "blueprint.md")),
+            (_, where) => Append(Path.Combine(where, "blueprint.md")),
             "blueprint.md");
 
         Console.WriteLine($"xray check --selftest: {failures} failure(s)");
@@ -87,20 +108,24 @@ internal static class CheckSelfTest
 
     /// <summary>
     /// Copies the real thing somewhere else, breaks it in one specific way, and runs the ordinary
-    /// check over the copy. An expectation of nothing means the copy was not broken and the check
-    /// is supposed to pass.
+    /// check over the copy. No expectations means the copy was not broken and the check is
+    /// supposed to pass. Otherwise every expectation has to turn up in what the check said, so
+    /// that a red build for some unrelated reason does not count as this case passing.
     /// </summary>
-    private static void Case(string what, string source, Action<string> tamper, string? expected)
+    private static void Case(string what, string source, Action<string, string> tamper, params string[] expected)
     {
-        // The copy keeps its position in the tree, under a marker file that says this is the top of
-        // a repository, because a generated page names the lesson by its path from there. A copy
-        // dumped in a flat temp directory would produce a different page for that reason alone,
-        // and every case below would then pass without testing anything.
+        // The copy keeps its position in the tree, under the three files that make a directory the
+        // top of this repository, because a generated page names the lesson by its path from there
+        // and the build refuses to start without a pin. A copy dumped in a flat temp directory
+        // would produce a different page for that reason alone, and every case below would then
+        // pass without testing anything.
         var repository = Path.Combine(Path.GetTempPath(), $"xray-check-selftest-{Environment.ProcessId}");
         var where = Path.Combine(repository, Path.GetFileName(Path.GetDirectoryName(source)!), Path.GetFileName(source));
 
         Directory.CreateDirectory(repository);
         File.WriteAllText(Path.Combine(repository, "ClrXray.slnx"), string.Empty);
+        File.Copy(Path.Combine(top, Resolve.PinName), Path.Combine(repository, Resolve.PinName), overwrite: true);
+        File.Copy(Path.Combine(top, Resolve.GlobalName), Path.Combine(repository, Resolve.GlobalName), overwrite: true);
         Copy(source, where);
 
         var log = new StringWriter();
@@ -110,14 +135,14 @@ internal static class CheckSelfTest
 
         try
         {
-            tamper(where);
+            tamper(repository, where);
 
             Console.SetOut(log);
             Console.SetError(log);
 
             try
             {
-                exit = LessonCommand.Run(where, write: false);
+                exit = Build.Run(where, write: false, offline: true);
             }
             finally
             {
@@ -132,7 +157,7 @@ internal static class CheckSelfTest
 
         var said = log.ToString();
 
-        if (expected is null)
+        if (expected.Length == 0)
         {
             Check(exit == 0, $"passes {what}", $"it came back with {exit} and said: {Squash(said)}");
             return;
@@ -144,10 +169,12 @@ internal static class CheckSelfTest
             return;
         }
 
+        var missing = expected.Where(text => !said.Contains(text, StringComparison.Ordinal)).ToList();
+
         Check(
-            said.Contains(expected, StringComparison.Ordinal),
+            missing.Count == 0,
             $"refuses {what}",
-            $"it failed, which is right, but did not mention '{expected}'. It said: {Squash(said)}");
+            $"it failed, which is right, but did not mention {string.Join(" or ", missing.Select(m => $"'{m}'"))}. It said: {Squash(said)}");
     }
 
     /// <summary>Bumps the first digit in a file, which is the smallest edit that is still a lie.</summary>
