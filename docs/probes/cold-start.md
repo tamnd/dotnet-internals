@@ -122,6 +122,8 @@ The right way to read this table is by column and not by row. Within a column th
 
 Nothing here is a benchmark. The point of the numbers is the shape: the SDK install and the first build of the tool are most of a cold run, and both of them are things a warm machine has already paid for and a reader pays once.
 
+The hosted runners are faster than any of the four above, because they sit next to the thing they are downloading. The first run of the job took 67 s on both Linux platforms, 61 s on macOS and 138 s on Windows, so running every gate a second time from nothing costs about a minute of wall clock on a pull request and none of the critical path, since it runs alongside everything else.
+
 ## Running it yourself
 
 On Linux, in a container with nothing in it, with the checkout mounted read only so the build cannot write into it:
