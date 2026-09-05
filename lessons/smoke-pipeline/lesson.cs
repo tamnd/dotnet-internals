@@ -23,8 +23,8 @@ Console.WriteLine("which is why it is allowed to be an expected file");
 
 // Everything this block prints is different on every machine, so it is marked drop. It still
 // runs, and the page can still show the code, but there is no expected file for it and the page
-// cannot quote its output. A lesson that wants to talk about a machine specific value has to
-// describe it rather than assert it.
+// cannot quote its output. What it can do is say what is true of that output on every machine,
+// which is what asserts.json next door is for.
 //# block id=machine env=E0 tags=[pipeline] capture=drop
 Console.WriteLine(System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier);
 Console.WriteLine(System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);

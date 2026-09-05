@@ -24,7 +24,7 @@ namespace ClrXray;
 /// </remarks>
 internal static class LessonCommand
 {
-    private const string SourceName = "lesson.cs";
+    internal const string SourceName = "lesson.cs";
     private const string ProseName = "lesson.src.md";
     private const string PageName = "lesson.md";
     private const string ExpectedDirectory = "expected";
@@ -69,7 +69,7 @@ internal static class LessonCommand
         return problems == 0 ? 0 : 1;
     }
 
-    private static List<string> Discover(string path)
+    internal static List<string> Discover(string path)
     {
         if (File.Exists(Path.Combine(path, SourceName)))
         {
@@ -94,6 +94,10 @@ internal static class LessonCommand
         var lines = File.ReadAllLines(sourcePath);
         var blocks = Blocks.Parse(sourcePath, lines);
 
+        // Loaded before the run, so a lesson with a broken assertions file says so in a second
+        // rather than after it has built a fixture and executed a program.
+        var asserts = Asserts.Load(directory, blocks);
+
         BuildFixture(directory);
 
         var captured = Blocks.Execute(directory, lines, blocks, "lesson");
@@ -101,7 +105,10 @@ internal static class LessonCommand
 
         foreach (var block in blocks)
         {
-            if (block.Capture != Blocks.Stdout)
+            // A none block is never marked, so there is nothing of its own to look at. Every other
+            // block is checked for having run at all, including the ones whose output is dropped,
+            // because a dropped block that never reached its marker is still a broken lesson.
+            if (block.Capture == Blocks.None)
             {
                 continue;
             }
@@ -110,6 +117,22 @@ internal static class LessonCommand
             {
                 Console.Error.WriteLine($"{name}: block '{block.Id}' printed no marker, so it never ran");
                 problems++;
+                continue;
+            }
+
+            if (asserts.TryGetValue(block.Id, out var asserted))
+            {
+                foreach (var problem in Asserts.Check(asserted, output))
+                {
+                    Console.Error.WriteLine($"{name}/{block.Id}: {problem}");
+                    problems++;
+                }
+            }
+
+            // The rest is about storing the output, which is the one thing a dropped block does
+            // not do.
+            if (block.Capture != Blocks.Stdout)
+            {
                 continue;
             }
 
@@ -125,7 +148,7 @@ internal static class LessonCommand
         var prosePath = Path.Combine(directory, ProseName);
         if (File.Exists(prosePath))
         {
-            var page = Render(directory, prosePath, blocks, captured);
+            var page = Render(directory, prosePath, blocks, captured, asserts);
             problems += Generated.Settle(Path.Combine(directory, PageName), page, write);
         }
 
@@ -180,7 +203,12 @@ internal static class LessonCommand
         yield return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     }
 
-    private static string Render(string directory, string prosePath, IReadOnlyList<Block> blocks, Dictionary<string, string> captured)
+    private static string Render(
+        string directory,
+        string prosePath,
+        IReadOnlyList<Block> blocks,
+        Dictionary<string, string> captured,
+        IReadOnlyDictionary<string, Asserted> asserts)
     {
         var byId = blocks.ToDictionary(b => b.Id, StringComparer.Ordinal);
         var gates = Gates.Load(directory);
@@ -229,7 +257,7 @@ internal static class LessonCommand
                 throw new LessonException($"{prosePath}: '{trimmed}' is not a transclusion");
             }
 
-            rendered.Append(Transclude(directory, prosePath, kind, id, byId, captured, gates)).Append('\n');
+            rendered.Append(Transclude(directory, prosePath, kind, id, byId, captured, gates, asserts)).Append('\n');
         }
 
         return rendered.ToString().TrimEnd('\n') + "\n";
@@ -242,7 +270,8 @@ internal static class LessonCommand
         string id,
         Dictionary<string, Block> blocks,
         Dictionary<string, string> captured,
-        IReadOnlyDictionary<string, Gate> gates)
+        IReadOnlyDictionary<string, Gate> gates,
+        IReadOnlyDictionary<string, Asserted> asserts)
     {
         switch (kind)
         {
@@ -266,6 +295,19 @@ internal static class LessonCommand
                 }
 
                 return "```text\n" + (output.Length == 0 ? "(the block printed nothing)\n" : output) + "```";
+
+            case "asserts":
+                if (!blocks.TryGetValue(id, out var promised))
+                {
+                    throw new LessonException($"{prosePath}: no block named '{id}' in {SourceName}");
+                }
+
+                if (!asserts.TryGetValue(id, out var claims))
+                {
+                    throw new LessonException($"{prosePath}: block '{id}' has nothing asserted about it in {Asserts.FileName}");
+                }
+
+                return Asserts.Render(claims, promised);
 
             case "gate":
                 if (!gates.TryGetValue(id, out var gate))

@@ -7,6 +7,7 @@ A lesson is a directory. Everything in it is either something a person wrote or 
 | `lesson.cs` | You | One program. The book quotes regions of it and runs the whole thing. |
 | `lesson.src.md` | You | The prose, with holes in it where the code and the output go. |
 | `gates.json` | You | The prediction gates, if the lesson has any. |
+| `asserts.json` | You | What is true of a block's output, for output the page cannot show. |
 | `fixture/` | You | An optional tiny project the lesson reads, built before the lesson runs. |
 | `boss/boss.json` | You | The boss fight: a title, a brief, and the list of things to work out. |
 | `boss/boss.cs` | You, then the reader | The starting file, with the parts the reader has to write left out. |
@@ -60,9 +61,56 @@ Everything printed before the first marker is discarded, so a cold restore that 
 
 `capture=stdout` is the normal one. The block is marked, its output is stored in `expected/<id>.txt`, and the page can quote it. Use it when the output is the same on every machine that runs it.
 
-`capture=drop` marks the block and throws the output away. Use it when the block prints a path, a timing, a pointer, a thread identifier or anything else that differs between two runs or two platforms. The page can show the code and cannot show the output, which the tool enforces rather than trusting.
+`capture=drop` marks the block and throws the output away. Use it when the block prints a path, a timing, a pointer, a thread identifier or anything else that differs between two runs or two platforms. The page can show the code and cannot show the output, which the tool enforces rather than trusting. A dropped block still has to say what is true of its output, in `asserts.json`, and that is the next section.
 
 `capture=none` does not mark the block at all. That is the only setting a block holding a type or a helper can use, because the marker is a statement, and a statement cannot come after a declaration in a file of top level statements. A block with this setting is quoted and never quoted back.
+
+## Assertions
+
+For most of this project's life the paragraph above was the end of the story for a dropped block, and that was the one hole left in the whole arrangement. A `stdout` block is pinned byte for byte and any change to it fails the build. A dropped block could print anything at all, or quietly stop printing, and nothing would notice, because the only thing reading its output was the bin.
+
+![What is checked about what a block printed](diagrams/assertions.svg)
+
+`asserts.json` closes it. You say what is true of the output whatever machine produced it, the build checks it on all four platforms, and the page prints the list under the code.
+
+```json
+[
+  {
+    "block": "sizes",
+    "claims": [
+      { "lines": 4, "why": "Four heaps, one line each." },
+      { "matches": "^Guid .* runs for +16 bytes$", "why": "Every entry in this heap is sixteen bytes and this assembly has one entry." },
+      { "matches": "^String +starts at +[0-9]+ and runs for +[1-9][0-9]* bytes$", "why": "An assembly that defines a type always has names to put somewhere." }
+    ]
+  }
+]
+```
+
+There are four kinds of claim and one claim sets exactly one of them.
+
+| Claim | Holds when |
+|---|---|
+| `contains` | The output has that text in it somewhere. |
+| `absent` | The output does not have that text in it anywhere. |
+| `matches` | Some line of the output matches that regular expression. |
+| `lines` | The output is exactly that many lines. |
+
+`matches` is multiline, so `^` and `$` mean the ends of a line rather than the ends of the whole blob, which is what anybody writing a rule about a table of output expects. Patterns are compiled when the file loads, so a broken one fails once with the file named rather than in the middle of a run on whichever platform got there first, and matching is given two seconds, so a pattern that backtracks forever is a build that fails rather than a build that hangs.
+
+**Every dropped block needs at least one claim, and there is no way out of that rule.** A dropped block with nothing asserted about it is exactly the hole this feature exists to close, so leaving one open is refused with the block named.
+
+**Every claim needs a `why`.** It is not a comment. It is the sentence a reader gets on the page and the sentence whoever broke the build gets in the log, and an invariant nobody can explain is one somebody deletes the first time it goes red.
+
+Assertions are allowed on a `stdout` block too, where they read differently: the bytes are already pinned, so the assertion is not adding a check so much as saying which part of the pinned output is load bearing. A change to that part then fails with a reason attached rather than as a diff.
+
+Pick the weakest claim that says the true thing. The example above pins the size of `#GUID` because the specification fixes it, and says of the strings heap only that it is not empty, because everything else about it moves when the compiler moves. An assertion that pins a number the compiler is free to change is a red build every time the SDK moves, and those teach people to ignore red builds.
+
+```
+dotnet run --project tools/xray -- assert lessons
+dotnet run --project tools/xray -- assert --selftest
+```
+
+`build` and `check` evaluate the same assertions and mention only the failures, which is right for a gate and unhelpful while you are writing one. `xray assert` runs the lessons and prints every claim, passing ones included, so you can see that the rule you have written is testing what you meant rather than passing because it is vacuous. That failure mode is the one worth worrying about here: an assertion that guarantees nothing reads on the page exactly like an assertion that guarantees something. `--selftest` runs twenty six cases, half of them about refusing output that does not hold, because only that half can tell the two apart.
 
 ## Transclusion
 
@@ -73,6 +121,7 @@ Everything printed before the first marker is discarded, so a cold restore that 
 | `{{block:tables}}` | The source of that block, in a fenced C# listing. |
 | `{{output:tables}}` | What that block printed, in a fenced text listing. |
 | `{{gate:g1}}` | A prediction gate, folded so the answer is not visible until it is opened. |
+| `{{asserts:tables}}` | What is checked about that block's output, one bullet each. |
 | `{{boss}}` | The boss fight, written out from `boss/boss.json`. It names nothing because a lesson has one. |
 
 There is no way to write output into the page by hand. There is no way to quote a block that does not exist. Both are errors that fail the build with the file and the name in the message.
@@ -159,9 +208,11 @@ A fixture is a project rather than a committed binary on purpose. A committed `.
 
 Output containing the path of the directory it ran in, or a path out of the home directory of the machine it ran on. An expected file with a laptop's home directory in it matches on one laptop and fails on the fourth platform, and the message you get there is much worse than the message you get here.
 
-A block that never printed its marker, which means the program exited before reaching it.
+A block that never printed its marker, which means the program exited before reaching it. That includes a dropped block, whose output nobody reads and which still has to have run.
 
 A gate with no correct option, or with two.
+
+A dropped block with nothing asserted about it, an assertion on a block that does not exist, an assertion that sets none of the four claim kinds or more than one of them, and an assertion with no reason written on it.
 
 A transclusion naming a block or a gate that does not exist, or asking for the output of a block that does not store any.
 
@@ -171,4 +222,4 @@ A boss fight whose solution never prints one of the answers it promised, and a b
 
 Lessons run with `DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1` set, so a number formats the same way on all four platforms. Line endings are normalised to one form before anything is compared, so Windows does not disagree with the other three about every line of every file.
 
-Anything else that varies is the lesson author's problem, and the answer is almost always `capture=drop` plus a sentence of prose describing what the reader will see instead.
+Anything else that varies is the lesson author's problem, and the answer is almost always `capture=drop` plus the assertions that say what stays the same about it.

@@ -36,19 +36,27 @@ That output is committed to the repository, and CI on linux-x64, linux-arm64, wi
 
 {{block:machine}}
 
-Those two lines are different on every machine that runs them, so this block is marked `capture=drop`. It runs, and the page shows the code, and there the matter ends. No expected file exists for it and the page is not allowed to quote its output, which the tool enforces rather than trusting.
+Those two lines are different on every machine that runs them, so this block is marked `capture=drop`. It runs, no expected file exists for it, and the page is not allowed to quote its output, which the tool enforces rather than trusting.
+
+That used to be the end of it, and it was the one hole in this whole arrangement. A dropped block could print anything at all, or stop printing, and nothing would notice. So a dropped block now has to say what is true of its output whatever machine produced it, and the build checks that on all four.
+
+{{asserts:machine}}
+
+The second of those is the one worth pointing at. This page claims in several places that the book runs on four platforms. That claim is now made by the runtime itself, once per platform, in a job that fails if any of them disagrees.
 
 {{gate:capture}}
 
 ## What this file guarantees
 
-Three things, and they are the three that every later lesson leans on.
+Four things, and they are the four that every later lesson leans on.
 
 The code on the page is the code that ran, because it is the same region of the same file rather than a copy of it.
 
 The output on the page is the output that region produced, on a machine you can look at, on four platforms rather than one.
 
 Changing the code and leaving the numbers alone is not possible, because the check that regenerates the page is the check that fails the build.
+
+Output the page cannot show you is still output somebody has made a promise about, and the promise is on the page next to the code that has to keep it.
 
 {{boss}}
 

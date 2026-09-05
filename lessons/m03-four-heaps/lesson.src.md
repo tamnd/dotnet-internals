@@ -40,11 +40,13 @@ Each heap has a position in the metadata section and a length.
 
 {{block:sizes}}
 
-That block is marked `capture=drop`, so its output is not stored and this page cannot quote it. Run it and you will see `#Strings` starting a few hundred bytes into the metadata and running for a few hundred more, with `#US` a good deal smaller, and `#GUID` smaller than either.
+Those numbers are positions in a file the compiler wrote, and they move when the compiler moves. A newer Roslyn that emits one more attribute makes every one of them different. Nothing would be learned by pinning them, and the build would break every time the SDK moved, which is the sort of red build that teaches people to ignore red builds. So the block is marked `capture=drop` and this page cannot show you what it printed.
 
-Those numbers are positions in a file the compiler wrote, and they move when the compiler moves. A newer Roslyn that emits one more attribute makes every one of them different. Nothing would be learned by pinning them, and the build would break every time the SDK moved, which is the sort of red build that teaches people to ignore red builds.
+That does not mean nothing is checked. It means the checking moves from the numbers to the shape.
 
-The exception is `#GUID`, whose size does not move at all. A block further down this page prints it, and it prints why.
+{{asserts:sizes}}
+
+Read the middle one again, because it is the interesting one. It pins the size of `#GUID` and says nothing whatever about the other three, which is the shape of most honest claims about a file format: one part is fixed by the specification and the rest is up to whoever wrote the compiler that day.
 
 ## A name is an offset, and you can go and look
 
@@ -120,7 +122,9 @@ Almost every assembly has exactly one entry, the module version id. The Mvid is 
 
 {{block:mvid}}
 
-That is marked `capture=drop` for the reason that is now familiar. Run it twice against two builds and you get two different values, which is the point of it.
+That is marked `capture=drop` for the reason that is now familiar. Run it twice against two builds and you get two different values, which is the point of it. What survives from one build to the next is the shape, so the shape is what gets checked.
+
+{{asserts:mvid}}
 
 ## What to take away
 

@@ -18,6 +18,8 @@ A citation without a repository prefix or without a commit. Two repositories are
 
 A number typed into prose. If you want to say a structure is twenty four bytes, transclude the block that printed twenty four. `xray numbers` enforces this on lesson source: a number already sitting in that lesson's captured output is refused outright, and any other bare number needs `<!-- literal: why this is not a measurement -->` on the line. The rules are in [docs/lesson-format.md](docs/lesson-format.md#numbers), including the hole in them.
 
+A block marked `capture=drop` with nothing asserted about its output. Dropping the output is how a lesson says the value differs between machines. It is not how a lesson says nobody is checking. Write down what is true of it whatever machine ran it, in `asserts.json`, and the build will check that on all four platforms and print it on the page.
+
 A codegen or disassembly claim with no environment banner. Generated code is a function of the runtime version, the build configuration, the platform, the instruction set and the tier. A listing without all five is not evidence of anything.
 
 A blueprint section that says "see the chapter". A blueprint is read by somebody implementing from scratch who has not read the chapter and does not have to, and `xray check blueprints` looks for the words that do this.
@@ -46,7 +48,7 @@ dotnet run --project tools/xray -- lint
 
 Commit what that wrote, including `lesson.md` and everything under `expected/`. CI runs the same build on four platforms with `check` instead of `build`, so a generated file that is out of date fails the pull request rather than reaching a reader.
 
-If a lesson prints something that differs between two machines, mark the block `capture=drop` and describe the output in prose. Do not go looking for a way to make the expected file match on your laptop.
+If a lesson prints something that differs between two machines, mark the block `capture=drop` and then say in `asserts.json` what is true of that output everywhere. Do not go looking for a way to make the expected file match on your laptop. Run `dotnet run --project tools/xray -- assert lessons` while you are writing them, because it prints the ones that pass as well as the ones that fail, and an assertion that is quietly vacuous is the failure mode here.
 
 If the lesson has a boss fight, write `boss/solution.cs` first and then take things out of it to make `boss/boss.cs`. Doing it the other way round produces a fight the solution does not quite answer, and you find that out from the build rather than from thinking about it.
 

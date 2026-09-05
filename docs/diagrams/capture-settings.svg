@@ -16,18 +16,21 @@
   </defs>
   <rect width="100%" height="100%" fill="#ffffff"/>
   <text class="title" x="24" y="32">The three capture settings</text>
-  <rect x="60" y="80" width="260" height="120" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
-  <text class="cell-heading" text-anchor="middle" x="190" y="128.5">capture=stdout</text>
-  <text class="cell-body" text-anchor="middle" x="190" y="145.5">stored on disk</text>
-  <text class="cell-body" text-anchor="middle" x="190" y="160.5">the page may quote it</text>
-  <rect x="320" y="80" width="260" height="120" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
-  <text class="cell-heading" text-anchor="middle" x="450" y="128.5">capture=drop</text>
-  <text class="cell-body" text-anchor="middle" x="450" y="145.5">runs, then discarded</text>
-  <text class="cell-body" text-anchor="middle" x="450" y="160.5">for output that varies</text>
-  <rect x="580" y="80" width="260" height="120" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
-  <text class="cell-heading" text-anchor="middle" x="710" y="128.5">capture=none</text>
-  <text class="cell-body" text-anchor="middle" x="710" y="145.5">no marker at all</text>
-  <text class="cell-body" text-anchor="middle" x="710" y="160.5">for a block holding a type</text>
+  <rect x="60" y="80" width="260" height="130" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="190" y="126">capture=stdout</text>
+  <text class="cell-body" text-anchor="middle" x="190" y="143">stored on disk</text>
+  <text class="cell-body" text-anchor="middle" x="190" y="158">the page may quote it</text>
+  <text class="cell-body" text-anchor="middle" x="190" y="173">pinned byte for byte</text>
+  <rect x="320" y="80" width="260" height="130" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="450" y="126">capture=drop</text>
+  <text class="cell-body" text-anchor="middle" x="450" y="143">runs, then discarded</text>
+  <text class="cell-body" text-anchor="middle" x="450" y="158">for output that varies</text>
+  <text class="cell-body" text-anchor="middle" x="450" y="173">checked by asserts.json</text>
+  <rect x="580" y="80" width="260" height="130" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="710" y="126">capture=none</text>
+  <text class="cell-body" text-anchor="middle" x="710" y="143">no marker at all</text>
+  <text class="cell-body" text-anchor="middle" x="710" y="158">for a block holding a type</text>
+  <text class="cell-body" text-anchor="middle" x="710" y="173">nothing to check</text>
   <rect x="60" y="240" width="780" height="60" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
   <text class="body" text-anchor="middle" x="450" y="267">A marker is a statement, and a statement cannot come after a declaration</text>
   <text class="body" text-anchor="middle" x="450" y="284">in a file of top level statements. That is the only reason the third setting exists.</text>
