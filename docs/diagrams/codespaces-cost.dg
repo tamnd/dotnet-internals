@@ -1,0 +1,23 @@
+# Two things share the name "cold start" and they are different sizes. The download is the part
+# this project controls and it is drawn to scale against the part GitHub controls, which is drawn
+# as an unknown on purpose rather than as a guess. The strip widths are the measured seconds.
+
+title Where a reader's first minute goes
+
+note code 40 70 920 60 "Measured on a 4 core runner at load 0.09, not on a Codespace." "The two boxes with a question mark are GitHub's and were not measured."
+
+box own 40 170 200 90 "what the repo" "controls" "measured"
+strip mine 260 170 230 90 "container start|0.19 s" "first build|4.5 s" "every build after|1.8 s"
+
+box theirs 40 290 200 90 "what GitHub" "controls" "not measured"
+strip gh 260 290 345 90 "provision a VM|?" "pull 0.70 GB|?"
+
+arrow mine.0 gh.0 "the same clock"
+
+note img 40 430 440 150 "The image is 1.7 GB unpacked" "and 0.70 GB compressed." "0.60 GB of the unpacked size" "is the base image's git and" "common-utils features, which" "no lesson here touches."
+
+note lean 520 430 440 150 "The same image on a plain" "ubuntu base is 1.2 GB and" "0.50 GB compressed, in 10" "layers rather than 17, and" "it still produces a JitDump." "Not shipped yet, see the page."
+
+note cost 40 610 920 90 "Cost to the project: 51 s of runner time to rebuild the image from nothing, 0 s when nothing changed." "Cost to a reader: 2 hours a day for thirty days fits in the free allowance on a 2 core machine." "The pilot lesson runs in 11.8 s once the container is up, and that is the number a lesson page inherits."
+
+size 1000 720

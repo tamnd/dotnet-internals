@@ -32,6 +32,8 @@ Every chapter therefore produces two things. The chapter teaches, in prose and p
 
 **Some lessons run in the browser, and the limit is not that things throw.** Fifty one checks were [run in a real page](docs/probes/browser-tier.md). Two throw. Sixteen more answer, and answer about Mono rather than about the runtime this book describes, and four of those do it without any sign that anything is wrong. Reading metadata, signatures and IL in the browser is exact, down to the byte. Reading an object header there gives you a different runtime's header with the two words in the other order, which is why the no install tier stops at Part III rather than Part IV.
 
+**The one click environment is built and its cost is measured, except for the part GitHub owns.** The [E0 image](docs/probes/codespaces-cost.md) carries the pinned SDK, lldb, the diagnostics tools and a checked JIT that produces a real `JitDump` with nothing installed by the reader. It rebuilds from nothing in 51 seconds, it is 0.70 GB to download, a reader's first command in it takes 4.5 seconds and the pilot lesson takes 11.8. What is not measured is how long a real Codespace takes to appear, so the question of whether the local path should be the recommended default is still open rather than answered.
+
 ## What "compatible" is allowed to mean
 
 Nobody has ever built a fully compatible CLI that is not CoreCLR, and a project that claims otherwise gets taken apart in an afternoon, so the tiers are here rather than in a footnote.

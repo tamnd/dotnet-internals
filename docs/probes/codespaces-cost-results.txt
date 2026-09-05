@@ -1,0 +1,64 @@
+The measurement behind codespaces-cost.md, 2 September 2026.
+Unedited apart from this header and the removal of a cleanup warning that repeated once per file.
+
+Run on a GitHub Actions ubuntu-latest runner, four cores, load average 0.09, Docker 28.0.4.
+A runner rather than one of this project's own machines because every one of those is shared and
+busy, and the same script on server3 at load 37 reported 7123 ms for the container start that
+reads as 192 ms here.
+
+host      Linux x86_64, 4 cpus
+load      0.09 0.05 0.01
+docker    28.0.4
+repo      /home/runner/work/dotnet-internals/dotnet-internals
+
+=== cold build, no cache ===
+cold build 51s
+
+=== warm rebuild, full cache ===
+warm rebuild 0s
+
+=== size ===
+unpacked, what the machine stores
+  image   1.7G
+  base    720M
+
+compressed, what a cold start downloads
+  total   0.70 GB in 17 layers
+  largest 0.24 GB
+
+the five largest layers, whole image:
+   640 MB  RUN |1 DOTNET_SDK_VERSION=10.0.400 /bin/sh -c curl -fsSL https:/
+   405 MB  RUN /bin/sh -c cp -ar /tmp/build-features-src/git_1 /tmp/dev-con
+   242 MB  RUN |1 DOTNET_SDK_VERSION=10.0.400 /bin/sh -c apt-get update && 
+   195 MB  RUN /bin/sh -c cp -ar /tmp/build-features-src/common-utils_0 /tm
+   160 MB  RUN |1 DOTNET_SDK_VERSION=10.0.400 /bin/sh -c dotnet tool instal
+
+=== a reader's first commands, median of 5 ===
+container only            192 ms   (runs: 185 192 193 181 201)
+banner, first time       4522 ms   (runs: 4477 4515 4547 4522 4529)
+banner, again            1814 ms   (runs: 1829 1820 1803 1786 1814)
+the pilot lesson        11751 ms   (runs: 11749 11751 11599 11802 11804)
+
+=== controls ===
+sdk       10.0.400
+counters  10.0.731102+f09edf7ea9a17a86b236b91eb4c458d0469546b6
+lldb      lldb version 18.1.3
+jit       {"repo":"dotnet/runtime","branch":"release/10.0","commit":"d27317c6b8b1ca3833c3b2b8bb0720de36f19b75","runtime":"10.0.11","file":"libclrjit_checked.so","switch":"DOTNET_JitName=libclrjit_checked.so"}
+does DOTNET_JitDump actually work on this image, with nothing installed by the reader:
+dump      1 line(s) naming the method
+
+=== free tier arithmetic, over GitHub's published rates ===
+a 2 core Codespace bills 2 core hours per wall clock hour
+the personal free allowance is 120 core hours a month, so 60 hours on a 2 core machine
+at one lesson a day for thirty days that is 2 hours a day before a reader pays
+
+storage is billed separately against a 15 GB month allowance, and the image is on the disk:
+  unpacked image 1.7G, against a 32 GB disk on the smallest machine
+  so a codespace left alive for a month spends roughly a sixth of the storage allowance
+  and a reader who deletes it between sessions spends almost none
+
+=== the same image on a plain ubuntu base ===
+cold build 44s
+unpacked   1.2G
+compressed 0.50 GB in 10 layers
+dump       1 line(s) naming the method

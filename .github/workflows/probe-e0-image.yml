@@ -1,0 +1,57 @@
+# Build the E0 image on a runner and measure it. Dispatch only, never on a push.
+#
+# It lives here rather than being run on somebody's desk for one reason: the numbers this probe
+# produces are timings, and every machine this project can reach for is shared and busy. A runner is
+# a dedicated VM, which makes it the quietest thing available and the closest in shape to the 2 core
+# VM a Codespace actually is.
+#
+# It also measures the cost to the project directly. The job's own duration is the Actions time a
+# prebuild regeneration spends, which is the half of question 7 that is not about the reader.
+
+name: probe e0 image
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: how many timed runs per measurement
+        default: "5"
+  # Remeasure whenever the image or the script changes, on the same principle as everything else
+  # here: a number in a document that describes a thing that has since changed is a wrong number,
+  # and nobody remembers to rerun a probe by hand.
+  push:
+    branches: [main, 'probe/**']
+    paths:
+      - '.devcontainer/**'
+      - 'docs/probes/codespaces-cost.sh'
+      - '.github/workflows/probe-e0-image.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: what this machine is
+        run: |
+          echo "cpus    $(nproc)"
+          echo "memory  $(free -g | awk '/^Mem:/{print $2}') GB"
+          echo "disk    $(df -h / | awk 'NR==2{print $4}') free"
+          echo "load    $(cut -d' ' -f1-3 /proc/loadavg)"
+
+      - name: measure
+        run: RUNS=${{ inputs.runs }} ./docs/probes/codespaces-cost.sh 2>&1 | tee /tmp/e0.log
+
+      # The build log too, not just the measurement. A cold build time that looks too good is the
+      # thing you most want to be able to check, and you cannot check it from a number.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e0-measurement
+          path: |
+            /tmp/e0.log
+            /tmp/e0-build.log
