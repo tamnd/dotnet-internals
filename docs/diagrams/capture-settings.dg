@@ -4,6 +4,6 @@
 title The three capture settings
 size 900 340
 
-strip c 60 80 260 120 "capture=stdout|stored on disk|the page may quote it" "capture=drop|runs, then discarded|for output that varies" "capture=none|no marker at all|for a block holding a type"
+strip c 60 80 260 130 "capture=stdout|stored on disk|the page may quote it|pinned byte for byte" "capture=drop|runs, then discarded|for output that varies|checked by asserts.json" "capture=none|no marker at all|for a block holding a type|nothing to check"
 
 note why 60 240 780 60 "A marker is a statement, and a statement cannot come after a declaration" "in a file of top level statements. That is the only reason the third setting exists."

@@ -79,11 +79,17 @@ foreach (var heap in Enum.GetValues<HeapIndex>())
 }
 ```
 
-That block is marked `capture=drop`, so its output is not stored and this page cannot quote it. Run it and you will see `#Strings` starting a few hundred bytes into the metadata and running for a few hundred more, with `#US` a good deal smaller, and `#GUID` smaller than either.
+Those numbers are positions in a file the compiler wrote, and they move when the compiler moves. A newer Roslyn that emits one more attribute makes every one of them different. Nothing would be learned by pinning them, and the build would break every time the SDK moved, which is the sort of red build that teaches people to ignore red builds. So the block is marked `capture=drop` and this page cannot show you what it printed.
 
-Those numbers are positions in a file the compiler wrote, and they move when the compiler moves. A newer Roslyn that emits one more attribute makes every one of them different. Nothing would be learned by pinning them, and the build would break every time the SDK moved, which is the sort of red build that teaches people to ignore red builds.
+That does not mean nothing is checked. It means the checking moves from the numbers to the shape.
 
-The exception is `#GUID`, whose size does not move at all. A block further down this page prints it, and it prints why.
+**Checked, though the output is not on this page.** That block prints something different on every machine, so nothing is stored and nothing can be quoted. These are the things that are true of it everywhere, and the build fails on any platform where one of them stops being true.
+
+- Exactly 4 lines. Four heaps, one line each. The tables stream is not among them, because it is a stream and not a heap, and a reader counting streams on this page will get five.
+- A line matches `^Guid .* runs for +16 bytes$`. Every entry in this heap is sixteen bytes wide and this assembly has one entry, so this is the one number in the block that does not move when the compiler moves.
+- A line matches `^String +starts at +[0-9]+ and runs for +[1-9][0-9]* bytes$`. The strings heap is never empty in an assembly that defines a type, because a type with no name is not something this format can represent. The size itself changes with every compiler release, so the rule says it is not zero and says nothing else about it.
+
+Read the middle one again, because it is the interesting one. It pins the size of `#GUID` and says nothing whatever about the other three, which is the shape of most honest claims about a file format: one part is fixed by the specification and the rest is up to whoever wrote the compiler that day.
 
 ## A name is an offset, and you can go and look
 
@@ -344,7 +350,12 @@ Almost every assembly has exactly one entry, the module version id. The Mvid is 
 Console.WriteLine(reader.GetGuid(module.Mvid));
 ```
 
-That is marked `capture=drop` for the reason that is now familiar. Run it twice against two builds and you get two different values, which is the point of it.
+That is marked `capture=drop` for the reason that is now familiar. Run it twice against two builds and you get two different values, which is the point of it. What survives from one build to the next is the shape, so the shape is what gets checked.
+
+**Checked, though the output is not on this page.** That block prints something different on every machine, so nothing is stored and nothing can be quoted. These are the things that are true of it everywhere, and the build fails on any platform where one of them stops being true.
+
+- Exactly one line. One module version id, because the heap it comes out of has one entry in it.
+- A line matches `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`. The value is different in every build and its shape is the same in all of them. That shape is the most a page can honestly say about a number whose entire job is to be new every time.
 
 ## What to take away
 

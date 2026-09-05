@@ -129,6 +129,21 @@ jobs:
       - run: dotnet run --project tools/xray -- numbers lessons
       - run: dotnet run --project tools/xray -- numbers --selftest
 
+  # The assertion checker. The assertions themselves are evaluated by the lessons job on all four
+  # platforms, which is where they belong, because the whole point of one is that it holds on a
+  # machine other than the author's. What is here is the self test, and it is here because this
+  # gate's failure mode is not a red build. An assertion that is quietly vacuous passes forever and
+  # reads on the page exactly like one that is doing something, so half of these cases are about
+  # refusing output that does not hold, since only those can tell the two apart.
+  asserts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - run: dotnet run --project tools/xray -- assert --selftest
+
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going
   # to be pinned to. It is allowed to fail, because a broken preview is not a broken repository.

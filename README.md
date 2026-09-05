@@ -53,7 +53,7 @@ Tier C is where every independent CLI has stopped, and the reason is worth stati
 
 It is not a specification of .NET. ECMA-335 is the standard, and this project specifies what it has examined against a pinned implementation and records where the two differ.
 
-It is not authoritative on performance. Every timing here is one measurement on one machine, labelled as such, and no lesson asserts on a timing.
+It is not authoritative on performance. Every timing here is one measurement on one machine, labelled as such, and no lesson asserts on a timing. A block that prints one has its output dropped, and what gets checked about it is its shape rather than its numbers, so a reader on a slow laptop never sees a red build that means their computer is slow.
 
 It is not stable across versions. The book is pinned to one runtime commit, one Roslyn commit and one SDK, the pin prints on every page, and there is a branch per minor version.
 
@@ -90,7 +90,7 @@ The first blueprint is [BP-METADATA](blueprints/bp-metadata/blueprint.md), a dra
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) first. The short version is that no number in this repository is typed by a human, no citation is trusted because somebody read it once, and a hand edited generated file is rejected on sight.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) first. The short version is that no number in this repository is typed by a human, no citation is trusted because somebody read it once, no output goes unchecked because it was too machine specific to print, and a hand edited generated file is rejected on sight.
 
 Issues labelled [good first issue](https://github.com/tamnd/dotnet-internals/labels/good%20first%20issue) are the place to start.
 

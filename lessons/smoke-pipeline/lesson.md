@@ -57,7 +57,17 @@ Console.WriteLine(System.Runtime.InteropServices.RuntimeInformation.RuntimeIdent
 Console.WriteLine(System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);
 ```
 
-Those two lines are different on every machine that runs them, so this block is marked `capture=drop`. It runs, and the page shows the code, and there the matter ends. No expected file exists for it and the page is not allowed to quote its output, which the tool enforces rather than trusting.
+Those two lines are different on every machine that runs them, so this block is marked `capture=drop`. It runs, no expected file exists for it, and the page is not allowed to quote its output, which the tool enforces rather than trusting.
+
+That used to be the end of it, and it was the one hole in this whole arrangement. A dropped block could print anything at all, or stop printing, and nothing would notice. So a dropped block now has to say what is true of its output whatever machine produced it, and the build checks that on all four.
+
+**Checked, though the output is not on this page.** That block prints something different on every machine, so nothing is stored and nothing can be quoted. These are the things that are true of it everywhere, and the build fails on any platform where one of them stops being true.
+
+- Exactly 2 lines. One line for the identifier and one for the description. Both values are different on every platform and the count of them is not.
+- A line matches `^(linux|win|osx)-(x64|arm64)$`. The first line is one of the four platforms this book claims to run on, and because this lesson runs on each of them, that claim is checked on each of them rather than written down once.
+- A line matches `^\.NET [0-9]+\.`. The second line names the product and then its version, so it starts with .NET and a number. A machine that answered .NET Framework here would be a machine this book does not run on.
+
+The second of those is the one worth pointing at. This page claims in several places that the book runs on four platforms. That claim is now made by the runtime itself, once per platform, in a job that fails if any of them disagrees.
 
 **Predict before you run it.** The program runs once, from top to bottom, and every block prints to standard output. The third block is marked capture=drop. What ends up in the repository for it?
 
@@ -80,13 +90,15 @@ There is a third setting, capture=none, and the difference is worth holding on t
 
 ## What this file guarantees
 
-Three things, and they are the three that every later lesson leans on.
+Four things, and they are the four that every later lesson leans on.
 
 The code on the page is the code that ran, because it is the same region of the same file rather than a copy of it.
 
 The output on the page is the output that region produced, on a machine you can look at, on four platforms rather than one.
 
 Changing the code and leaving the numbers alone is not possible, because the check that regenerates the page is the check that fails the build.
+
+Output the page cannot show you is still output somebody has made a promise about, and the promise is on the page next to the code that has to keep it.
 
 ## Boss fight: Read the lesson the way the tool reads it
 

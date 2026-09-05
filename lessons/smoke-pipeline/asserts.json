@@ -1,0 +1,19 @@
+[
+  {
+    "block": "machine",
+    "claims": [
+      {
+        "lines": 2,
+        "why": "One line for the identifier and one for the description. Both values are different on every platform and the count of them is not."
+      },
+      {
+        "matches": "^(linux|win|osx)-(x64|arm64)$",
+        "why": "The first line is one of the four platforms this book claims to run on, and because this lesson runs on each of them, that claim is checked on each of them rather than written down once."
+      },
+      {
+        "matches": "^\\.NET [0-9]+\\.",
+        "why": "The second line names the product and then its version, so it starts with .NET and a number. A machine that answered .NET Framework here would be a machine this book does not run on."
+      }
+    ]
+  }
+]

@@ -1,0 +1,19 @@
+# What happens to the output of one block, and where the hole was before assertions existed.
+
+title What is checked about what a block printed
+
+box run 280 60 440 80 "One block, one run" "It printed something. Here is what" "the build does with it."
+
+box stored 40 190 440 140 "capture=stdout" "The output goes into expected/<id>.txt" "and the page quotes it. One changed" "byte fails the build, on all four" "platforms."
+
+box dropped 520 190 440 140 "capture=drop" "The output goes nowhere. It differs" "on every machine, so the page is" "not allowed to quote it. So what is" "left to check?"
+
+note rule 40 390 440 170 "The rule with teeth, over on the" "right hand side: a dropped block" "with nothing asserted about it is" "refused. It was the one place in a" "lesson where a program could print" "anything at all, or stop printing," "and nobody would find out."
+
+box asserts 520 390 440 170 "asserts.json, which is the answer" "This many lines. Contains this." "Does not contain that. A line" "matching this pattern. Each one" "with a reason, checked everywhere," "and printed onto the page."
+
+arrow run stored "pinned"
+arrow run dropped "not pinned"
+arrow dropped asserts "still checked"
+
+size 1000 590

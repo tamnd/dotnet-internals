@@ -1,0 +1,32 @@
+[
+  {
+    "block": "sizes",
+    "claims": [
+      {
+        "lines": 4,
+        "why": "Four heaps, one line each. The tables stream is not among them, because it is a stream and not a heap, and a reader counting streams on this page will get five."
+      },
+      {
+        "matches": "^Guid .* runs for +16 bytes$",
+        "why": "Every entry in this heap is sixteen bytes wide and this assembly has one entry, so this is the one number in the block that does not move when the compiler moves."
+      },
+      {
+        "matches": "^String +starts at +[0-9]+ and runs for +[1-9][0-9]* bytes$",
+        "why": "The strings heap is never empty in an assembly that defines a type, because a type with no name is not something this format can represent. The size itself changes with every compiler release, so the rule says it is not zero and says nothing else about it."
+      }
+    ]
+  },
+  {
+    "block": "mvid",
+    "claims": [
+      {
+        "lines": 1,
+        "why": "One module version id, because the heap it comes out of has one entry in it."
+      },
+      {
+        "matches": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "why": "The value is different in every build and its shape is the same in all of them. That shape is the most a page can honestly say about a number whose entire job is to be new every time."
+      }
+    ]
+  }
+]
