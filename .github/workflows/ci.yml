@@ -144,6 +144,21 @@ jobs:
           global-json-file: global.json
       - run: dotnet run --project tools/xray -- assert --selftest
 
+  # Two claims hold this repository up. No number in a lesson is typed by a person, and no table in
+  # a blueprint is transcribed by one. Both are enforced the same way, by regenerating the file and
+  # comparing it against what is committed, so both are exactly as true as that comparison is. This
+  # job goes and hand edits the generated files on purpose and requires the build to object to each
+  # one by name. Two of its seven cases change nothing, because a harness that failed on everything
+  # would otherwise report a clean sweep.
+  tamper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - run: dotnet run --project tools/xray -- check --selftest
+
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going
   # to be pinned to. It is allowed to fail, because a broken preview is not a broken repository.

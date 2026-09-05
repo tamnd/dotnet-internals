@@ -15,7 +15,7 @@ internal static class Program
             "banner" => Banner.Run(),
             "lint" => Lint.Run(args.Length > 1 ? args[1] : "."),
             "build" => LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: true),
-            "check" => LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: false),
+            "check" => args.Contains("--selftest") ? CheckSelfTest.Run(args.Length > 2 ? args[2] : ".") : LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: false),
             "boss" => Fight(args),
             "cite" => args.Contains("--selftest") ? CiteSelfTest.Run() : Cite.Run(args.Length > 1 ? args[1] : "."),
             "numbers" => args.Contains("--selftest") ? NumbersSelfTest.Run() : Numbers.Run(args.Length > 1 ? args[1] : "lessons"),
@@ -56,6 +56,7 @@ internal static class Program
         Console.WriteLine("  xray lint [path]   Check the prose rules across every markdown file under path.");
         Console.WriteLine("  xray build [path]  Draw the diagrams, run the lessons and regenerate the blueprints under path.");
         Console.WriteLine("  xray check [path]  The same work, and fail if the committed files differ from it.");
+        Console.WriteLine("  xray check --selftest   Hand edit a generated file on purpose and prove the check objects.");
         Console.WriteLine("  xray boss <path>   Grade your answer to one lesson's boss fight.");
         Console.WriteLine("  xray cite [path]   Resolve every citation under path against the two pinned repositories.");
         Console.WriteLine("  xray cite --selftest   Prove the citation gate still rejects what it is supposed to.");

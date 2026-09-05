@@ -27,6 +27,14 @@ dotnet run --project tools/xray -- check lessons
 
 `build` runs every lesson and writes the generated files. `check` does exactly the same work and then fails if what it produced is not what is committed. CI runs `check` on linux-x64, linux-arm64, win-x64 and osx-arm64, which is what stops a lesson from being right on one machine and wrong on the page.
 
+Everything on a page therefore rests on that comparison, so there is a third command whose whole job is to distrust it.
+
+```
+dotnet run --project tools/xray -- check --selftest
+```
+
+That copies a real lesson and a real blueprint, hand edits the generated files in five different ways, and requires the check to object to each one by name. Two more cases change nothing and have to pass, because a harness that failed on everything would otherwise report a clean sweep. A comparison that always passed would look exactly like a repository where nobody had ever hand edited anything, and nobody would find out which one this is until a reader noticed a page saying something the program does not.
+
 ## Blocks
 
 A block is a named region of `lesson.cs`, marked by two comments.

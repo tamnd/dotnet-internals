@@ -269,7 +269,10 @@ internal static class Boss
             text.Append("- **").Append(question.Key).Append("** ").Append(question.Ask).Append('\n');
         }
 
-        var path = Path.GetRelativePath(System.IO.Directory.GetCurrentDirectory(), lesson).Replace('\\', '/');
+        // Relative to the top of the repository, not to wherever the tool happens to have been run
+        // from. This line goes into a generated file, and a generated file that depends on the
+        // working directory fails the check for a reason nobody can see.
+        var path = Path.GetRelativePath(Files.Root(lesson), lesson).Replace('\\', '/');
 
         text.Append("\nOpen `").Append(Directory).Append('/').Append(Stub).Append("`, fill in the parts marked as yours, and run this until it stops complaining.\n\n");
         text.Append("```\ndotnet run --project tools/xray -- boss ").Append(path).Append("\n```\n\n");
