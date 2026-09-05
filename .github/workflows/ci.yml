@@ -114,6 +114,21 @@ jobs:
       - run: dotnet run --project tools/xray -- cite
       - run: dotnet run --project tools/xray -- cite --selftest
 
+  # The gate behind the sentence the whole project rests on, which is that no number in a lesson is
+  # typed by a person. It reads the lesson source rather than the generated page, and the rule with
+  # teeth is the second one: a number that is already sitting in this lesson's own captured output
+  # and was retyped into the prose anyway. The self test is here for the same reason the citation
+  # one is, which is that a gate everything passes and a gate that does nothing look identical.
+  numbers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - run: dotnet run --project tools/xray -- numbers lessons
+      - run: dotnet run --project tools/xray -- numbers --selftest
+
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going
   # to be pinned to. It is allowed to fail, because a broken preview is not a broken repository.

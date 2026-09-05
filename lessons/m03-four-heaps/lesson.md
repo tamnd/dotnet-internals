@@ -66,7 +66,7 @@ type definitions: 3
   Sample.Shelf
 ```
 
-The metadata version string is worth a moment. It says `v4.0.30319`, which is the build number of .NET Framework 4.0, released in 2010. Every .NET assembly ever produced since then says that, including the one you built ten seconds ago on .NET 10. It is a version number that stopped meaning anything and stayed anyway, because too much code compares it against that exact string.
+The metadata version string is worth a moment. It says `v4.0.30319`, which is the build number of .NET Framework 4.0, released in 2010. Every .NET assembly ever produced since then says that, including the one you built ten seconds ago on .NET 10. It is a version number that stopped meaning anything and stayed anyway, because too much code compares it against that exact string. <!-- literal: product versions and the year one of them shipped, neither of which this lesson measured -->
 
 ## Where the heaps are, and why that is not on this page
 
@@ -79,11 +79,11 @@ foreach (var heap in Enum.GetValues<HeapIndex>())
 }
 ```
 
-That block is marked `capture=drop`, so its output is not stored and this page cannot quote it. Run it and you will see something like `#Strings` starting around byte 700 and running for about 600 bytes, with `#US` a good deal smaller and `#GUID` at exactly 16.
+That block is marked `capture=drop`, so its output is not stored and this page cannot quote it. Run it and you will see `#Strings` starting a few hundred bytes into the metadata and running for a few hundred more, with `#US` a good deal smaller, and `#GUID` smaller than either.
 
 Those numbers are positions in a file the compiler wrote, and they move when the compiler moves. A newer Roslyn that emits one more attribute makes every one of them different. Nothing would be learned by pinning them, and the build would break every time the SDK moved, which is the sort of red build that teaches people to ignore red builds.
 
-The exception is `#GUID` at 16 bytes, and you will see why later in this lesson.
+The exception is `#GUID`, whose size does not move at all. A block further down this page prints it, and it prints why.
 
 ## A name is an offset, and you can go and look
 
@@ -120,7 +120,7 @@ decoded as UTF-8:     Catalogue
 and the reader says:  Catalogue
 ```
 
-Nine bytes of UTF-8, then a zero. `43` is `C`, `61` is `a`, `74` is `t`. The reader agrees with us because the reader is doing the same thing with better error handling.
+Nine bytes of UTF-8, then a zero. Read that hex two characters at a time and the first three pairs are `C`, `a` and `t`, one byte each, because every character in this name happens to be ASCII. The reader agrees with us because the reader is doing the same thing with better error handling.
 
 ![Two heaps, two ways of ending a string](../../docs/diagrams/heap-entries.svg)
 
@@ -376,7 +376,7 @@ The grader names the answer that is wrong and shows you what you printed. It doe
 
 ## Sources
 
-ECMA-335, 6th edition, June 2012.
+ECMA-335, 6th edition, June 2012. <!-- literal: the edition and the month it was published -->
 
 II.24.2.1 for the metadata root, II.24.2.2 for the stream headers, II.24.2.3 for `#Strings`, II.24.2.4 for `#US` and `#Blob` including the flag byte on the end of a user string, II.24.2.5 for `#GUID`, and II.24.2.6 for `#~`.
 
