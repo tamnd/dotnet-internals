@@ -17,6 +17,7 @@ internal static class Program
             "build" => Build.Run(Where(args), write: true, offline: args.Contains("--offline")),
             "check" => args.Contains("--selftest") ? CheckSelfTest.Run(Where(args)) : Build.Run(Where(args), write: false, offline: args.Contains("--offline")),
             "env" => Environments.Run(Where(args), Required(args)),
+            "cache" => args.Contains("--selftest") ? CacheSelfTest.Run() : Cache.Run(args),
             "boss" => Fight(args),
             "cite" => args.Contains("--selftest") ? CiteSelfTest.Run() : Cite.Run(args.Length > 1 ? args[1] : "."),
             "numbers" => args.Contains("--selftest") ? NumbersSelfTest.Run() : Numbers.Run(args.Length > 1 ? args[1] : "lessons"),
@@ -97,6 +98,11 @@ internal static class Program
         Console.WriteLine("  xray check --selftest   Hand edit a generated file on purpose and prove the check objects.");
         Console.WriteLine("  xray env           Say which of the declared configurations this machine has, and why not.");
         Console.WriteLine("      --require E1   Fail unless this machine has that one, which is how a job asserts rather than discovers.");
+        Console.WriteLine("  xray cache list    What this machine has fetched, and where each thing came from.");
+        Console.WriteLine("      path           Print the cache directory, which " + Cache.Variable + " overrides.");
+        Console.WriteLine("      key            Print the key for a set of parts, which is what a workflow restores a cache by.");
+        Console.WriteLine("      clear          Empty it.");
+        Console.WriteLine("  xray cache --selftest   Prove the cache refuses an entry that has been altered since it was stored.");
         Console.WriteLine("  xray boss <path>   Grade your answer to one lesson's boss fight.");
         Console.WriteLine("  xray cite [path]   Resolve every citation under path against the two pinned repositories.");
         Console.WriteLine("  xray cite --selftest   Prove the citation gate still rejects what it is supposed to.");

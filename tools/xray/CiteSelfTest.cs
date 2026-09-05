@@ -155,7 +155,12 @@ internal static class CiteSelfTest
     {
         Console.WriteLine("resolution, against dotnet/runtime and dotnet/roslyn over the network");
 
-        var source = new Source { Cache = Path.Combine(Path.GetTempPath(), "xray-cite-selftest-cache") };
+        // The shared cache rather than one of its own, on purpose. Until the pin lands there are no
+        // citations in the repository, so these four are the only files anything here ever fetches,
+        // and pointing them somewhere private would leave the cache untested by every run. The
+        // cases below that expect a refusal are not cached, because nothing stores a 404, so the
+        // network is still reached whatever is sitting on disk.
+        var source = new Source();
 
         Resolves($"runtime:{RuntimeFile}:910@60629d1#class MethodTable", Landed, source, "the class the whole book is about");
         Resolves($"runtime:{RuntimeFile}:909-911@60629d1#class MethodTable", Landed, source, "a range around it");

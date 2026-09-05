@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 
 namespace ClrXray;
 
@@ -15,9 +16,11 @@ namespace ClrXray;
 /// saying so.
 /// </para>
 /// <para>
-/// Fetched files are cached by commit, so the second run costs nothing and a pull request that
-/// touches one paragraph does not pull half of <c>dotnet/runtime</c>. A commit never changes, so
-/// the cache never needs invalidating.
+/// Fetched files go in the shared cache, keyed by repository and commit, so the second run costs
+/// nothing and a pull request that touches one paragraph does not pull half of
+/// <c>dotnet/runtime</c>. A commit never changes, so the cache never needs invalidating. What is
+/// in the cache is checked against the hash recorded when it was stored, because a file sitting in
+/// a directory is not evidence of anything on its own.
 /// </para>
 /// </remarks>
 internal static class Cite
@@ -168,24 +171,27 @@ internal sealed class Source
 
     private readonly Dictionary<string, string[]> loaded = new(StringComparer.Ordinal);
 
-    /// <summary>Where fetched files live, overridable so the self test does not touch a real cache.</summary>
-    internal string Cache { get; init; } = Default();
+    /// <summary>Where fetched files live. Overridable so a caller can point it somewhere of its own.</summary>
+    internal Cache Store { get; init; } = new();
 
     internal string[]? Read(string repo, string commit, string path, out string? error)
     {
         error = null;
-        var key = $"{repo}@{commit}:{path}";
-        if (loaded.TryGetValue(key, out var already))
+        var seen = $"{repo}@{commit}:{path}";
+        if (loaded.TryGetValue(seen, out var already))
         {
             return already;
         }
 
-        var file = Path.Combine(Cache, repo.Replace('/', Path.DirectorySeparatorChar), commit, path.Replace('/', Path.DirectorySeparatorChar));
+        // A source file is the same text whatever machine asked for it and whatever configuration
+        // that machine builds in, so two of the four axes say so rather than being left out.
+        var key = new Key(repo, commit, Key.Any, Key.Any, path);
+        var cached = Store.Read(key);
         string text;
 
-        if (File.Exists(file))
+        if (cached is not null)
         {
-            text = File.ReadAllText(file);
+            text = Encoding.UTF8.GetString(cached);
         }
         else
         {
@@ -196,8 +202,7 @@ internal sealed class Source
             }
 
             text = fetched;
-            Directory.CreateDirectory(Path.GetDirectoryName(file)!);
-            File.WriteAllText(file, text);
+            Store.Store(key, Encoding.UTF8.GetBytes(text), Url(repo, commit, path));
         }
 
         var lines = Generated.Normalise(text).Split('\n');
@@ -210,14 +215,14 @@ internal sealed class Source
             lines = lines[..^1];
         }
 
-        loaded[key] = lines;
+        loaded[seen] = lines;
         return lines;
     }
 
     private static string? Fetch(string repo, string commit, string path, out string? error)
     {
         error = null;
-        var url = $"https://raw.githubusercontent.com/{repo}/{commit}/{path}";
+        var url = Url(repo, commit, path);
 
         try
         {
@@ -253,15 +258,6 @@ internal sealed class Source
         return client;
     }
 
-    private static string Default()
-    {
-        var set = Environment.GetEnvironmentVariable("XRAY_CITE_CACHE");
-        if (!string.IsNullOrWhiteSpace(set))
-        {
-            return set;
-        }
-
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        return Path.Combine(string.IsNullOrEmpty(home) ? Path.GetTempPath() : home, "xray", "cite");
-    }
+    private static string Url(string repo, string commit, string path) =>
+        $"https://raw.githubusercontent.com/{repo}/{commit}/{path}";
 }

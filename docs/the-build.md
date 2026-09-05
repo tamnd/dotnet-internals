@@ -43,6 +43,8 @@ Takes every citation on every page apart, checks it against the pin, fetches the
 
 This is the one step that needs the network, so it is also the one step with a way to turn it off. `--offline` skips it and says on the step line that it skipped it, because a check that did not run and a check that passed have to look different or the flag becomes a way of being green.
 
+Every file it fetches goes into [the cache](the-cache.md), keyed by the repository and the commit, so the second run over the same pages costs nothing and a pull request that edits one paragraph does not pull half of `dotnet/runtime` again. What comes back out of the cache is checked against the hash recorded when it went in, because a file sitting in a directory is not evidence of anything on its own.
+
 ### 3. execute
 
 Runs every lesson and every blueprint generator, once each. One process per lesson, because a lesson is a sequence where the third block depends on what the first one allocated.
