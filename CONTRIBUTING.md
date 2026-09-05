@@ -14,7 +14,7 @@ These are mechanical and CI enforces most of them. A rejection is not a comment 
 
 A hand edited generated file. Expected outputs, captured runs and generated blueprint sections are outputs. If one of them is wrong, the generator is wrong.
 
-A citation without a repository prefix or without a commit. Two repositories are pinned and both of them move. `runtime:src/coreclr/vm/methodtable.h:1420@abc1234` resolves. `methodtable.h line 1420` does not.
+A citation without a repository prefix or without a commit. Two repositories are pinned and both of them move. `runtime:src/coreclr/vm/methodtable.h:1420@abc1234` resolves. `methodtable.h line 1420` does not. The format is written up in [docs/citation-format.md](docs/citation-format.md) and `xray cite` fetches every one of them, so a citation that points at nothing fails the build rather than the review. <!-- xray-cite: allow, the citation above is an example rather than a claim -->
 
 A number typed into prose. If you want to say a structure is twenty four bytes, transclude the block that printed twenty four.
 

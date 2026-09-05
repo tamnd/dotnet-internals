@@ -73,6 +73,8 @@ The machine readable copy is [pin.json](pin.json), and the commits in it are nul
 
 Two repositories are pinned rather than one, which costs something. Every citation carries a repository prefix, the drift bot has two heads, and a version bump is two bumps that have to land together.
 
+Citations are checked by a machine rather than by a reviewer. `xray cite` takes each one apart, refuses anything pinned to a tag or a branch instead of a commit, fetches the file from the repository it names at the commit it names, checks the line is there and says what the citation claims it says, and then prints that line so a reviewer reading the log sees what was pointed at rather than a tick. The [format is here](docs/citation-format.md). Because the pin has not landed, the honest count of citations in this repository today is zero, which is also what a broken checker would report, so the gate proves it can go red: a self test resolves against two real commits in the two pinned repositories and checks that every citation that should be refused is refused for the right reason.
+
 ## Layout
 
 | Path | What is in it |
@@ -80,7 +82,7 @@ Two repositories are pinned rather than one, which costs something. Every citati
 | `tools/xray` | The command line tool. Prints the environment banner, lints the prose rules, builds and checks lessons, diagrams and blueprints |
 | `lessons` | One directory per lesson. The page in each one is generated, never edited |
 | `blueprints` | One directory per blueprint. The document in each one is generated, and so are the sections that can be |
-| `docs` | How the machinery works. The [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md) and the [blueprint format](docs/blueprint-format.md) |
+| `docs` | How the machinery works. The [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md), the [blueprint format](docs/blueprint-format.md) and the [citation format](docs/citation-format.md) |
 | `docs/probes` | The measurements that decided something, with the script that produced each one |
 | `.github/workflows` | CI. Everything in this repository is checked by a machine or it is not checked |
 

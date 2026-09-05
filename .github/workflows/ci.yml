@@ -98,6 +98,22 @@ jobs:
       # section differs from what is committed.
       - run: dotnet run --project tools/xray -- check blueprints
 
+  # The citation gate, and the only job here that touches the network. Every citation on every
+  # page is fetched from the repository it names at the commit it names, and the line it lands on
+  # is printed into the log so a reviewer can see what was cited rather than that something was.
+  # The second step is the one that matters while the pin has not landed: it proves the gate still
+  # rejects a citation pinned to a branch, a line past the end of a file and a line that does not
+  # say what the page claims, because a check that has never refused anything is not a check.
+  cite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - run: dotnet run --project tools/xray -- cite
+      - run: dotnet run --project tools/xray -- cite --selftest
+
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going
   # to be pinned to. It is allowed to fail, because a broken preview is not a broken repository.

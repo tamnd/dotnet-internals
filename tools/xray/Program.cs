@@ -17,6 +17,7 @@ internal static class Program
             "build" => LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: true),
             "check" => LessonCommand.Run(args.Length > 1 ? args[1] : "lessons", write: false),
             "boss" => Fight(args),
+            "cite" => args.Contains("--selftest") ? CiteSelfTest.Run() : Cite.Run(args.Length > 1 ? args[1] : "."),
             "--help" or "-h" or "help" => Usage(),
             _ => Unknown(args[0]),
         };
@@ -54,6 +55,8 @@ internal static class Program
         Console.WriteLine("  xray build [path]  Draw the diagrams, run the lessons and regenerate the blueprints under path.");
         Console.WriteLine("  xray check [path]  The same work, and fail if the committed files differ from it.");
         Console.WriteLine("  xray boss <path>   Grade your answer to one lesson's boss fight.");
+        Console.WriteLine("  xray cite [path]   Resolve every citation under path against the two pinned repositories.");
+        Console.WriteLine("  xray cite --selftest   Prove the citation gate still rejects what it is supposed to.");
         return 0;
     }
 

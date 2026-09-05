@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="610" viewBox="0 0 1000 610">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .heading { font-size: 15px; font-weight: 600; fill: #1e1e1e; }
+    .body { font-size: 13px; fill: #495057; }
+    .cell-heading { font-size: 13px; font-weight: 600; fill: #1e1e1e; }
+    .cell-body { font-size: 11px; fill: #495057; }
+    .title { font-size: 18px; font-weight: 700; fill: #1e1e1e; }
+    .edge { font-size: 12px; fill: #495057; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+    .footer { font-size: 11px; fill: #868e96; }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#868e96"/>
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text class="title" x="24" y="32">What xray cite does to one citation</text>
+  <line x1="640" y1="215" x2="340" y2="355" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <text class="edge" text-anchor="middle" x="490" y="279">then</text>
+  <rect x="40" y="70" width="920" height="60" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="500" y="97">runtime:src/coreclr/vm/methodtable.h:910@60629d1#class MethodTable</text>
+  <text class="body" text-anchor="middle" x="500" y="114">One code span on a page. Everything under it is what happens to that span.</text>
+  <rect x="40" y="160" width="300" height="110" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="190" y="203.5">1 take it apart</text>
+  <text class="cell-body" text-anchor="middle" x="190" y="220.5">repo, path, line,</text>
+  <text class="cell-body" text-anchor="middle" x="190" y="235.5">commit, expectation</text>
+  <rect x="340" y="160" width="300" height="110" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="490" y="203.5">2 check the repo</text>
+  <text class="cell-body" text-anchor="middle" x="490" y="220.5">one of the two that</text>
+  <text class="cell-body" text-anchor="middle" x="490" y="235.5">pin.json names</text>
+  <rect x="640" y="160" width="300" height="110" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="790" y="203.5">3 check the commit</text>
+  <text class="cell-body" text-anchor="middle" x="790" y="220.5">it has to be the pin,</text>
+  <text class="cell-body" text-anchor="middle" x="790" y="235.5">not a tag or a branch</text>
+  <rect x="40" y="300" width="300" height="110" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="190" y="343.5">4 fetch the file</text>
+  <text class="cell-body" text-anchor="middle" x="190" y="360.5">from that repo at that</text>
+  <text class="cell-body" text-anchor="middle" x="190" y="375.5">commit, cached after</text>
+  <rect x="340" y="300" width="300" height="110" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="490" y="343.5">5 check the line</text>
+  <text class="cell-body" text-anchor="middle" x="490" y="360.5">it is inside the file</text>
+  <text class="cell-body" text-anchor="middle" x="490" y="375.5">and says what is claimed</text>
+  <rect x="640" y="300" width="300" height="110" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="790" y="343.5">6 print what it says</text>
+  <text class="cell-body" text-anchor="middle" x="790" y="360.5">the line itself, so a</text>
+  <text class="cell-body" text-anchor="middle" x="790" y="375.5">reviewer can audit it</text>
+  <rect x="40" y="450" width="440" height="130" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="260" y="486.5">Step 4 is the only place in this</text>
+  <text class="body" text-anchor="middle" x="260" y="503.5">repository that needs the network.</text>
+  <text class="body" text-anchor="middle" x="260" y="520.5">It is cached by commit, and a commit</text>
+  <text class="body" text-anchor="middle" x="260" y="537.5">never changes, so it is fetched once.</text>
+  <text class="body" text-anchor="middle" x="260" y="554.5">That is why cite is its own command.</text>
+  <rect x="520" y="450" width="440" height="130" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="740" y="486.5">Step 3 fails today, on purpose.</text>
+  <text class="body" text-anchor="middle" x="740" y="503.5">pin.json holds a null commit until</text>
+  <text class="body" text-anchor="middle" x="740" y="520.5">the release candidate is tagged, so</text>
+  <text class="body" text-anchor="middle" x="740" y="537.5">the right number of citations right</text>
+  <text class="body" text-anchor="middle" x="740" y="554.5">now is zero and the tool says so.</text>
+  <text class="footer" x="24" y="596">Generated by xray from citation-resolution.dg. Edit that file, not this one.</text>
+</svg>
