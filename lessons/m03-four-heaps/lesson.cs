@@ -18,8 +18,13 @@ using System.Text;
 //# end
 
 //# block id=open env=E0 tags=[metadata]
+// The build says which directory this lesson is in. It has to, because dotnet run does not
+// promise the working directory of a file you point it at. Run this by hand from the lesson
+// directory and the dot is the same answer.
+var here = Environment.GetEnvironmentVariable("XRAY_HERE") ?? ".";
+
 // The fixture is built before this runs, so there is exactly one Sample.dll under it.
-var file = Directory.GetFiles(Path.Combine("fixture", "bin", "Release"), "Sample.dll", SearchOption.AllDirectories)[0];
+var file = Directory.GetFiles(Path.Combine(here, "fixture", "bin", "Release"), "Sample.dll", SearchOption.AllDirectories)[0];
 
 using var stream = File.OpenRead(file);
 using var image = new PEReader(stream);

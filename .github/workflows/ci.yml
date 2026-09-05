@@ -186,8 +186,8 @@ jobs:
   # a blueprint is transcribed by one. Both are enforced the same way, by regenerating the file and
   # comparing it against what is committed, so both are exactly as true as that comparison is. This
   # job goes and hand edits the generated files on purpose and requires the build to object to each
-  # one by name. Two of its seven cases change nothing, because a harness that failed on everything
-  # would otherwise report a clean sweep.
+  # one by name. Three of its sixteen cases expect a green build, because a harness that failed on
+  # everything would otherwise report a clean sweep.
   tamper:
     runs-on: ubuntu-latest
     steps:
@@ -196,6 +196,53 @@ jobs:
         with:
           global-json-file: global.json
       - run: dotnet run --project tools/xray -- check --selftest
+
+  # A cold machine is not a slower warm machine, it is a different machine. Every other job here
+  # starts from a runner image with an SDK on it, a NuGet folder, a home directory and a package
+  # manager that has already been used. A reader starts from none of that, and so does a container.
+  # This job takes all of it away on all four platforms and runs the gates again.
+  #
+  # It has found three things a warm run cannot. A bare Ubuntu image cannot start .NET at all until
+  # libicu is installed, which dotnet-install.sh says it will not do for you. global.json names
+  # 10.0.100 but rolls forward, so every machine anybody had used resolved a 10.0.4xx, and the two
+  # feature bands disagree about the working directory of a file run with dotnet run. And the
+  # regeneration self test was copying a lesson without the two Directory.Build.props files above
+  # it, so it had been building its cases with the SDK's settings rather than this repository's.
+  #
+  # The steps are the same script the fleet and a reader can run, rather than a copy of it kept in
+  # a YAML file where nobody would notice it drifting.
+  cold:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: ubuntu-24.04-arm
+            rid: linux-arm64
+          - os: windows-latest
+            rid: win-x64
+          - os: macos-latest
+            rid: osx-arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      # No setup-dotnet in this job, on purpose. It is the one step every other job starts with and
+      # the one thing a cold machine does not have.
+      #
+      # The Linux legs run in a bare ubuntu:24.04 with the checkout mounted read only, so the
+      # container has to install everything down to ca-certificates, and cannot quietly write build
+      # output back into the checkout. The other two are the same script with no container: Windows
+      # containers are a whole operating system image rather than a directory tree, and the macOS
+      # runners cannot run containers at all. On those two the cold part is an empty HOME,
+      # DOTNET_ROOT, NuGet folder and artifact cache, and a path with no dotnet on it.
+      - if: runner.os == 'Linux'
+        run: docker run --rm -v "$PWD:/src:ro" ubuntu:24.04 bash /src/docs/probes/cold-start.sh /src
+      - if: runner.os == 'macOS'
+        run: bash docs/probes/cold-start.sh
+      - if: runner.os == 'Windows'
+        run: pwsh -File docs/probes/cold-start.ps1
 
   # The pin moves to .NET 11 at general availability on 10 November 2026. Until then this job
   # answers, on every pull request, whether the tooling still builds on the preview it is going

@@ -75,6 +75,12 @@ internal static class Lessons
         var sourcePath = Path.Combine(directory, SourceName);
         var lines = File.ReadAllLines(sourcePath);
         var blocks = Blocks.Parse(sourcePath, lines);
+        Runner.Rooted(sourcePath, lines, plan);
+
+        foreach (var file in Boss.Code(directory))
+        {
+            Runner.Rooted(file, File.ReadAllLines(file), plan);
+        }
 
         var needs = Needs(sourcePath, blocks, available, plan);
         if (needs is null)

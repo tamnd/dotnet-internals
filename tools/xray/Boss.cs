@@ -51,6 +51,15 @@ internal static class Boss
 
     internal static bool Has(string lesson) => File.Exists(Path.Combine(lesson, Directory, "boss.json"));
 
+    /// <summary>
+    /// The code of a fight, which is the reader's starting file and the worked answer. Both are run
+    /// by the build, so both are held to the same rules as the lesson itself.
+    /// </summary>
+    internal static IEnumerable<string> Code(string lesson) =>
+        Has(lesson)
+            ? new[] { Stub, Solution }.Select(file => Path.Combine(lesson, Directory, file)).Where(File.Exists)
+            : [];
+
     internal static BossFight Load(string lesson)
     {
         var path = Path.Combine(lesson, Directory, "boss.json");
@@ -179,16 +188,21 @@ internal static class Boss
     }
 
     /// <summary>
-    /// Runs one file of the boss directory and collects the lines that look like an answer. The
-    /// working directory is the lesson rather than the boss directory, so that a path written in
-    /// the fight is the same path the lesson uses.
+    /// Runs one file of the boss directory and collects the lines that look like an answer.
     /// </summary>
+    /// <remarks>
+    /// This used to say that the working directory is the lesson rather than the boss directory, so
+    /// that a path written in the fight is the same path the lesson uses. That was true on the SDK
+    /// it was written on and is not something the SDK promises, which is why a fight now gets told
+    /// where it is through <see cref="Runner.Here"/> instead of working it out from where it is
+    /// standing.
+    /// </remarks>
     private static Dictionary<string, string> Answer(string lesson, string file)
     {
         var (exit, stdout, stderr) = Runner.Dotnet(lesson, ["run", Path.Combine(Directory, file)]);
         if (exit != 0)
         {
-            throw new LessonException($"{Path.GetFileName(lesson)}: {file} exited with {exit}\n{stderr}");
+            throw new LessonException($"{Path.GetFileName(lesson)}: {file} exited with {exit}\n{Runner.Said(stdout, stderr)}");
         }
 
         var answers = new Dictionary<string, string>(StringComparer.Ordinal);
