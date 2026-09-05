@@ -16,7 +16,7 @@ A hand edited generated file. Expected outputs, captured runs and generated blue
 
 A citation without a repository prefix or without a commit. Two repositories are pinned and both of them move. `runtime:src/coreclr/vm/methodtable.h:1420@abc1234` resolves. `methodtable.h line 1420` does not. The format is written up in [docs/citation-format.md](docs/citation-format.md) and `xray cite` fetches every one of them, so a citation that points at nothing fails the build rather than the review. <!-- xray-cite: allow, the citation above is an example rather than a claim -->
 
-A number typed into prose. If you want to say a structure is twenty four bytes, transclude the block that printed twenty four.
+A number typed into prose. If you want to say a structure is twenty four bytes, transclude the block that printed twenty four. `xray numbers` enforces this on lesson source: a number already sitting in that lesson's captured output is refused outright, and any other bare number needs `<!-- literal: why this is not a measurement -->` on the line. The rules are in [docs/lesson-format.md](docs/lesson-format.md#numbers), including the hole in them.
 
 A codegen or disassembly claim with no environment banner. Generated code is a function of the runtime version, the build configuration, the platform, the instruction set and the tier. A listing without all five is not evidence of anything.
 

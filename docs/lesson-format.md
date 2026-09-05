@@ -77,6 +77,22 @@ Everything printed before the first marker is discarded, so a cold restore that 
 
 There is no way to write output into the page by hand. There is no way to quote a block that does not exist. Both are errors that fail the build with the file and the name in the message.
 
+## Numbers
+
+Every other guarantee here is downstream of one sentence: no number in a lesson is typed by a person. A page whose listings are generated and whose prose says the header is sixteen bytes because somebody measured it once in a debugger goes quietly wrong at the next version bump, and it goes wrong in the half a reader is most likely to believe.
+
+`xray numbers` is the gate. It reads `lesson.src.md`, not the generated page, and it has two rules.
+
+**A number that is already in this lesson's captured output is a defect, and there is no excuse for it.** The number is sitting a few lines up the page inside a transclusion. Retyping it means the page can disagree with itself, and it will, the first time the output changes.
+
+**Any other bare number needs a reason written on the line**, as `<!-- literal: why this is not a measurement -->`. The reason has to say something. An empty one is refused, because an escape hatch with nothing written in it is a checkbox.
+
+A number is a run of digits with no letters anywhere in it. That one line is the whole definition and it is doing more work than it looks like, because a letter turns a token into a name: `x64` is a platform, `UTF-16` is an encoding, `M05` is a lesson, `II.24.2.1` is a clause of the standard, `v4.0.30319` is a version string and `0x1F` is written the way the runtime writes it. None of those is anybody reporting a measurement, and a rule that argued with them is a rule people turn off. Front matter, fenced blocks, transclusion lines and link targets are skipped for the same reason.
+
+The hole in it, said plainly: writing "sixteen" instead of `16` gets past this gate. Closing that would mean a check that trips on the word "sixteen" everywhere it legitimately appears, which is a check nobody would keep. So the words are review's job and the digits are the machine's, and the two rules above are the part that can be guaranteed.
+
+`xray numbers --selftest` runs ten cases against throwaway lessons on disk, because this gate is one loosened rule away from passing everything and the day it does, the repository keeps printing a green tick under a claim it is no longer checking.
+
 ## Gates
 
 A gate asks the reader what will happen before the output is shown to them. It lives in `gates.json` as a question, a list of options with exactly one marked correct, a sentence explaining each option including the wrong ones, and a closing paragraph for the thing the answer does not cover.
