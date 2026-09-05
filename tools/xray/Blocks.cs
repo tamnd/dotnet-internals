@@ -190,7 +190,7 @@ internal static class Blocks
             var (exit, stdout, stderr) = Runner.Dotnet(directory, ["run", Path.Combine(RunDirectory, "run.cs")]);
             if (exit != 0)
             {
-                throw new LessonException($"{Path.GetFileName(directory)}: the {what} exited with {exit}\n{stderr}");
+                throw new LessonException($"{Path.GetFileName(directory)}: the {what} exited with {exit}\n{Runner.Said(stdout, stderr)}");
             }
 
             return Split(stdout);

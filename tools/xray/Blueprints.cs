@@ -141,6 +141,7 @@ internal static class Blueprints
 
         var lines = File.ReadAllLines(sourcePath);
         var blocks = Blocks.Parse(sourcePath, lines);
+        Runner.Rooted(sourcePath, lines, plan);
 
         // A blueprint is a specification generated from what the runtime and its libraries already
         // publish, so it has no business needing anything a reader would have to build or download.

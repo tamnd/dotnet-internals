@@ -8,7 +8,11 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Text;
 
-var file = Directory.GetFiles(Path.Combine("fixture", "bin", "Release"), "Sample.dll", SearchOption.AllDirectories)[0];
+// The build says which directory this lesson is in. It has to, because dotnet run does not
+// promise the working directory of a file you point it at, and this file lives one level down.
+var here = Environment.GetEnvironmentVariable("XRAY_HERE") ?? "..";
+
+var file = Directory.GetFiles(Path.Combine(here, "fixture", "bin", "Release"), "Sample.dll", SearchOption.AllDirectories)[0];
 
 using var stream = File.OpenRead(file);
 using var image = new PEReader(stream);

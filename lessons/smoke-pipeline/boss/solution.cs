@@ -4,9 +4,13 @@
 // This file is also what generates answers.txt, so it is run on every build. If you change it and
 // the answers move, the build says so.
 
+// The build says which directory this lesson is in. It has to, because dotnet run does not
+// promise the working directory of a file you point it at, and this file lives one level down.
+var here = Environment.GetEnvironmentVariable("XRAY_HERE") ?? "..";
+
 var directives = new List<string>();
 
-foreach (var line in File.ReadAllLines("lesson.cs"))
+foreach (var line in File.ReadAllLines(Path.Combine(here, "lesson.cs")))
 {
     var trimmed = line.Trim();
     if (trimmed.StartsWith("//# block", StringComparison.Ordinal))

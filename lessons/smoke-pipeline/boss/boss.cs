@@ -10,7 +10,11 @@
 // Read lesson.cs from code rather than counting the blocks by eye. The counting works here and
 // stops working three lessons from now.
 
-var lines = File.ReadAllLines("lesson.cs");
+// The build says which directory this lesson is in. It has to, because dotnet run does not
+// promise the working directory of a file you point it at, and this file lives one level down.
+var here = Environment.GetEnvironmentVariable("XRAY_HERE") ?? "..";
+
+var lines = File.ReadAllLines(Path.Combine(here, "lesson.cs"));
 
 // Yours. Find the lines that open a block.
 var directives = new List<string>();

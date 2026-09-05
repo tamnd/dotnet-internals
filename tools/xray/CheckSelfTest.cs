@@ -145,6 +145,25 @@ internal static class CheckSelfTest
             },
             "the front matter says env: E0 and the most a block in this lesson asks for is E3");
 
+        // The two cases behind the rule that a path in lesson code never starts from a literal.
+        // Both of these were how the repository was written until a machine with a different SDK
+        // resolved the working directory differently and four files started looking one directory
+        // too deep. The fight is the interesting one, because it lives in boss/ and the lesson it
+        // reads is above it, so it is the file where being wrong about this is invisible.
+        Case(
+            "a boss fight that reads its lesson from wherever it happens to be standing",
+            lesson,
+            (_, where) => Retype(Path.Combine(where, Boss.Directory, "solution.cs"), "Path.Combine(here, \"lesson.cs\")", "\"lesson.cs\""),
+            "starts from a string literal",
+            Runner.Here);
+
+        Case(
+            "a lesson that opens a file by a path relative to nothing in particular",
+            lesson,
+            (_, where) => Retype(Path.Combine(where, Lessons.SourceName), "//# end", "var settings = File.ReadAllText(\"gates.json\");\n//# end"),
+            "starts from a string literal",
+            Runner.Here);
+
         Case("an untouched blueprint", blueprint, (_, _) => { });
 
         Case(
@@ -184,6 +203,22 @@ internal static class CheckSelfTest
         File.Copy(Path.Combine(top, Resolve.PinName), Path.Combine(repository, Resolve.PinName), overwrite: true);
         File.Copy(Path.Combine(top, Resolve.GlobalName), Path.Combine(repository, Resolve.GlobalName), overwrite: true);
         File.Copy(Path.Combine(top, Environments.FileName), Path.Combine(repository, Environments.FileName), overwrite: true);
+
+        // Both of these, and this is not tidiness. Without them the copy is compiled with the
+        // SDK's defaults rather than this repository's, which is a different build from the one
+        // every case below claims to be testing, and it produced exactly that: five cases failing
+        // on a machine with a different SDK, with a stack trace where the verdict should be. A
+        // harness that builds a tree the real build never builds is testing something else.
+        foreach (var props in new[] { "Directory.Build.props", Path.Combine("lessons", "Directory.Build.props") })
+        {
+            var from = Path.Combine(top, props);
+            if (File.Exists(from))
+            {
+                var to = Path.Combine(repository, props);
+                Directory.CreateDirectory(Path.GetDirectoryName(to)!);
+                File.Copy(from, to, overwrite: true);
+            }
+        }
 
         // The declaration points at the documents that say how to get each configuration, and the
         // build checks those exist. The copy needs them, as empty files, or every case below fails
