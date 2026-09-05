@@ -32,7 +32,7 @@ The words simply, just, obviously, of course and trivially. They are not stylist
 
 The linter has to be told to ignore the line above, which is the only exemption in this repository and is meant to be visible in the diff.
 
-A lesson that needs a runtime build without saying so in the second block, in bold, with the time and the disk cost.
+A lesson that needs more than the stock SDK without saying so on its own page, in bold, with what it costs. This one used to be enforced by somebody remembering it in review and is now enforced by the build. Put `{{needs}}` near the top of the prose and the notice is written out of `environments.json`, so the page cannot promise one configuration while the code runs in another. [The lesson format](docs/lesson-format.md) has the three rules that go with it.
 
 ## Working on a lesson
 

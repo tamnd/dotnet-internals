@@ -11,7 +11,14 @@ namespace ClrXray;
 /// <param name="Platform">The runtime identifier, which is the thing that makes two runs differ.</param>
 /// <param name="Sdk">The SDK version the lessons will be compiled by.</param>
 /// <param name="Landed">Whether the pin has a version in it yet.</param>
-internal sealed record Toolchain(string Root, string Framework, string Platform, string Sdk, bool Landed);
+/// <param name="Available">Every configuration a lesson may declare, and whether this machine has it.</param>
+internal sealed record Toolchain(
+    string Root,
+    string Framework,
+    string Platform,
+    string Sdk,
+    bool Landed,
+    IReadOnlyList<Available> Available);
 
 /// <summary>
 /// The first step of a build. Works out what everything is pinned to, and refuses to go any
@@ -83,7 +90,11 @@ internal static class Resolve
             plan.Problem($"{PinName} has a runtime commit and no SDK version, which is half a pin and reads on a page as a whole one");
         }
 
-        return new Toolchain(root, Banner.Framework, Banner.Platform, Sdk(root), landed);
+        // Last, because the list of configurations is a thing the build is standing on in exactly
+        // the same way the pin is: it decides which lessons this machine is allowed to run at all.
+        var available = Environments.Detect(Environments.Load(root));
+
+        return new Toolchain(root, Banner.Framework, Banner.Platform, Sdk(root), landed, available);
     }
 
     /// <summary>
@@ -91,8 +102,9 @@ internal static class Resolve
     /// numbers they would get.
     /// </summary>
     internal static string Describe(Toolchain toolchain) =>
-        $"{toolchain.Framework} on {toolchain.Platform}, SDK {toolchain.Sdk}, " +
-        (toolchain.Landed ? "pinned" : $"{PinName} holds no version yet so no citation resolves");
+        $"{toolchain.Framework} on {toolchain.Platform}, SDK {toolchain.Sdk}, "
+        + (toolchain.Landed ? "pinned" : $"{PinName} holds no version yet so no citation resolves")
+        + $", {Environments.Describe(toolchain.Available)}";
 
     /// <summary>
     /// A tag with no commit, or a commit with no tag. Both halves say what the pin is, and one

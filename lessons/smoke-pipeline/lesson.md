@@ -12,6 +12,8 @@ platforms: [linux-x64, linux-arm64, win-x64, osx-arm64]
 
 This is not a lesson about .NET. It is the smallest thing the lesson pipeline can build, and it is here so that when a real lesson breaks, you can tell whether the lesson broke or the machinery under it did.
 
+This lesson runs on the stock SDK. Nothing to install beyond the one in the README.
+
 Everything below is generated. The code came out of `lesson.cs`, the output came out of running `lesson.cs`, and the page you are reading was assembled from `lesson.src.md`. Nobody typed the output, and nobody can, because CI runs the same build on four platforms and fails if what it produces is not what is committed.
 
 ## A block is a region of a file

@@ -43,6 +43,13 @@ internal sealed class Plan
     }
 
     /// <summary>
+    /// Something the build did that is not wrong and is not nothing, such as leaving a lesson out
+    /// because this machine cannot run it. Said out loud, because work that quietly did not happen
+    /// looks exactly like work that passed.
+    /// </summary>
+    internal static void Note(string message) => Console.WriteLine($"    {message}");
+
+    /// <summary>
     /// The last step. Writes every artifact, or reports every one that differs from what is
     /// committed.
     /// </summary>
@@ -173,7 +180,7 @@ internal static class Build
                 return Resolve.Describe(toolchain);
             })
             && Step("cite", plan, () => Citations(path, plan, offline))
-            && Step("execute", plan, () => Execute(lessons, blueprints, plan, ran, made))
+            && Step("execute", plan, () => Execute(lessons, blueprints, toolchain!.Available, plan, ran, made))
             && Step("generate", plan, () => Generate(diagrams, ran, made, plan))
             && Step("assemble", plan, () => Assemble(ran, made, plan));
 
@@ -235,13 +242,26 @@ internal static class Build
             : $"{count} citation(s) resolved";
     }
 
-    private static string Execute(List<string> lessons, List<string> blueprints, Plan plan, List<Ran> ran, List<Made> made)
+    private static string Execute(
+        List<string> lessons,
+        List<string> blueprints,
+        IReadOnlyList<Available> available,
+        Plan plan,
+        List<Ran> ran,
+        List<Made> made)
     {
         foreach (var lesson in lessons)
         {
             try
             {
-                ran.Add(Lessons.Execute(lesson, plan));
+                // Nothing comes back when the lesson needs a configuration this machine does not
+                // have. It contributes no artifacts, so the check step never compares a committed
+                // page against a run that did not happen.
+                var lessonRan = Lessons.Execute(lesson, available, plan);
+                if (lessonRan is not null)
+                {
+                    ran.Add(lessonRan);
+                }
             }
             catch (LessonException error)
             {
@@ -263,8 +283,10 @@ internal static class Build
 
         var blocks = ran.Sum(r => r.Blocks.Count) + made.Sum(m => m.Blocks.Count);
         var claims = ran.Sum(r => r.Asserts.Values.Sum(a => a.Claims.Count));
+        var skipped = lessons.Count - ran.Count;
 
-        return $"{lessons.Count} lesson(s) and {blueprints.Count} blueprint(s), {blocks} block(s) run, {claims} assertion(s) held";
+        return $"{ran.Count} lesson(s) and {made.Count} blueprint(s), {blocks} block(s) run, {claims} assertion(s) held"
+            + (skipped == 0 ? string.Empty : $", {skipped} lesson(s) not run here");
     }
 
     private static string Generate(List<string> diagrams, List<Ran> ran, List<Made> made, Plan plan)

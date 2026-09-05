@@ -16,6 +16,7 @@ internal static class Program
             "lint" => Lint.Run(args.Length > 1 ? args[1] : "."),
             "build" => Build.Run(Where(args), write: true, offline: args.Contains("--offline")),
             "check" => args.Contains("--selftest") ? CheckSelfTest.Run(Where(args)) : Build.Run(Where(args), write: false, offline: args.Contains("--offline")),
+            "env" => Environments.Run(Where(args), Required(args)),
             "boss" => Fight(args),
             "cite" => args.Contains("--selftest") ? CiteSelfTest.Run() : Cite.Run(args.Length > 1 ? args[1] : "."),
             "numbers" => args.Contains("--selftest") ? NumbersSelfTest.Run() : Numbers.Run(args.Length > 1 ? args[1] : "lessons"),
@@ -30,8 +31,36 @@ internal static class Program
     /// not a flag. Everything defaults to the whole repository, because a build that quietly
     /// covers half of it is how a generated file goes stale without anybody being told.
     /// </summary>
-    private static string Where(string[] args) =>
-        args.Skip(1).FirstOrDefault(a => !a.StartsWith('-')) ?? ".";
+    private static string Where(string[] args)
+    {
+        for (var i = 1; i < args.Length; i++)
+        {
+            // The one flag that takes a value. Without this, the value looks like a path and the
+            // command quietly builds the wrong part of the repository.
+            if (args[i] == "--require")
+            {
+                i++;
+                continue;
+            }
+
+            if (!args[i].StartsWith('-'))
+            {
+                return args[i];
+            }
+        }
+
+        return ".";
+    }
+
+    /// <summary>
+    /// The configuration a caller insists this machine has, as in <c>xray env --require E1</c>.
+    /// A job that discovers what it has instead of asserting it goes green by skipping work.
+    /// </summary>
+    private static string? Required(string[] args)
+    {
+        var at = Array.IndexOf(args, "--require");
+        return at >= 0 && at + 1 < args.Length ? args[at + 1] : null;
+    }
 
     /// <summary>
     /// Grades a boss fight. This is the one command a reader runs at somebody, so it says which
@@ -66,6 +95,8 @@ internal static class Program
         Console.WriteLine("  xray check [path]  The same six steps, and fail if the committed files differ from what they produce.");
         Console.WriteLine("      --offline      Skip the cite step, which is the one step that needs the network.");
         Console.WriteLine("  xray check --selftest   Hand edit a generated file on purpose and prove the check objects.");
+        Console.WriteLine("  xray env           Say which of the declared configurations this machine has, and why not.");
+        Console.WriteLine("      --require E1   Fail unless this machine has that one, which is how a job asserts rather than discovers.");
         Console.WriteLine("  xray boss <path>   Grade your answer to one lesson's boss fight.");
         Console.WriteLine("  xray cite [path]   Resolve every citation under path against the two pinned repositories.");
         Console.WriteLine("  xray cite --selftest   Prove the citation gate still rejects what it is supposed to.");

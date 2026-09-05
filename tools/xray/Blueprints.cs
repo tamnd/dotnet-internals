@@ -141,6 +141,15 @@ internal static class Blueprints
 
         var lines = File.ReadAllLines(sourcePath);
         var blocks = Blocks.Parse(sourcePath, lines);
+
+        // A blueprint is a specification generated from what the runtime and its libraries already
+        // publish, so it has no business needing anything a reader would have to build or download.
+        // A generator that did would be a specification only its author could reproduce.
+        foreach (var block in blocks.Where(b => b.Env != Environments.Stock))
+        {
+            plan.Problem($"{sourcePath}:{block.DirectiveLine + 1}: block '{block.Id}' declares env={block.Env}, and a blueprint generator runs on the stock SDK or it is not a specification anybody else can regenerate");
+        }
+
         var captured = Blocks.Execute(directory, lines, blocks, "generator");
 
         foreach (var block in blocks)

@@ -22,7 +22,7 @@ The names are also a promise about ordering. The step that runs the lessons happ
 
 ### 1. resolve
 
-Reads `pin.json` and `global.json`, asks the SDK which version of itself is about to compile everything, and reports the platform.
+Reads `pin.json`, `global.json` and `environments.json`, asks the SDK which version of itself is about to compile everything, reports the platform, and works out which of the declared configurations this machine actually has.
 
 These two files are doing different jobs. `global.json` decides which compiler runs. `pin.json` decides which source tree a citation resolves against. Today they name different .NET versions on purpose, because the citations will be written against .NET 11 and the tooling still builds on 10. The moment the pin lands that gap has to close, and this step is what closes it.
 
@@ -33,6 +33,9 @@ What it refuses:
 - No `global.json`, or a `global.json` with no SDK version, which means two people cloning this repository can be compiling it with two different compilers.
 - A pin and a `global.json` that name different SDK versions, once the pin has landed.
 - Half a pin: a tag with no commit, or a commit with no tag.
+- No `environments.json`, or one whose ids do not run from `E0` upward with no gaps, or one where a configuration does not say what it costs or points at a document that has been deleted.
+
+The one line this step prints is the line that decides whether the numbers further down are the numbers a reader would get. It ends with which configurations are here and which are not, and `dotnet run --project tools/xray -- env` prints the long version with a reason for each absence.
 
 ### 2. cite
 
@@ -45,6 +48,8 @@ This is the one step that needs the network, so it is also the one step with a w
 Runs every lesson and every blueprint generator, once each. One process per lesson, because a lesson is a sequence where the third block depends on what the first one allocated.
 
 Everything checked here is a fact about the run rather than about a file. Each block reached its marker, so it actually ran. What it printed holds every assertion made about it. None of what it printed carries a path off the machine that produced it. A boss fight's starting file loses to its own grader, so the fight is a fight.
+
+A lesson that needs a configuration this machine does not have is left out. It is named in the log with the reason, it produces nothing, and the later steps therefore never compare a committed page against a run that did not happen. Leaving one out is allowed only when its page and its captured output are already committed, because otherwise a missing environment becomes the reason a lesson nobody has ever built looks fine. [The lesson format](lesson-format.md) has the rest of that.
 
 ### 4. generate
 
@@ -88,7 +93,7 @@ Two of the claims this repository rests on are that no number in a lesson is typ
 dotnet run --project tools/xray -- check --selftest
 ```
 
-This copies a real lesson and a real blueprint, breaks each copy in one specific way, and requires the ordinary check to object by name. It bumps a digit in a captured output, deletes one, appends a sentence to a generated page, leaves a file behind that no block produces, and takes away the pin. Two of its cases change nothing and have to pass, because without them a harness that failed on everything would report a clean sweep. It runs in CI as the `tamper` job.
+This copies a real lesson and a real blueprint, breaks each copy in one specific way, and requires the ordinary check to object by name. It bumps a digit in a captured output, deletes one, appends a sentence to a generated page, leaves a file behind that no block produces, takes away the pin, points a block at a configuration nobody declared, makes the front matter disagree with the blocks about what the lesson needs, and skips a lesson for a missing configuration that has never been built anywhere. Three of its cases change nothing and have to pass, because without them a harness that failed on everything would report a clean sweep. It runs in CI as the `tamper` job.
 
 ## Pointing it somewhere smaller
 

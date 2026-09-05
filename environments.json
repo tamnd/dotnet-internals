@@ -1,0 +1,38 @@
+{
+  "comment": "The configurations a lesson is allowed to need, cheapest first. Every block in every lesson declares one of these ids in its env= attribute, and a block that names an id which is not in this list fails the build. Edit this file rather than a sentence in a document, because this is the copy the tool reads.",
+  "environments": [
+    {
+      "id": "E0",
+      "name": "the stock SDK",
+      "what": "One SDK, installed the way anybody installs it. No downloads beyond that, no environment variables, nothing built from source.",
+      "cost": "One install. Nothing after that.",
+      "how": "README.md",
+      "here": {
+        "kind": "always"
+      }
+    },
+    {
+      "id": "E1",
+      "name": "a checked JIT beside the stock runtime",
+      "what": "The release runtime with a checked clrjit dropped in next to it under a name of its own, selected with DOTNET_JitName. This is what DOTNET_JitDump needs, and it is a download rather than a build.",
+      "cost": "One file of about thirty megabytes, and roughly twice the JIT time while it is switched on.",
+      "how": "docs/probes/nightly-checked-jit.md",
+      "here": {
+        "kind": "beside-the-runtime",
+        "file": "checked-jit.json",
+        "variable": "XRAY_CHECKED_JIT"
+      }
+    },
+    {
+      "id": "E2",
+      "name": "a runtime built from source",
+      "what": "A clone of dotnet/runtime at the pinned commit, built. Nothing else reaches the parts of the runtime that are not in a shipped binary at all.",
+      "cost": "Hours the first time, tens of gigabytes of disk, and a toolchain per platform.",
+      "how": "docs/lesson-format.md",
+      "here": {
+        "kind": "pointed-at",
+        "variable": "XRAY_RUNTIME_SOURCE"
+      }
+    }
+  ]
+}
