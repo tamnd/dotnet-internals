@@ -1,0 +1,14 @@
+title What xray cite does to one citation
+
+note span 40 70 920 60 "runtime:src/coreclr/vm/methodtable.h:910@60629d1#class MethodTable" "One code span on a page. Everything under it is what happens to that span."
+
+strip first 40 160 300 110 "1 take it apart|repo, path, line,|commit, expectation" "2 check the repo|one of the two that|pin.json names" "3 check the commit|it has to be the pin,|not a tag or a branch"
+strip then 40 300 300 110 "4 fetch the file|from that repo at that|commit, cached after" "5 check the line|it is inside the file|and says what is claimed" "6 print what it says|the line itself, so a|reviewer can audit it"
+
+arrow first.2 then.0 "then"
+
+note net 40 450 440 130 "Step 4 is the only place in this" "repository that needs the network." "It is cached by commit, and a commit" "never changes, so it is fetched once." "That is why cite is its own command."
+
+note pin 520 450 440 130 "Step 3 fails today, on purpose." "pin.json holds a null commit until" "the release candidate is tagged, so" "the right number of citations right" "now is zero and the tool says so."
+
+size 1000 610

@@ -13,11 +13,6 @@ internal static class Lint
 {
     private const string Allow = "xray-lint: allow";
 
-    private static readonly string[] SkipDirectories =
-    [
-        ".git", "bin", "obj", "vendor", "node_modules", "artifacts", "build",
-    ];
-
     private static readonly string[] BannedWords =
     [
         "simply", "just", "obviously", "trivially", "of course",
@@ -34,7 +29,7 @@ internal static class Lint
         var problems = 0;
         var files = 0;
 
-        foreach (var path in Markdown(root).Order(StringComparer.Ordinal))
+        foreach (var path in Files.Markdown(root).Order(StringComparer.Ordinal))
         {
             files++;
             problems += Check(path);
@@ -42,19 +37,6 @@ internal static class Lint
 
         Console.WriteLine($"xray lint: {files} file(s), {problems} problem(s)");
         return problems == 0 ? 0 : 1;
-    }
-
-    private static IEnumerable<string> Markdown(string root)
-    {
-        foreach (var path in Directory.EnumerateFiles(root, "*.md", SearchOption.AllDirectories))
-        {
-            var relative = Path.GetRelativePath(root, path);
-            var parts = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            if (!parts.Any(part => SkipDirectories.Contains(part, StringComparer.Ordinal)))
-            {
-                yield return path;
-            }
-        }
     }
 
     private static int Check(string path)
