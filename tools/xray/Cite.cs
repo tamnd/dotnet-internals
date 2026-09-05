@@ -26,7 +26,28 @@ internal static class Cite
     {
         try
         {
-            return Check(root);
+            if (!Directory.Exists(root))
+            {
+                Console.Error.WriteLine($"xray cite: no such directory: {root}");
+                return 2;
+            }
+
+            var (count, errors) = Verify(root, verbose: true);
+
+            foreach (var error in errors.Order(StringComparer.Ordinal))
+            {
+                Console.Error.WriteLine(error);
+            }
+
+            // Saying the count out loud matters while the pin has not landed, because zero
+            // citations and a working checker look exactly the same from the outside otherwise.
+            Console.WriteLine($"xray cite: {count} citation(s), {errors.Count} problem(s)");
+            if (count == 0 && errors.Count == 0)
+            {
+                Console.WriteLine("xray cite: there are none yet, because pin.json still holds a null commit and a citation without one is not accepted");
+            }
+
+            return errors.Count == 0 ? 0 : 1;
         }
         catch (CiteException error)
         {
@@ -35,14 +56,13 @@ internal static class Cite
         }
     }
 
-    private static int Check(string root)
+    /// <summary>
+    /// The work itself, shared by the standalone command and by the cite step of a build. The
+    /// build wants the numbers rather than a footer of its own, so the reporting is the caller's
+    /// job and this hands back what it found.
+    /// </summary>
+    internal static (int Count, List<string> Errors) Verify(string root, bool verbose)
     {
-        if (!Directory.Exists(root))
-        {
-            Console.Error.WriteLine($"xray cite: no such directory: {root}");
-            return 2;
-        }
-
         var pin = Pin.Load(root);
         var errors = new List<string>();
         var citations = new List<Citation>();
@@ -62,23 +82,13 @@ internal static class Cite
                 continue;
             }
 
-            Console.WriteLine($"  {citation.Where}  {citation.Repo}:{citation.Path}:{Span(citation)}  {resolved}");
+            if (verbose)
+            {
+                Console.WriteLine($"  {citation.Where}  {citation.Repo}:{citation.Path}:{Span(citation)}  {resolved}");
+            }
         }
 
-        foreach (var error in errors.Order(StringComparer.Ordinal))
-        {
-            Console.Error.WriteLine(error);
-        }
-
-        // Saying the count out loud matters while the pin has not landed, because zero citations
-        // and a working checker look exactly the same from the outside otherwise.
-        Console.WriteLine($"xray cite: {citations.Count} citation(s), {errors.Count} problem(s)");
-        if (citations.Count == 0 && errors.Count == 0)
-        {
-            Console.WriteLine("xray cite: there are none yet, because pin.json still holds a null commit and a citation without one is not accepted");
-        }
-
-        return errors.Count == 0 ? 0 : 1;
+        return (citations.Count, errors);
     }
 
     private static string Span(Citation citation) =>

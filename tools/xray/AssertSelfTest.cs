@@ -117,7 +117,7 @@ internal static class AssertSelfTest
 
         try
         {
-            var source = Path.Combine(directory, LessonCommand.SourceName);
+            var source = Path.Combine(directory, Lessons.SourceName);
             File.WriteAllText(source, $"//# block id=one env=E0 capture={capture}\nConsole.WriteLine(\"hello\");\n//# end\n");
 
             if (json is not null)

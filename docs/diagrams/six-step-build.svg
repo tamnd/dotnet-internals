@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="550" viewBox="0 0 940 550">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .heading { font-size: 15px; font-weight: 600; fill: #1e1e1e; }
+    .body { font-size: 13px; fill: #495057; }
+    .cell-heading { font-size: 13px; font-weight: 600; fill: #1e1e1e; }
+    .cell-body { font-size: 11px; fill: #495057; }
+    .title { font-size: 18px; font-weight: 700; fill: #1e1e1e; }
+    .edge { font-size: 12px; fill: #495057; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+    .footer { font-size: 11px; fill: #868e96; }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#868e96"/>
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text class="title" x="24" y="32">The six step build</text>
+  <line x1="300" y1="115" x2="340" y2="115" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="600" y1="115" x2="640" y2="115" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="770" y1="170" x2="770" y2="230" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="640" y1="285" x2="600" y2="285" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="340" y1="285" x2="300" y2="285" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <rect x="40" y="60" width="260" height="110" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="170" y="93.5">1. resolve</text>
+  <text class="body" text-anchor="middle" x="170" y="113.5">What is this build standing on?</text>
+  <text class="body" text-anchor="middle" x="170" y="130.5">Reads pin.json and global.json.</text>
+  <text class="body" text-anchor="middle" x="170" y="147.5">Refuses if they disagree.</text>
+  <rect x="340" y="60" width="260" height="110" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="470" y="93.5">2. cite</text>
+  <text class="body" text-anchor="middle" x="470" y="113.5">Does every citation still point</text>
+  <text class="body" text-anchor="middle" x="470" y="130.5">where the page says it does?</text>
+  <text class="body" text-anchor="middle" x="470" y="147.5">The one step needing the network.</text>
+  <rect x="640" y="60" width="260" height="110" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="770" y="93.5">3. execute</text>
+  <text class="body" text-anchor="middle" x="770" y="113.5">Run every lesson and every</text>
+  <text class="body" text-anchor="middle" x="770" y="130.5">generator, once each. Check the</text>
+  <text class="body" text-anchor="middle" x="770" y="147.5">assertions against what printed.</text>
+  <rect x="40" y="230" width="260" height="110" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="170" y="263.5">6. check</text>
+  <text class="body" text-anchor="middle" x="170" y="283.5">The only step that touches disk.</text>
+  <text class="body" text-anchor="middle" x="170" y="300.5">build writes it. check compares</text>
+  <text class="body" text-anchor="middle" x="170" y="317.5">and fails on any difference.</text>
+  <rect x="340" y="230" width="260" height="110" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="470" y="263.5">5. assemble</text>
+  <text class="body" text-anchor="middle" x="470" y="283.5">Fill every hole in the prose with</text>
+  <text class="body" text-anchor="middle" x="470" y="300.5">the piece that belongs in it, and</text>
+  <text class="body" text-anchor="middle" x="470" y="317.5">hand over the finished pages.</text>
+  <rect x="640" y="230" width="260" height="110" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="770" y="263.5">4. generate</text>
+  <text class="body" text-anchor="middle" x="770" y="283.5">Turn what ran into files: captured</text>
+  <text class="body" text-anchor="middle" x="770" y="300.5">output, blueprint sections,</text>
+  <text class="body" text-anchor="middle" x="770" y="317.5">pictures, boss fight answers.</text>
+  <rect x="40" y="390" width="400" height="130" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="240" y="418">A step that finds a problem is the</text>
+  <text class="body" text-anchor="middle" x="240" y="435">last step that runs. Every step</text>
+  <text class="body" text-anchor="middle" x="240" y="452">reads what the one before it made,</text>
+  <text class="body" text-anchor="middle" x="240" y="469">so output from a step built on a</text>
+  <text class="body" text-anchor="middle" x="240" y="486">failed one is not a second opinion,</text>
+  <text class="body" text-anchor="middle" x="240" y="503">it is noise with a line number.</text>
+  <rect x="480" y="390" width="420" height="130" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="690" y="418">build and check are the same six</text>
+  <text class="body" text-anchor="middle" x="690" y="435">steps with one flag flipped. Nothing</text>
+  <text class="body" text-anchor="middle" x="690" y="452">is written until step six, so the two</text>
+  <text class="body" text-anchor="middle" x="690" y="469">cannot drift apart, and a file the</text>
+  <text class="body" text-anchor="middle" x="690" y="486">build no longer produces is reported</text>
+  <text class="body" text-anchor="middle" x="690" y="503">rather than left lying there.</text>
+  <text class="footer" x="24" y="536">Generated by xray from six-step-build.dg. Edit that file, not this one.</text>
+</svg>

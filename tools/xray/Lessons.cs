@@ -3,17 +3,26 @@ using System.Text;
 namespace ClrXray;
 
 /// <summary>
-/// Builds a lesson, or checks that the lesson already in the repository is the one the code
-/// produces.
+/// One lesson that has been run, and everything the later steps of the build need from it.
 /// </summary>
 /// <remarks>
-/// <para>
-/// These are the same operation with one flag flipped, and that is the point. <c>xray build</c>
-/// writes the captured output and the rendered page. <c>xray check</c> does all the same work
-/// and then fails if what it produced is not what is committed. So the pull request that changes
-/// a line of lesson code cannot be merged with the old numbers still on the page, and nobody has
-/// to notice in review.
-/// </para>
+/// A lesson runs exactly once per build. Everything after that reads this rather than starting
+/// another process, which is why the page and the captured output can never be produced by two
+/// different runs of the same program.
+/// </remarks>
+internal sealed record Ran(
+    string Directory,
+    string Name,
+    IReadOnlyList<Block> Blocks,
+    IReadOnlyDictionary<string, Asserted> Asserts,
+    Dictionary<string, string> Captured,
+    string? BossAnswers);
+
+/// <summary>
+/// The lesson side of the build, in the three steps the pipeline names: execute the code, generate
+/// the files that hold what it printed, and assemble the page around them.
+/// </summary>
+/// <remarks>
 /// <para>
 /// The run itself is one process per lesson. The lesson source is copied with a marker printed
 /// at the top of each block, the whole program runs once, and the markers cut the output into
@@ -21,53 +30,19 @@ namespace ClrXray;
 /// practice, because a lesson is a sequence where the third block depends on what the first one
 /// allocated.
 /// </para>
+/// <para>
+/// Nothing here writes a file. Every one of these steps hands its work to the plan, and the plan
+/// is settled at the end, which is what makes <c>build</c> and <c>check</c> the same six steps
+/// with one flag flipped. So the pull request that changes a line of lesson code cannot be merged
+/// with the old numbers still on the page, and nobody has to notice in review.
+/// </para>
 /// </remarks>
-internal static class LessonCommand
+internal static class Lessons
 {
     internal const string SourceName = "lesson.cs";
     private const string ProseName = "lesson.src.md";
     private const string PageName = "lesson.md";
     private const string ExpectedDirectory = "expected";
-
-    internal static int Run(string path, bool write)
-    {
-        // Diagrams first. They are cheap, they fail fast, and a lesson that quotes a picture wants
-        // the picture to exist before the page is assembled around it.
-        var problems = Diagrams.Run(path, write, out var drawings);
-        problems += Blueprints.Run(path, write, out var blueprints);
-
-        var lessons = Discover(path);
-        if (lessons.Count == 0)
-        {
-            // A path holding diagrams and no lessons is a normal thing, because the docs and
-            // blueprints directories are exactly that. A path holding none of the three is
-            // somebody's typo.
-            if (drawings > 0 || blueprints > 0)
-            {
-                return problems == 0 ? 0 : 1;
-            }
-
-            Console.Error.WriteLine($"xray: nothing to build under {path}, a lesson is a directory holding {SourceName}");
-            return 2;
-        }
-
-        foreach (var lesson in lessons)
-        {
-            try
-            {
-                problems += One(lesson, write);
-            }
-            catch (LessonException error)
-            {
-                Console.Error.WriteLine($"xray: {error.Message}");
-                problems++;
-            }
-        }
-
-        var verb = write ? "build" : "check";
-        Console.WriteLine($"xray {verb}: {lessons.Count} lesson(s), {problems} problem(s)");
-        return problems == 0 ? 0 : 1;
-    }
 
     internal static List<string> Discover(string path)
     {
@@ -87,7 +62,13 @@ internal static class LessonCommand
             .ToList();
     }
 
-    private static int One(string directory, bool write)
+    /// <summary>
+    /// Step three. Builds the fixture, runs the lesson once, and checks everything that is a fact
+    /// about the run rather than about a file: that each block reached its marker, that what it
+    /// printed holds every assertion made about it, and that none of it carries a path off this
+    /// machine.
+    /// </summary>
+    internal static Ran Execute(string directory, Plan plan)
     {
         var name = Path.GetFileName(directory);
         var sourcePath = Path.Combine(directory, SourceName);
@@ -101,7 +82,6 @@ internal static class LessonCommand
         BuildFixture(directory);
 
         var captured = Blocks.Execute(directory, lines, blocks, "lesson");
-        var problems = 0;
 
         foreach (var block in blocks)
         {
@@ -115,8 +95,7 @@ internal static class LessonCommand
 
             if (!captured.TryGetValue(block.Id, out var output))
             {
-                Console.Error.WriteLine($"{name}: block '{block.Id}' printed no marker, so it never ran");
-                problems++;
+                plan.Problem($"{name}: block '{block.Id}' printed no marker, so it never ran");
                 continue;
             }
 
@@ -124,35 +103,61 @@ internal static class LessonCommand
             {
                 foreach (var problem in Asserts.Check(asserted, output))
                 {
-                    Console.Error.WriteLine($"{name}/{block.Id}: {problem}");
-                    problems++;
+                    plan.Problem($"{name}/{block.Id}: {problem}");
                 }
             }
 
-            // The rest is about storing the output, which is the one thing a dropped block does
-            // not do.
-            if (block.Capture != Blocks.Stdout)
+            if (block.Capture == Blocks.Stdout)
+            {
+                Machine(directory, name, block.Id, output, plan);
+            }
+        }
+
+        var answers = Boss.Has(directory) ? Boss.Execute(directory, plan) : null;
+
+        return new Ran(directory, name, blocks, asserts, captured, answers);
+    }
+
+    /// <summary>
+    /// Step four. One file per block whose output the page is allowed to quote, plus the boss
+    /// fight's answer file.
+    /// </summary>
+    internal static int Generate(Ran lesson, Plan plan)
+    {
+        var count = 0;
+
+        foreach (var block in lesson.Blocks)
+        {
+            if (block.Capture != Blocks.Stdout || !lesson.Captured.TryGetValue(block.Id, out var output))
             {
                 continue;
             }
 
-            problems += Machine(directory, name, block.Id, output);
-            problems += Generated.Settle(Path.Combine(directory, ExpectedDirectory, block.Id + ".txt"), output, write);
+            plan.Add(Path.Combine(lesson.Directory, ExpectedDirectory, block.Id + ".txt"), output);
+            count++;
         }
 
-        if (Boss.Has(directory))
+        if (lesson.BossAnswers is not null)
         {
-            problems += Boss.Build(directory, write);
+            plan.Add(Path.Combine(lesson.Directory, Boss.Directory, Boss.Answers), lesson.BossAnswers);
         }
 
-        var prosePath = Path.Combine(directory, ProseName);
-        if (File.Exists(prosePath))
+        return count;
+    }
+
+    /// <summary>
+    /// Step five. Fills every hole in the prose and gives the plan the page.
+    /// </summary>
+    internal static int Assemble(Ran lesson, Plan plan)
+    {
+        var prosePath = Path.Combine(lesson.Directory, ProseName);
+        if (!File.Exists(prosePath))
         {
-            var page = Render(directory, prosePath, blocks, captured, asserts);
-            problems += Generated.Settle(Path.Combine(directory, PageName), page, write);
+            return 0;
         }
 
-        return problems;
+        plan.Add(Path.Combine(lesson.Directory, PageName), Render(lesson, prosePath));
+        return 1;
     }
 
     /// <summary>
@@ -180,21 +185,16 @@ internal static class LessonCommand
     /// out of somebody's home directory in an expected file is a file that can only ever match on
     /// one laptop, and it fails on the fourth platform instead of in review.
     /// </summary>
-    internal static int Machine(string directory, string name, string id, string output)
+    internal static void Machine(string directory, string name, string id, string output, Plan plan)
     {
-        var problems = 0;
-
         foreach (var secret in Leaks(directory))
         {
             if (secret.Length > 0 && output.Contains(secret, StringComparison.OrdinalIgnoreCase))
             {
-                Console.Error.WriteLine($"{name}/{id}: output contains a path from this machine, print a file name rather than a full path");
-                problems++;
-                break;
+                plan.Problem($"{name}/{id}: output contains a path from this machine, print a file name rather than a full path");
+                return;
             }
         }
-
-        return problems;
     }
 
     private static IEnumerable<string> Leaks(string directory)
@@ -203,15 +203,10 @@ internal static class LessonCommand
         yield return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     }
 
-    private static string Render(
-        string directory,
-        string prosePath,
-        IReadOnlyList<Block> blocks,
-        Dictionary<string, string> captured,
-        IReadOnlyDictionary<string, Asserted> asserts)
+    private static string Render(Ran lesson, string prosePath)
     {
-        var byId = blocks.ToDictionary(b => b.Id, StringComparer.Ordinal);
-        var gates = Gates.Load(directory);
+        var byId = lesson.Blocks.ToDictionary(b => b.Id, StringComparer.Ordinal);
+        var gates = Gates.Load(lesson.Directory);
         var source = File.ReadAllLines(prosePath);
         var page = new StringBuilder();
         var notice = false;
@@ -257,21 +252,19 @@ internal static class LessonCommand
                 throw new LessonException($"{prosePath}: '{trimmed}' is not a transclusion");
             }
 
-            rendered.Append(Transclude(directory, prosePath, kind, id, byId, captured, gates, asserts)).Append('\n');
+            rendered.Append(Transclude(lesson, prosePath, kind, id, byId, gates)).Append('\n');
         }
 
         return rendered.ToString().TrimEnd('\n') + "\n";
     }
 
     private static string Transclude(
-        string directory,
+        Ran lesson,
         string prosePath,
         string kind,
         string id,
         Dictionary<string, Block> blocks,
-        Dictionary<string, string> captured,
-        IReadOnlyDictionary<string, Gate> gates,
-        IReadOnlyDictionary<string, Asserted> asserts)
+        IReadOnlyDictionary<string, Gate> gates)
     {
         switch (kind)
         {
@@ -289,7 +282,7 @@ internal static class LessonCommand
                     throw new LessonException($"{prosePath}: block '{id}' does not store its output, so the page cannot quote it");
                 }
 
-                if (!captured.TryGetValue(id, out var output))
+                if (!lesson.Captured.TryGetValue(id, out var output))
                 {
                     throw new LessonException($"{prosePath}: block '{id}' has no captured output");
                 }
@@ -302,7 +295,7 @@ internal static class LessonCommand
                     throw new LessonException($"{prosePath}: no block named '{id}' in {SourceName}");
                 }
 
-                if (!asserts.TryGetValue(id, out var claims))
+                if (!lesson.Asserts.TryGetValue(id, out var claims))
                 {
                     throw new LessonException($"{prosePath}: block '{id}' has nothing asserted about it in {Asserts.FileName}");
                 }
@@ -318,12 +311,12 @@ internal static class LessonCommand
                 return Gates.Render(gate);
 
             case "boss":
-                if (!Boss.Has(directory))
+                if (!Boss.Has(lesson.Directory))
                 {
                     throw new LessonException($"{prosePath}: the page asks for a boss fight and there is no {Boss.Directory} directory");
                 }
 
-                return Boss.Render(directory, Boss.Load(directory));
+                return Boss.Render(lesson.Directory, Boss.Load(lesson.Directory));
 
             default:
                 throw new LessonException($"{prosePath}: '{kind}' is not a kind of transclusion");

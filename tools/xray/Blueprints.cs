@@ -25,6 +25,17 @@ internal sealed class BlueprintManifest
 }
 
 /// <summary>
+/// One blueprint whose generator has been run, and everything the later steps of the build need
+/// from it.
+/// </summary>
+internal sealed record Made(
+    string Directory,
+    string Name,
+    BlueprintManifest Manifest,
+    IReadOnlyList<Block> Blocks,
+    Dictionary<string, string> Captured);
+
+/// <summary>
 /// Builds a blueprint, which is a specification of one subsystem written for somebody
 /// implementing it rather than for somebody learning it.
 /// </summary>
@@ -89,35 +100,7 @@ internal static class Blueprints
         AllowTrailingCommas = true,
     };
 
-    internal static int Run(string path, bool write, out int count)
-    {
-        var found = Discover(path);
-        var problems = 0;
-        count = found.Count;
-
-        foreach (var directory in found)
-        {
-            try
-            {
-                problems += One(directory, write);
-            }
-            catch (LessonException error)
-            {
-                Console.Error.WriteLine($"xray: {error.Message}");
-                problems++;
-            }
-        }
-
-        if (found.Count > 0)
-        {
-            var verb = write ? "build" : "check";
-            Console.WriteLine($"xray {verb}: {found.Count} blueprint(s), {problems} problem(s)");
-        }
-
-        return problems;
-    }
-
-    private static List<string> Discover(string path)
+    internal static List<string> Discover(string path)
     {
         if (File.Exists(Path.Combine(path, ManifestName)))
         {
@@ -135,14 +118,14 @@ internal static class Blueprints
             .ToList();
     }
 
-    private static int One(string directory, bool write)
+    /// <summary>
+    /// Step three. Reads the manifest and runs the generator, which is the only part of a
+    /// blueprint that is a program rather than a file.
+    /// </summary>
+    internal static Made Execute(string directory, Plan plan)
     {
         var name = Path.GetFileName(directory);
         var manifest = LoadManifest(directory);
-        var problems = 0;
-
-        var (captured, generating) = Generate(directory, name, write);
-        problems += generating;
 
         var prosePath = Path.Combine(directory, ProseName);
         if (!File.Exists(prosePath))
@@ -150,15 +133,81 @@ internal static class Blueprints
             throw new LessonException($"{name}: no {ProseName}, so there is a generator and nothing to put it in");
         }
 
+        var sourcePath = Path.Combine(directory, SourceName);
+        if (!File.Exists(sourcePath))
+        {
+            return new Made(directory, name, manifest, [], []);
+        }
+
+        var lines = File.ReadAllLines(sourcePath);
+        var blocks = Blocks.Parse(sourcePath, lines);
+        var captured = Blocks.Execute(directory, lines, blocks, "generator");
+
+        foreach (var block in blocks)
+        {
+            if (block.Capture != Blocks.Stdout)
+            {
+                continue;
+            }
+
+            if (!captured.TryGetValue(block.Id, out var output))
+            {
+                plan.Problem($"{name}: block '{block.Id}' printed no marker, so it never ran");
+                continue;
+            }
+
+            if (output.Length == 0)
+            {
+                plan.Problem($"{name}: block '{block.Id}' produced nothing, so the section it fills would be empty");
+                continue;
+            }
+
+            Lessons.Machine(directory, name, block.Id, output, plan);
+        }
+
+        return new Made(directory, name, manifest, blocks, captured);
+    }
+
+    /// <summary>
+    /// Step four. One file per generated section, which is the artefact a reviewer diffs when
+    /// somebody changes the generator.
+    /// </summary>
+    internal static int Generate(Made blueprint, Plan plan)
+    {
+        var count = 0;
+
+        foreach (var block in blueprint.Blocks)
+        {
+            if (block.Capture != Blocks.Stdout
+                || !blueprint.Captured.TryGetValue(block.Id, out var output)
+                || output.Length == 0)
+            {
+                continue;
+            }
+
+            plan.Add(Path.Combine(blueprint.Directory, GeneratedDirectory, block.Id + ".md"), output);
+            count++;
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// Step five. Checks the nine sections and the house rule about pointing at the teaching side
+    /// of the book, then puts the page together.
+    /// </summary>
+    internal static int Assemble(Made blueprint, Plan plan)
+    {
+        var prosePath = Path.Combine(blueprint.Directory, ProseName);
         var prose = Generated.Normalise(File.ReadAllText(prosePath)).Split('\n');
 
-        problems += Sections(prosePath, manifest, prose, out var written);
-        problems += References(prosePath, prose);
+        var written = Sections(prosePath, blueprint.Manifest, prose, plan);
+        References(prosePath, prose, plan);
 
-        var page = Render(prosePath, manifest, prose, captured, written);
-        problems += Generated.Settle(Path.Combine(directory, PageName), page, write);
+        var page = Render(prosePath, blueprint.Manifest, prose, blueprint.Captured, written);
+        plan.Add(Path.Combine(blueprint.Directory, PageName), page);
 
-        return problems;
+        return 1;
     }
 
     private static BlueprintManifest LoadManifest(string directory)
@@ -186,57 +235,12 @@ internal static class Blueprints
     }
 
     /// <summary>
-    /// Runs the generator, if there is one, and settles one file per block it captured.
-    /// </summary>
-    private static (Dictionary<string, string> Captured, int Problems) Generate(string directory, string name, bool write)
-    {
-        var problems = 0;
-        var sourcePath = Path.Combine(directory, SourceName);
-        if (!File.Exists(sourcePath))
-        {
-            return ([], problems);
-        }
-
-        var lines = File.ReadAllLines(sourcePath);
-        var blocks = Blocks.Parse(sourcePath, lines);
-        var captured = Blocks.Execute(directory, lines, blocks, "generator");
-
-        foreach (var block in blocks)
-        {
-            if (block.Capture != Blocks.Stdout)
-            {
-                continue;
-            }
-
-            if (!captured.TryGetValue(block.Id, out var output))
-            {
-                Console.Error.WriteLine($"{name}: block '{block.Id}' printed no marker, so it never ran");
-                problems++;
-                continue;
-            }
-
-            if (output.Length == 0)
-            {
-                Console.Error.WriteLine($"{name}: block '{block.Id}' produced nothing, so the section it fills would be empty");
-                problems++;
-                continue;
-            }
-
-            problems += LessonCommand.Machine(directory, name, block.Id, output);
-            problems += Generated.Settle(Path.Combine(directory, GeneratedDirectory, block.Id + ".md"), output, write);
-        }
-
-        return (captured, problems);
-    }
-
-    /// <summary>
     /// Checks the nine sections: the right names, in the right order, and all of them once the
     /// blueprint stops calling itself a draft.
     /// </summary>
-    private static int Sections(string prosePath, BlueprintManifest manifest, string[] prose, out List<int> written)
+    private static List<int> Sections(string prosePath, BlueprintManifest manifest, string[] prose, Plan plan)
     {
-        var problems = 0;
-        written = [];
+        var written = new List<int>();
         var next = 0;
 
         foreach (var line in prose)
@@ -251,8 +255,7 @@ internal static class Blueprints
             var dot = heading.IndexOf('.', StringComparison.Ordinal);
             if (dot <= 0 || !int.TryParse(heading[..dot], out var number))
             {
-                Console.Error.WriteLine($"{prosePath}: '{heading}' is not one of the nine sections, which are numbered");
-                problems++;
+                plan.Problem($"{prosePath}: '{heading}' is not one of the nine sections, which are numbered");
                 continue;
             }
 
@@ -260,15 +263,13 @@ internal static class Blueprints
             if (number < 1 || number > Template.Length || Template[number - 1] != title)
             {
                 var expected = number >= 1 && number <= Template.Length ? Template[number - 1] : "no such section";
-                Console.Error.WriteLine($"{prosePath}: section {number} is '{expected}', not '{title}'");
-                problems++;
+                plan.Problem($"{prosePath}: section {number} is '{expected}', not '{title}'");
                 continue;
             }
 
             if (number < next)
             {
-                Console.Error.WriteLine($"{prosePath}: section {number} comes after section {next}, and the nine are always in order");
-                problems++;
+                plan.Problem($"{prosePath}: section {number} comes after section {next}, and the nine are always in order");
                 continue;
             }
 
@@ -278,36 +279,29 @@ internal static class Blueprints
 
         if (manifest.Status == Complete && written.Count != Template.Length)
         {
-            Console.Error.WriteLine($"{prosePath}: a blueprint that is not a draft has all nine sections, this one has {written.Count}");
-            problems++;
+            plan.Problem($"{prosePath}: a blueprint that is not a draft has all nine sections, this one has {written.Count}");
         }
 
         if (written.Count == 0)
         {
-            Console.Error.WriteLine($"{prosePath}: no sections at all");
-            problems++;
+            plan.Problem($"{prosePath}: no sections at all");
         }
 
-        return problems;
+        return written;
     }
 
-    private static int References(string prosePath, string[] prose)
+    private static void References(string prosePath, string[] prose, Plan plan)
     {
-        var problems = 0;
-
         for (var i = 0; i < prose.Length; i++)
         {
             foreach (var pointer in Pointers)
             {
                 if (prose[i].Contains(pointer, StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.Error.WriteLine($"{prosePath}:{i + 1}: '{pointer}' points at the teaching side of the book, and a blueprint stands on its own");
-                    problems++;
+                    plan.Problem($"{prosePath}:{i + 1}: '{pointer}' points at the teaching side of the book, and a blueprint stands on its own");
                 }
             }
         }
-
-        return problems;
     }
 
     private static string Render(

@@ -79,10 +79,10 @@ Citations are checked by a machine rather than by a reviewer. `xray cite` takes 
 
 | Path | What is in it |
 |---|---|
-| `tools/xray` | The command line tool. Prints the environment banner, lints the prose rules, builds and checks lessons, diagrams and blueprints |
+| `tools/xray` | The command line tool. Prints the environment banner, lints the prose rules, and runs [the six step build](docs/the-build.md) over lessons, diagrams and blueprints |
 | `lessons` | One directory per lesson. The page in each one is generated, never edited |
 | `blueprints` | One directory per blueprint. The document in each one is generated, and so are the sections that can be |
-| `docs` | How the machinery works. The [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md), the [blueprint format](docs/blueprint-format.md) and the [citation format](docs/citation-format.md) |
+| `docs` | How the machinery works. [The build](docs/the-build.md), the [lesson format](docs/lesson-format.md), the [diagram format](docs/diagram-format.md), the [blueprint format](docs/blueprint-format.md) and the [citation format](docs/citation-format.md) |
 | `docs/probes` | The measurements that decided something, with the script that produced each one |
 | `.github/workflows` | CI. Everything in this repository is checked by a machine or it is not checked |
 
