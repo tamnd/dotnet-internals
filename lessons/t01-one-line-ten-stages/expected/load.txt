@@ -1,0 +1,4 @@
+Sample loaded before we ask for it: False
+Sample loaded after we ask for it:  True
+the library it was compiled against: System.Private.CoreLib
+and that one is loaded:              True

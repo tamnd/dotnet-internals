@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The program the lesson follows. It is a project rather than a committed binary, because a
+    committed binary is a number typed by a human in the one format nobody can review.
+
+    It is an executable rather than a library, and that is the only interesting choice in here. A
+    library build produces one file worth looking at. An executable build produces five, and four
+    of them are the answer to a question the lesson asks: if your code is in the dll, what are the
+    other four for.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Sample</AssemblyName>
+    <RootNamespace>Sample</RootNamespace>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+</Project>

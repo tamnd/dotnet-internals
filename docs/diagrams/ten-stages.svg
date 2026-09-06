@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="580" viewBox="0 0 1120 580">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .heading { font-size: 15px; font-weight: 600; fill: #1e1e1e; }
+    .body { font-size: 13px; fill: #495057; }
+    .cell-heading { font-size: 13px; font-weight: 600; fill: #1e1e1e; }
+    .cell-body { font-size: 11px; fill: #495057; }
+    .title { font-size: 18px; font-weight: 700; fill: #1e1e1e; }
+    .edge { font-size: 12px; fill: #495057; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+    .footer { font-size: 11px; fill: #868e96; }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#868e96"/>
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text class="title" x="24" y="32">One line, ten stages</text>
+  <line x1="230" y1="130" x2="250" y2="130" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="440" y1="130" x2="460" y2="130" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="650" y1="130" x2="670" y2="130" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="860" y1="130" x2="880" y2="130" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="975" y1="190" x2="975" y2="250" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="880" y1="315" x2="860" y2="315" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="670" y1="315" x2="650" y2="315" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="460" y1="315" x2="440" y2="315" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <line x1="250" y1="315" x2="230" y2="315" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <rect x="40" y="70" width="190" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="135" y="117">One. text</text>
+  <text class="body" text-anchor="middle" x="135" y="137">the line, as bytes</text>
+  <text class="body" text-anchor="middle" x="135" y="154">in a .cs file</text>
+  <rect x="250" y="70" width="190" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="345" y="117">Two. resolve</text>
+  <text class="body" text-anchor="middle" x="345" y="137">a name becomes one</text>
+  <text class="body" text-anchor="middle" x="345" y="154">specific overload</text>
+  <rect x="460" y="70" width="190" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="555" y="117">Three. emit</text>
+  <text class="body" text-anchor="middle" x="555" y="137">one PE file, with</text>
+  <text class="body" text-anchor="middle" x="555" y="154">no machine code</text>
+  <rect x="670" y="70" width="190" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="765" y="117">Four. a row</text>
+  <text class="body" text-anchor="middle" x="765" y="137">the method becomes</text>
+  <text class="body" text-anchor="middle" x="765" y="154">a line in a table</text>
+  <rect x="880" y="70" width="190" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="975" y="117">Five. IL</text>
+  <text class="body" text-anchor="middle" x="975" y="137">the line becomes</text>
+  <text class="body" text-anchor="middle" x="975" y="154">twelve bytes</text>
+  <rect x="880" y="250" width="190" height="130" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="975" y="293.5">Six. the host</text>
+  <text class="body" text-anchor="middle" x="975" y="313.5">a text file names</text>
+  <text class="body" text-anchor="middle" x="975" y="330.5">the runtime to ask</text>
+  <text class="body" text-anchor="middle" x="975" y="347.5">for</text>
+  <rect x="670" y="250" width="190" height="130" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="765" y="302">Seven. load</text>
+  <text class="body" text-anchor="middle" x="765" y="322">the assembly turns</text>
+  <text class="body" text-anchor="middle" x="765" y="339">up inside a process</text>
+  <rect x="460" y="250" width="190" height="130" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="555" y="293.5">Eight. type load</text>
+  <text class="body" text-anchor="middle" x="555" y="313.5">a structure built</text>
+  <text class="body" text-anchor="middle" x="555" y="330.5">that the file does</text>
+  <text class="body" text-anchor="middle" x="555" y="347.5">not contain</text>
+  <rect x="250" y="250" width="190" height="130" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="345" y="302">Nine. the JIT</text>
+  <text class="body" text-anchor="middle" x="345" y="322">IL becomes machine</text>
+  <text class="body" text-anchor="middle" x="345" y="339">code, on first call</text>
+  <rect x="40" y="250" width="190" height="130" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="135" y="302">Ten. it runs</text>
+  <text class="body" text-anchor="middle" x="135" y="322">and the heap is</text>
+  <text class="body" text-anchor="middle" x="135" y="339">different afterwards</text>
+  <rect x="40" y="420" width="510" height="120" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="295" y="451.5">Stages one to five happen once, on</text>
+  <text class="body" text-anchor="middle" x="295" y="468.5">whichever machine ran the build. What</text>
+  <text class="body" text-anchor="middle" x="295" y="485.5">comes out is one file that copies to</text>
+  <text class="body" text-anchor="middle" x="295" y="502.5">all four platforms unchanged, and it</text>
+  <text class="body" text-anchor="middle" x="295" y="519.5">holds no machine code for any of them.</text>
+  <rect x="570" y="420" width="500" height="120" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="820" y="451.5">Stages six to ten happen every time</text>
+  <text class="body" text-anchor="middle" x="820" y="468.5">the program starts, on the machine</text>
+  <text class="body" text-anchor="middle" x="820" y="485.5">running it. None of it is in the file</text>
+  <text class="body" text-anchor="middle" x="820" y="502.5">and all of it is gone again when the</text>
+  <text class="body" text-anchor="middle" x="820" y="519.5">process exits.</text>
+  <text class="footer" x="24" y="566">Generated by xray from ten-stages.dg. Edit that file, not this one.</text>
+</svg>

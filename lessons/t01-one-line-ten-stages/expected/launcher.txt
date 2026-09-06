@@ -1,0 +1,4 @@
+your line's IL, inside Sample.dll:   True
+your line's IL, inside the launcher: False
+managed metadata in Sample.dll:      True
+managed metadata in the launcher:    False

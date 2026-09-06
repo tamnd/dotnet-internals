@@ -1,0 +1,57 @@
+[
+  {
+    "block": "files",
+    "claims": [
+      {
+        "lines": 5,
+        "why": "Five files come out of building one program with one type in it, and the count is the whole point of the block. Four of them are not your code."
+      },
+      {
+        "matches": "^Sample\\.dll +[0-9]+ bytes$",
+        "why": "The assembly is always called Sample.dll, on every platform, because a managed assembly is not a platform specific file and does not get a platform specific name."
+      },
+      {
+        "matches": "^Sample(\\.exe)? +[0-9]+ bytes$",
+        "why": "The launcher is the one file here whose name changes with the operating system, and this is the pattern that covers both spellings of it."
+      },
+      {
+        "matches": "^Sample\\.runtimeconfig\\.json +[0-9]+ bytes$",
+        "why": "The launcher cannot start without this file, because it is where the version of the runtime to ask for is written down, so a build that does not produce it produces a program that does not run."
+      }
+    ]
+  },
+  {
+    "block": "jit",
+    "claims": [
+      {
+        "lines": 4,
+        "why": "Two timings, the comparison between them, and the address. The timings are what this block is for and the comparison is the only part of them that is true everywhere."
+      },
+      {
+        "contains": "the first one cost at least ten times the rest: True",
+        "why": "This is the load bearing claim of the whole block and the only one worth gating. Ten is a long way below what any machine actually shows, which is a few hundred, and it is set there so that a slow shared runner does not make a true statement go red."
+      },
+      {
+        "matches": "^entry point: 0x[0-9A-F]+$",
+        "why": "An address in this process, in this run. The shape is all a page can honestly claim about a number that is different every time the program starts, and it is worth claiming because a zero here would mean the method has no entry point at all."
+      }
+    ]
+  },
+  {
+    "block": "machine",
+    "claims": [
+      {
+        "lines": 3,
+        "why": "Three facts about the machine, and none of them belongs on a page that four platforms have to agree on."
+      },
+      {
+        "matches": "^pointers: 64 bits$",
+        "why": "Every platform this book supports is sixty four bit, and a great deal of the arithmetic in later lessons assumes it out loud. If this ever goes red, the lessons that add up object sizes are wrong rather than this line."
+      },
+      {
+        "matches": "^runtime:  \\.NET [0-9]+\\.[0-9]+\\.[0-9]+$",
+        "why": "A three part version, which is what the runtime reports when it is a release rather than a preview. It is checked for shape here because a reader comparing their output with the page needs to know which of the two of you is on something unusual."
+      }
+    ]
+  }
+]

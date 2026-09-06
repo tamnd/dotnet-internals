@@ -1,0 +1,7 @@
+the line returned 4
+and allocated 184 bytes on the way
+
+a string of 3 characters: 32 bytes
+a string of 5 characters: 32 bytes
+an array of 4 references: 56 bytes
+which adds up to 184

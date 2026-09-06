@@ -1,0 +1,33 @@
+# The ten stages between a line of C# and a CPU. The top row is the build and the bottom row is
+# the run, and the bottom row goes right to left so that the arrow between the two rows is a
+# straight drop rather than a line back across the picture.
+
+title One line, ten stages
+
+size 1120 580
+
+box text 40 70 190 120 "One. text" "the line, as bytes" "in a .cs file"
+box bind 250 70 190 120 "Two. resolve" "a name becomes one" "specific overload"
+box emit 460 70 190 120 "Three. emit" "one PE file, with" "no machine code"
+box row 670 70 190 120 "Four. a row" "the method becomes" "a line in a table"
+box il 880 70 190 120 "Five. IL" "the line becomes" "twelve bytes"
+
+box host 880 250 190 130 "Six. the host" "a text file names" "the runtime to ask" "for"
+box load 670 250 190 130 "Seven. load" "the assembly turns" "up inside a process"
+box type 460 250 190 130 "Eight. type load" "a structure built" "that the file does" "not contain"
+box jit 250 250 190 130 "Nine. the JIT" "IL becomes machine" "code, on first call"
+box run 40 250 190 130 "Ten. it runs" "and the heap is" "different afterwards"
+
+note built 40 420 510 120 "Stages one to five happen once, on" "whichever machine ran the build. What" "comes out is one file that copies to" "all four platforms unchanged, and it" "holds no machine code for any of them."
+
+note ran 570 420 500 120 "Stages six to ten happen every time" "the program starts, on the machine" "running it. None of it is in the file" "and all of it is gone again when the" "process exits."
+
+arrow text bind ""
+arrow bind emit ""
+arrow emit row ""
+arrow row il ""
+arrow il host ""
+arrow host load ""
+arrow load type ""
+arrow type jit ""
+arrow jit run ""

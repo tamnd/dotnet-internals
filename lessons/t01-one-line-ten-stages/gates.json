@@ -1,0 +1,68 @@
+[
+  {
+    "id": "machine",
+    "question": "The fixture was built on whichever machine produced this page, and one of those is an Apple laptop with an ARM chip in it. What does the CPU field in the header of Sample.dll say?",
+    "options": [
+      {
+        "text": "ARM64, because that is the machine it was built on.",
+        "correct": false,
+        "why": "Nothing about the build depends on the machine it ran on. The same source produces the same bytes on all four platforms, which is a property the build here checks on every change, and a CPU name in the header would make that impossible."
+      },
+      {
+        "text": "I386, meaning a thirty two bit Intel processor from the 1980s.",
+        "correct": true,
+        "why": "There is a flag elsewhere in the header saying the file contains no machine code at all, and once that flag is set the CPU field means nothing. It says I386 because that is what the very first version of this format wrote there and no loader has cared since. It is a field that stopped meaning anything and stayed."
+      },
+      {
+        "text": "Nothing. The field is zero, because the file has no machine code in it.",
+        "correct": false,
+        "why": "That would be the sensible design and it is not the one we have. Zero in that field means unknown, and old loaders refused files that said unknown, so the value that means nothing here is the value that used to mean something."
+      }
+    ],
+    "after": "The whole header is like this once you start reading it. Fields that meant something on one operating system in one decade, still being written by a compiler that targets none of it, because a reader somewhere might check. The rule for reading this format is that a value is only worth believing once you know which flag says whether anyone looks at it."
+  },
+  {
+    "id": "arguments",
+    "question": "The line calls line.Split(' ') and passes one argument. How many arguments does the call instruction in the IL pass?",
+    "options": [
+      {
+        "text": "One. The compiler writes down what you wrote.",
+        "correct": false,
+        "why": "The compiler writes down what it resolved, which is not always what you wrote. There is no method on String that takes one char and nothing else, so a call passing one argument would have nothing to point at."
+      },
+      {
+        "text": "Two. The overload takes a second argument with a default, and the default is filled in here rather than at run time.",
+        "correct": true,
+        "why": "Split(char, StringSplitOptions) has a default of StringSplitOptions.None on the second parameter. A default argument in C# is not stored anywhere in the compiled call. The compiler looks it up at the call site and writes the value into the instruction stream, which is why changing a default in a library does nothing to code that was already compiled against it."
+      },
+      {
+        "text": "Two, and the second one is the array that Split will fill in.",
+        "correct": false,
+        "why": "Split returns its array rather than being handed one. The second argument is a set of options, and you can see it in the IL as ldc.i4.0, which pushes zero, which is StringSplitOptions.None."
+      }
+    ],
+    "after": "That last part is worth keeping. A default argument is baked into the caller, so a library that changes one has not changed the behaviour of anything already built against it. The same is true of a const field and it is not true of a static readonly field, and the difference between those two is a thing that has cost people days."
+  },
+  {
+    "id": "allocation",
+    "question": "Splitting a nineteen character string into four words, how many objects end up on the heap?",
+    "options": [
+      {
+        "text": "None. Split hands back views into the string that is already there.",
+        "correct": false,
+        "why": "This is what a span based split does and it is the reason spans exist. String.Split predates all of that and returns real strings, because a string in .NET owns its characters and there is no such thing as a string that points into the middle of another one."
+      },
+      {
+        "text": "One. The array, with its four entries pointing into the original string.",
+        "correct": false,
+        "why": "Same reason as above. There is no way to make an entry of a string array point at the middle of another string, so each word has to be copied somewhere of its own."
+      },
+      {
+        "text": "Five. One array and four strings, and the original is untouched.",
+        "correct": true,
+        "why": "Every word is copied into a string of its own and the array holds four references to them. The original nineteen character string is still there and unchanged, so after this line there are six strings alive where there was one."
+      }
+    ],
+    "after": "This is the shape of most allocation in a program that nobody thought was allocating. Nothing here says new, and the line reads like it is looking at the string rather than copying it. Part VIII is about what happens to those five objects afterwards, and T07 in this part is a first look at it."
+  }
+]

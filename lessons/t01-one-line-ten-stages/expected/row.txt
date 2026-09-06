@@ -1,0 +1,7 @@
+token:          0x06000001
+top byte:       0x06, which is the MethodDef table
+row number:     1
+declaring type: Sample.Text
+name:           Count
+attributes:     Public, Static, HideBySig
+the row holds no code of its own, only the address of some

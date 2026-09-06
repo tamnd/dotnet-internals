@@ -1,0 +1,5 @@
+first two bytes:       MZ
+machine in the header: I386
+sections:              .text, .rsrc, .reloc
+managed header says:   ILOnly
+precompiled code:      0 bytes
