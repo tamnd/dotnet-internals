@@ -1,0 +1,8 @@
+types defined here:     5
+types named here:      19
+members named here:    26
+
+assemblies it says it needs:
+  System.Runtime       10.0.0.0
+  System.Collections   10.0.0.0
+  System.Console       10.0.0.0

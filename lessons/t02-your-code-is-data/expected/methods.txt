@@ -1,0 +1,8 @@
+  0x06000001  Program.<Main>$
+  0x06000002  Program..ctor
+  0x06000003  Shape.Area
+  0x06000004  Shape..ctor
+  0x06000005  Circle..ctor
+  0x06000006  Circle.Area
+  0x06000007  Square..ctor
+  0x06000008  Square.Area

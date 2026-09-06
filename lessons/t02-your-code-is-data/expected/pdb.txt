@@ -1,0 +1,12 @@
+local variable names in the assembly: 0
+local variable names in the pdb:      3
+
+  slot 0: shapes
+  slot 1: total
+  slot 3: shape
+
+source documents the pdb knows about: 4
+  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+  L1.AssemblyInfo.cs
+  L1.GlobalUsings.g.cs
+  Shapes.cs

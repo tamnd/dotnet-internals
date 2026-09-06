@@ -1,0 +1,68 @@
+[
+  {
+    "id": "types",
+    "question": "The program is ten lines long and declares three classes. How many types does the assembly define?",
+    "options": [
+      {
+        "text": "Three. Shape, Circle and Square.",
+        "correct": false,
+        "why": "Those are the three somebody typed, and the file has more than the ones somebody typed. Both of the extra ones are there for reasons that have nothing to do with the shapes."
+      },
+      {
+        "text": "Four. The three classes and a class holding the code that is not inside any of them.",
+        "correct": false,
+        "why": "Half right, and the half that is right is the interesting half. Top level statements do get wrapped in a class, called Program, with a method called <Main>$ on it. There is one more type still."
+      },
+      {
+        "text": "Five. The three classes, one for the top level statements, and one that is in every assembly ever produced.",
+        "correct": true,
+        "why": "Row one of the TypeDef table is always a type called <Module>, in no namespace, and every assembly has it. It is where anything that belongs to the file rather than to a type would go, and in an ordinary C# assembly nothing does, so it sits there empty. The format requires it to exist, so the compiler writes it."
+      }
+    ],
+    "after": "<Module> is the oldest thing in the file. The format allows a method or a field to belong to the whole assembly rather than to any type, which some languages that target this runtime use and C# never does, and a table of rows needs somewhere to hang those off. So row one of TypeDef is reserved for a type that is not a type, and in a C# assembly it is always empty and always present."
+  },
+  {
+    "id": "dispose",
+    "question": "There is no using statement in this program, no try, and nothing that looks like cleanup. Does the assembly reference IDisposable.Dispose?",
+    "options": [
+      {
+        "text": "No. Nothing in the program is disposable and nothing in it needs cleaning up.",
+        "correct": false,
+        "why": "Nothing the reader wrote needs cleaning up, which is not the same statement. The reference is there, and finding out why is worth more than the answer."
+      },
+      {
+        "text": "Yes, because the foreach turned into something with a try and a finally in it.",
+        "correct": true,
+        "why": "A foreach over anything is a call to GetEnumerator, a loop on MoveNext and get_Current, and a finally that disposes the enumerator if it is disposable. The compiler writes the try and the finally whether or not the enumerator turns out to need them. You can see the whole shape in the MemberRef table: GetEnumerator, MoveNext, get_Current, Dispose, in that order and next to each other."
+      },
+      {
+        "text": "Yes, because List<T> is disposable and the list goes out of scope at the end.",
+        "correct": false,
+        "why": "List<T> is not disposable, and going out of scope does not dispose anything in .NET even when it is. The reference comes from the loop rather than from the list."
+      }
+    ],
+    "after": "There is a cost hiding in that answer. The finally block is written whether or not it is needed, and a finally around a loop body is a thing the JIT has to respect. For List<T> in particular the enumerator is a struct and the compiler knows its exact type, so the Dispose call ends up costing nothing at run time. Change the variable's type to IEnumerable<Shape> and none of that is true any more, which is a difference in generated code from a change that looks like a matter of taste."
+  },
+  {
+    "id": "total",
+    "question": "The program has a local variable called total. Is the name total in the assembly?",
+    "options": [
+      {
+        "text": "Yes. It is a name in the program, and names go in the string heap.",
+        "correct": false,
+        "why": "Names of things other code could refer to go in the string heap. A local variable is not one of those. Nothing outside the method can name it, so the method body refers to it by slot number and the name is dropped."
+      },
+      {
+        "text": "No, and it is gone for good. That is what a release build means.",
+        "correct": false,
+        "why": "It is not in the assembly, and it is not gone. Release builds in .NET still produce debug information by default, which is not what people expect if they came from a language where release means stripped."
+      },
+      {
+        "text": "No. It is in the pdb file sitting next to the assembly.",
+        "correct": true,
+        "why": "The pdb is a second file in the same metadata format, with its own tables, holding exactly the things the runtime does not need and a human does: local variable names, which source file each instruction came from, and which line. Ship the dll on its own and the program runs identically and every stack trace loses its line numbers."
+      }
+    ],
+    "after": "Worth knowing what this costs you. A pdb is not loaded unless something asks for a stack trace with line numbers in it, so carrying one costs nothing at run time and about twice the size of the assembly on disk. Almost every argument for not shipping one is really an argument about not shipping the source, and a pdb holds no source."
+  }
+]

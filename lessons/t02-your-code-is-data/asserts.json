@@ -1,0 +1,36 @@
+[
+  {
+    "block": "scale",
+    "claims": [
+      {
+        "lines": 3,
+        "why": "One line for the program, one for the library it was built against, and the comparison between them. The comparison is the only part of the block that is a statement about .NET rather than about whichever runtime happens to be installed."
+      },
+      {
+        "matches": "^L1\\.dll +[0-9]+ rows$",
+        "why": "The program's own row count is small and stable, but it is printed here next to a number that is neither, so the pair has to be dropped together and the shape is what is left to check."
+      },
+      {
+        "contains": "the library is more than a thousand times the program: True",
+        "why": "The load bearing claim. A thousand is far below the real ratio, which is over two thousand today, and it is set low so that a future version of the library shedding a few thousand rows does not turn a true statement red."
+      }
+    ]
+  },
+  {
+    "block": "machine",
+    "claims": [
+      {
+        "lines": 2,
+        "why": "The two facts on this page that are different for every reader, kept in one place so that nothing else on the page has to be."
+      },
+      {
+        "matches": "^platform: (linux|osx|win)-(x64|arm64)$",
+        "why": "One of the four platforms this book supports. Anything else here means the lesson ran somewhere nobody has checked, and the rest of the page is then a claim about a machine rather than about .NET."
+      },
+      {
+        "matches": "^runtime:  \\.NET [0-9]+\\.[0-9]+\\.[0-9]+$",
+        "why": "A three part version, which is what the runtime reports when it is a release rather than a preview. It matters here because the row counts on this page are what one specific compiler emitted, and a reader who sees different ones needs to know whether they are on something unusual."
+      }
+    ]
+  }
+]

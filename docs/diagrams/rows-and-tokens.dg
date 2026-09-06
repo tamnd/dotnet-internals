@@ -1,0 +1,27 @@
+# The three groups a metadata table falls into, and the chain of rows that gets you from a call in
+# your code out to the file that will answer it. Deliberately no row counts anywhere in here: the
+# counts are on the lesson page, where the build regenerates them, and a number in a diagram is a
+# number nothing checks.
+
+title A .dll is a database
+
+size 1100 640
+
+box own 40 80 320 180 "Defined here" "TypeDef  MethodDef" "Field  Param" "Rows with something behind" "them. A body, a layout, a" "name that somebody typed."
+
+box outward 390 80 320 180 "Named here, kept elsewhere" "TypeRef  MemberRef" "AssemblyRef" "A name and nowhere in this" "file to look it up. Far" "more of these than the left."
+
+box added 740 80 320 180 "Nobody typed these" "Module  Assembly" "CustomAttribute  TypeSpec" "MethodSpec  StandAloneSig" "Bookkeeping, written by the" "compiler for the runtime."
+
+box mref 40 320 280 120 "A MemberRef row" "name: Add" "owner: a row in TypeRef"
+
+box tref 400 320 280 120 "A TypeRef row" "name: List`1" "home: a row in AssemblyRef"
+
+box aref 760 320 280 120 "An AssemblyRef row" "name: System.Collections" "and now you are out of this" "file"
+
+arrow mref tref "which type"
+arrow tref aref "which assembly"
+
+strip token 40 490 165 120 "0x06|which table|MethodDef" "0x000005|which row|the fifth one"
+
+note why 400 490 640 120 "Every link in this picture is a token, and a token is four bytes." "One byte saying which table and three saying which row. No pointers," "no offsets into memory, no strings. That is why a reader can map the" "file straight off disk, follow any link in it, and never allocate."

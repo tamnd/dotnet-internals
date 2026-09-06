@@ -1,0 +1,8 @@
+  .ctor <Main>$ <Module> <radius>P <side>P Area Circle Program Shape Square args radius side
+
+  Area     is a name in the file: True
+  Circle   is a name in the file: True
+  radius   is a name in the file: True
+  shapes   is a name in the file: False
+  total    is a name in the file: False
+  shape    is a name in the file: False

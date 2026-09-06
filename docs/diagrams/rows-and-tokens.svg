@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .heading { font-size: 15px; font-weight: 600; fill: #1e1e1e; }
+    .body { font-size: 13px; fill: #495057; }
+    .cell-heading { font-size: 13px; font-weight: 600; fill: #1e1e1e; }
+    .cell-body { font-size: 11px; fill: #495057; }
+    .title { font-size: 18px; font-weight: 700; fill: #1e1e1e; }
+    .edge { font-size: 12px; fill: #495057; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+    .footer { font-size: 11px; fill: #868e96; }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#868e96"/>
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text class="title" x="24" y="32">A .dll is a database</text>
+  <line x1="320" y1="380" x2="400" y2="380" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <text class="edge" text-anchor="middle" x="360" y="374">which type</text>
+  <line x1="680" y1="380" x2="760" y2="380" stroke="#868e96" stroke-width="1.5" marker-end="url(#head)"/>
+  <text class="edge" text-anchor="middle" x="720" y="374">which assembly</text>
+  <rect x="40" y="80" width="320" height="180" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="200" y="131.5">Defined here</text>
+  <text class="body" text-anchor="middle" x="200" y="151.5">TypeDef  MethodDef</text>
+  <text class="body" text-anchor="middle" x="200" y="168.5">Field  Param</text>
+  <text class="body" text-anchor="middle" x="200" y="185.5">Rows with something behind</text>
+  <text class="body" text-anchor="middle" x="200" y="202.5">them. A body, a layout, a</text>
+  <text class="body" text-anchor="middle" x="200" y="219.5">name that somebody typed.</text>
+  <rect x="390" y="80" width="320" height="180" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="550" y="131.5">Named here, kept elsewhere</text>
+  <text class="body" text-anchor="middle" x="550" y="151.5">TypeRef  MemberRef</text>
+  <text class="body" text-anchor="middle" x="550" y="168.5">AssemblyRef</text>
+  <text class="body" text-anchor="middle" x="550" y="185.5">A name and nowhere in this</text>
+  <text class="body" text-anchor="middle" x="550" y="202.5">file to look it up. Far</text>
+  <text class="body" text-anchor="middle" x="550" y="219.5">more of these than the left.</text>
+  <rect x="740" y="80" width="320" height="180" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="900" y="131.5">Nobody typed these</text>
+  <text class="body" text-anchor="middle" x="900" y="151.5">Module  Assembly</text>
+  <text class="body" text-anchor="middle" x="900" y="168.5">CustomAttribute  TypeSpec</text>
+  <text class="body" text-anchor="middle" x="900" y="185.5">MethodSpec  StandAloneSig</text>
+  <text class="body" text-anchor="middle" x="900" y="202.5">Bookkeeping, written by the</text>
+  <text class="body" text-anchor="middle" x="900" y="219.5">compiler for the runtime.</text>
+  <rect x="40" y="320" width="280" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="180" y="367">A MemberRef row</text>
+  <text class="body" text-anchor="middle" x="180" y="387">name: Add</text>
+  <text class="body" text-anchor="middle" x="180" y="404">owner: a row in TypeRef</text>
+  <rect x="400" y="320" width="280" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="540" y="367">A TypeRef row</text>
+  <text class="body" text-anchor="middle" x="540" y="387">name: List`1</text>
+  <text class="body" text-anchor="middle" x="540" y="404">home: a row in AssemblyRef</text>
+  <rect x="760" y="320" width="280" height="120" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="heading" text-anchor="middle" x="900" y="358.5">An AssemblyRef row</text>
+  <text class="body" text-anchor="middle" x="900" y="378.5">name: System.Collections</text>
+  <text class="body" text-anchor="middle" x="900" y="395.5">and now you are out of this</text>
+  <text class="body" text-anchor="middle" x="900" y="412.5">file</text>
+  <rect x="40" y="490" width="165" height="120" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="122.5" y="538.5">0x06</text>
+  <text class="cell-body" text-anchor="middle" x="122.5" y="555.5">which table</text>
+  <text class="cell-body" text-anchor="middle" x="122.5" y="570.5">MethodDef</text>
+  <rect x="205" y="490" width="165" height="120" rx="6" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="1.5"/>
+  <text class="cell-heading" text-anchor="middle" x="287.5" y="538.5">0x000005</text>
+  <text class="cell-body" text-anchor="middle" x="287.5" y="555.5">which row</text>
+  <text class="cell-body" text-anchor="middle" x="287.5" y="570.5">the fifth one</text>
+  <rect x="400" y="490" width="640" height="120" rx="6" fill="#fff9db" stroke="#1e1e1e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text class="body" text-anchor="middle" x="720" y="530">Every link in this picture is a token, and a token is four bytes.</text>
+  <text class="body" text-anchor="middle" x="720" y="547">One byte saying which table and three saying which row. No pointers,</text>
+  <text class="body" text-anchor="middle" x="720" y="564">no offsets into memory, no strings. That is why a reader can map the</text>
+  <text class="body" text-anchor="middle" x="720" y="581">file straight off disk, follow any link in it, and never allocate.</text>
+  <text class="footer" x="24" y="626">Generated by xray from rows-and-tokens.dg. Edit that file, not this one.</text>
+</svg>
