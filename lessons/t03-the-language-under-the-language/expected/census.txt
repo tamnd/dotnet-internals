@@ -1,0 +1,33 @@
+methods with a body:  7
+bytes of IL in total: 280
+instructions:         90
+distinct opcodes:     28 of the 226 that exist
+
+  call           13
+  ldarg.0        10
+  ldloca.s        9
+  callvirt        7
+  ret             7
+  ldc.r8          5
+  ldfld           4
+  newobj          4
+  dup             3
+  ldstr           3
+  mul             3
+  ldarg.1         2
+  ldloc.0         2
+  ldloc.1         2
+  stfld           2
+  stloc.1         2
+  add             1
+  br.s            1
+  brtrue.s        1
+  constrained.    1
+  endfinally      1
+  ldc.i4.2        1
+  ldc.i4.s        1
+  ldloc.3         1
+  leave.s         1
+  stloc.0         1
+  stloc.2         1
+  stloc.3         1

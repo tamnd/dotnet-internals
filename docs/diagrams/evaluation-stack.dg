@@ -1,0 +1,17 @@
+# Why the middle language is a stack machine rather than a register machine, which is the part of
+# T03 that the instruction listings cannot show on their own. No offsets, no opcode numbers and no
+# counts in here on purpose: those are all on the lesson page, where the build regenerates them.
+
+title Why the middle language is a stack machine
+
+size 1140 700
+
+box csharp 40 90 320 150 "What you wrote" "public override double" "Area() => side * side;"
+
+strip il 400 90 240 150 "ldarg.0|ldfld <side>P|put a value on the stack" "ldarg.0|ldfld <side>P|put another one on" "mul|take two off the top|and put one back"
+
+box machine 40 300 500 190 "What a processor wants" "Registers, with names, picked before" "anything runs. One machine has one set" "of them, the next has a different set" "and a different number, and the right" "choice depends on what else is live."
+
+note answer 580 300 520 190 "So the middle language does not pick. It says what the" "program means using a stack that no hardware has, and" "leaves the question of where a value lives until the" "machine is known. That happens in T05, every time the" "method is first called. It is also why one file runs on" "a laptop and on a phone with nothing rebuilt."
+
+note checked 40 540 1060 130 "The stack buys one more thing. How deep it is at every instruction can be worked out" "without running the program, and a method whose stack does not come out even is refused" "before it runs. That is what makes it safe to load code that this runtime did not build," "and it is a large part of why the format could be written down and standardised at all."

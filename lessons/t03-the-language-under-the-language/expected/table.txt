@@ -1,0 +1,9 @@
+opcodes in the instruction set: 226
+  one byte:  199
+  two bytes: 27
+
+  0x0002  ldarg.0    operand InlineNone     pop Pop0       push Push1
+  0x007B  ldfld      operand InlineField    pop Popref     push Push1
+  0x005A  mul        operand InlineNone     pop Pop1_pop1  push Push1
+  0x006F  callvirt   operand InlineMethod   pop Varpop     push Varpush
+  0x002A  ret        operand InlineNone     pop Varpop     push Push0

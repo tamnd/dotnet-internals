@@ -1,0 +1,9 @@
+  method                 header  maxstack  code  locals  init
+  Program.<Main>$            28         3   200       5  True
+  Program..ctor               1         8     7       0  False
+  Shape.Area             no body at all, and the row says why: Abstract
+  Shape..ctor                 1         8     7       0  False
+  Circle..ctor                1         8    14       0  False
+  Circle.Area                 1         8    24       0  False
+  Square..ctor                1         8    14       0  False
+  Square.Area                 1         8    14       0  False

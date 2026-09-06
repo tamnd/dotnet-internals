@@ -1,0 +1,6 @@
+  IL_0000  ldarg.0
+  IL_0001  ldfld          Square.<side>P
+  IL_0006  ldarg.0
+  IL_0007  ldfld          Square.<side>P
+  IL_000C  mul
+  IL_000D  ret
