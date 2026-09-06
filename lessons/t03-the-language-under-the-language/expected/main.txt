@@ -1,0 +1,65 @@
+  local 0: List`1<Shape>
+  local 1: Double
+  local 2: Enumerator<Shape>
+  local 3: Shape
+  local 4: DefaultInterpolatedStringHandler
+  Finally: try IL_0053 to IL_0071, handler IL_0071 to IL_007F
+
+  IL_0000  newobj         List`1<Shape>..ctor
+  IL_0005  dup
+  IL_0006  ldc.r8         2
+  IL_000F  newobj         Circle..ctor
+  IL_0014  callvirt       List`1<Shape>.Add
+  IL_0019  dup
+  IL_001A  ldc.r8         3
+  IL_0023  newobj         Square..ctor
+  IL_0028  callvirt       List`1<Shape>.Add
+  IL_002D  dup
+  IL_002E  ldc.r8         5
+  IL_0037  newobj         Circle..ctor
+  IL_003C  callvirt       List`1<Shape>.Add
+  IL_0041  stloc.0
+  IL_0042  ldc.r8         0
+  IL_004B  stloc.1
+  IL_004C  ldloc.0
+  IL_004D  callvirt       List`1<Shape>.GetEnumerator
+  IL_0052  stloc.2
+  IL_0053  br.s           IL_0066
+  IL_0055  ldloca.s       2
+  IL_0057  call           Enumerator<Shape>.get_Current
+  IL_005C  stloc.3
+  IL_005D  ldloc.1
+  IL_005E  ldloc.3
+  IL_005F  callvirt       Shape.Area
+  IL_0064  add
+  IL_0065  stloc.1
+  IL_0066  ldloca.s       2
+  IL_0068  call           Enumerator<Shape>.MoveNext
+  IL_006D  brtrue.s       IL_0055
+  IL_006F  leave.s        IL_007F
+  IL_0071  ldloca.s       2
+  IL_0073  constrained.   Enumerator<Shape>
+  IL_0079  callvirt       IDisposable.Dispose
+  IL_007E  endfinally
+  IL_007F  ldloca.s       4
+  IL_0081  ldc.i4.s       15
+  IL_0083  ldc.i4.2
+  IL_0084  call           DefaultInterpolatedStringHandler..ctor
+  IL_0089  ldloca.s       4
+  IL_008B  ldloc.0
+  IL_008C  callvirt       List`1<Shape>.get_Count
+  IL_0091  call           DefaultInterpolatedStringHandler.AppendFormatted<Int32>
+  IL_0096  ldloca.s       4
+  IL_0098  ldstr          " shapes, "
+  IL_009D  call           DefaultInterpolatedStringHandler.AppendLiteral
+  IL_00A2  ldloca.s       4
+  IL_00A4  ldloc.1
+  IL_00A5  ldstr          "F2"
+  IL_00AA  call           DefaultInterpolatedStringHandler.AppendFormatted<Double>
+  IL_00AF  ldloca.s       4
+  IL_00B1  ldstr          " total"
+  IL_00B6  call           DefaultInterpolatedStringHandler.AppendLiteral
+  IL_00BB  ldloca.s       4
+  IL_00BD  call           DefaultInterpolatedStringHandler.ToStringAndClear
+  IL_00C2  call           Console.WriteLine
+  IL_00C7  ret

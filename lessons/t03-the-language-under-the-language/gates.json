@@ -1,0 +1,68 @@
+[
+  {
+    "id": "maxstack",
+    "question": "Square.Area needs two values on the stack at the deepest point, and never more. What does its method header say the maximum depth is?",
+    "options": [
+      {
+        "text": "Two. The compiler worked it out, which is the whole reason the header has that field.",
+        "correct": false,
+        "why": "The compiler did work it out. It then had nowhere to write it down, which is the part worth knowing."
+      },
+      {
+        "text": "Eight, and it says eight for almost every method in the program.",
+        "correct": true,
+        "why": "There are two header formats. The small one is a single byte, and a single byte has room for the code length and nothing else, so the format fixes the maximum depth at eight and any method that fits gets that number whether it needs it or not. The large header is twelve bytes and has a real field, and a method only gets one when it is too big or too complicated for the small one."
+      },
+      {
+        "text": "Nothing. The runtime works it out when it loads the method.",
+        "correct": false,
+        "why": "The runtime could work it out, and it would rather not. The number is there so that the code that turns IL into machine code knows how much space to set aside before it starts, in one pass rather than two."
+      }
+    ],
+    "after": "The number is a promise about the most, not a report of the actual, and the two failure modes are not symmetric. Writing down less than the method needs produces a file that is refused, because the code that allocates the stack would come up short. Writing down more than it needs costs nothing at all once the method is running. So rounding up is always safe, and the small header rounds up to eight for free."
+  },
+  {
+    "id": "callvirt",
+    "question": "List<T>.Add is not a virtual method. Which instruction does the compiler use to call it?",
+    "options": [
+      {
+        "text": "call, because there is nothing to look up.",
+        "correct": false,
+        "why": "There is nothing to look up, and the compiler uses callvirt anyway. The reason has nothing to do with looking anything up."
+      },
+      {
+        "text": "callvirt, because callvirt throws when the thing being called on is null and call does not.",
+        "correct": true,
+        "why": "C# uses callvirt for an instance call on a reference type whether or not the target is virtual, because callvirt checks the receiver for null first and call does not. Without it, calling a method that never touches a field on a null reference would run happily, and the exception would turn up much later somewhere confusing."
+      },
+      {
+        "text": "callvirt, because the compiler cannot tell whether Add is virtual in another assembly.",
+        "correct": false,
+        "why": "It can tell. Whether a method is virtual is a flag on its row, and reading rows from another assembly is the ordinary case rather than the hard one."
+      }
+    ],
+    "after": "There is one place where C# has to break its own rule, and it is worth knowing because it is the one case where a null receiver gets no check. Writing base.Something() in an override has to reach the base method, and callvirt would find the override again and call it forever, so the compiler emits call. Every base constructor call in this program is that case."
+  },
+  {
+    "id": "constrained",
+    "question": "The finally block disposes an enumerator that is a struct. Calling an interface method on a struct normally means boxing it onto the heap first. Does this program box, once for every loop it runs?",
+    "options": [
+      {
+        "text": "Yes. That is the price of the interface, and it is why people say to avoid foreach in hot code.",
+        "correct": false,
+        "why": "It would be the price, if the format had no answer for it. It has one, and it is a single instruction long."
+      },
+      {
+        "text": "No. There is an instruction in front of the call whose only job is to say what the thing really is.",
+        "correct": true,
+        "why": "The constrained prefix names the exact type of the thing being called on. When that type is a struct that implements the method itself, the runtime skips the interface entirely and calls the struct's method directly, with the address it already has. No box, no allocation, no lookup."
+      },
+      {
+        "text": "No, because the finally block only runs if something throws.",
+        "correct": false,
+        "why": "A finally runs on the way out however the way out happens, and the normal path through this loop goes through it too. Look for the leave instruction and see where it lands."
+      }
+    ],
+    "after": "This is the instruction that makes the answer to the dispose question in T02 come out to nothing. It is also conditional in a way worth remembering: if the struct did not implement the method itself, and inherited it from object instead, the prefix would have to box after all. That is why a struct that overrides Equals and GetHashCode behaves so differently in a dictionary from one that does not."
+  }
+]

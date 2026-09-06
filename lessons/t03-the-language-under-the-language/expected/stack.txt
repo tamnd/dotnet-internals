@@ -1,0 +1,9 @@
+  IL_0000  ldarg.0  pops 0  pushes 1  stack now 1
+  IL_0001  ldfld    pops 1  pushes 1  stack now 1
+  IL_0006  ldarg.0  pops 0  pushes 1  stack now 2
+  IL_0007  ldfld    pops 1  pushes 1  stack now 2
+  IL_000C  mul      pops 2  pushes 1  stack now 1
+  IL_000D  ret      pops 1  pushes 0  stack now 0
+
+deepest the stack ever gets: 2
+the method header claims:    8

@@ -1,0 +1,8 @@
+  IL_0000  ldc.r8         3.141592653589793
+  IL_0009  ldarg.0
+  IL_000A  ldfld          Circle.<radius>P
+  IL_000F  mul
+  IL_0010  ldarg.0
+  IL_0011  ldfld          Circle.<radius>P
+  IL_0016  mul
+  IL_0017  ret
