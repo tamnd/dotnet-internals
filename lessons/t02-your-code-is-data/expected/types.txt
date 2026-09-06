@@ -1,0 +1,5 @@
+  0x02000001  <Module>     NotPublic
+  0x02000002  Program      BeforeFieldInit
+  0x02000003  Shape        Public, Abstract, BeforeFieldInit
+  0x02000004  Circle       Public, Sealed, BeforeFieldInit
+  0x02000005  Square       Public, Sealed, BeforeFieldInit

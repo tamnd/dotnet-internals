@@ -1,0 +1,17 @@
+  number  table             rows
+    0x00  Module              1
+    0x01  TypeRef            19
+    0x02  TypeDef             5
+    0x04  Field               2
+    0x06  MethodDef           8
+    0x08  Param               3
+    0x0A  MemberRef          26
+    0x0C  CustomAttribute    14
+    0x11  StandAloneSig       1
+    0x1B  TypeSpec            2
+    0x20  Assembly            1
+    0x23  AssemblyRef         3
+    0x2B  MethodSpec          2
+
+13 tables with anything in them, out of the 53 this reader knows how to find
+87 rows in total, and that is the whole program

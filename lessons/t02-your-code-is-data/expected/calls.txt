@@ -1,0 +1,17 @@
+26 rows, of which 12 are attribute constructors nobody typed.
+the rest, in the order the compiler wrote them down:
+
+  List`1<Shape>..ctor
+  List`1<Shape>.Add
+  List`1<Shape>.GetEnumerator
+  Enumerator<Shape>.get_Current
+  Enumerator<Shape>.MoveNext
+  IDisposable.Dispose
+  DefaultInterpolatedStringHandler..ctor
+  List`1<Shape>.get_Count
+  DefaultInterpolatedStringHandler.AppendFormatted
+  DefaultInterpolatedStringHandler.AppendLiteral
+  DefaultInterpolatedStringHandler.AppendFormatted
+  DefaultInterpolatedStringHandler.ToStringAndClear
+  Console.WriteLine
+  Object..ctor

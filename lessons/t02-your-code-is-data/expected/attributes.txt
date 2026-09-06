@@ -1,0 +1,19 @@
+14 rows, each one an owner and a constructor:
+
+  FieldDefinition    CompilerGeneratedAttribute
+  ModuleDefinition   RefSafetyRulesAttribute
+  AssemblyDefinition CompilationRelaxationsAttribute
+  AssemblyDefinition RuntimeCompatibilityAttribute
+  AssemblyDefinition DebuggableAttribute
+  AssemblyDefinition TargetFrameworkAttribute
+  AssemblyDefinition AssemblyCompanyAttribute
+  AssemblyDefinition AssemblyConfigurationAttribute
+  AssemblyDefinition AssemblyFileVersionAttribute
+  AssemblyDefinition AssemblyInformationalVersionAttribute
+  AssemblyDefinition AssemblyProductAttribute
+  AssemblyDefinition AssemblyTitleAttribute
+  FieldDefinition    CompilerGeneratedAttribute
+  TypeDefinition     CompilerGeneratedAttribute
+
+every one of those constructors is in another assembly: True
+the framework the file asks for: .NETCoreApp,Version=v10.0

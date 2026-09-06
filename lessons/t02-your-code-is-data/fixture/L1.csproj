@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The program is L1, which lives in lessons/shared/l1 because the whole book comes back to it.
+    This project compiles that source into this lesson's own output directory. Every lesson that
+    uses L1 does the same thing, so two lessons building at once cannot tread on each other.
+
+    Nothing here turns anything off. A reader who types the same ten lines into a new console
+    project gets an assembly with the same rows in it, and a census that showed something tidier
+    than what a normal build produces would be worth less than nothing.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>L1</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../shared/l1/*.cs" />
+  </ItemGroup>
+
+</Project>
