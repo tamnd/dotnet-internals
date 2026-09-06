@@ -19,4 +19,21 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <!--
+    A file based app has the trimming and native AOT analysers on, because the point of one is
+    that dotnet publish can turn it into a single native binary. A lesson is never published. It
+    is run once by the build and once by a reader, and half of what it exists to show is done
+    through reflection, which is exactly what those analysers warn about. Left on, every lesson
+    that loads an assembly and asks it for a type prints five warnings before it prints anything a
+    reader wanted, and warnings nobody can act on are how people learn to scroll past warnings.
+
+    A lesson that is about trimming or about AOT turns them back on in its own directory, and Part
+    IX is where that happens.
+  -->
+  <PropertyGroup>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <EnableSingleFileAnalyzer>false</EnableSingleFileAnalyzer>
+  </PropertyGroup>
+
 </Project>

@@ -1,0 +1,2 @@
+public static int Count(string line) => line.Split(' ').Length;
+63 bytes of UTF-8, and nothing else

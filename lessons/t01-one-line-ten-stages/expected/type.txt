@@ -1,0 +1,4 @@
+the handle is not zero:          True
+asking twice gives one answer:   True
+two types, two structures:       True
+the file has no such number in it, because it is an address in this process

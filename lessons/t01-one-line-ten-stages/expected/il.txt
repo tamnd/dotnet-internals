@@ -1,0 +1,9 @@
+12 bytes: 021F20166F0D00000A8E692A
+
+  02             ldarg.0        push the first argument, which is the string
+  1F 0x20        ldc.i4.s       push the next byte as a number
+  16             ldc.i4.0       push zero, the argument nobody wrote
+  6F 0x0A00000D  callvirt       call the method named by the next four bytes
+  8E             ldlen          pop an array, push its length
+  69             conv.i4        make that length a 32 bit int
+  2A             ret            return what is on the stack
