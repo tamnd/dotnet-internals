@@ -48,7 +48,7 @@ jobs:
 
       # The build log too, not just the measurement. A cold build time that looks too good is the
       # thing you most want to be able to check, and you cannot check it from a number.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: e0-measurement
