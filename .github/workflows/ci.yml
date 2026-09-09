@@ -127,7 +127,7 @@ jobs:
         run: |
           echo "path=$(dotnet run --project tools/xray -- cache path)" >> "$GITHUB_OUTPUT"
           echo "key=$(dotnet run --project tools/xray -- cache key --repository dotnet-internals --tag ${{ hashFiles('pin.json') }} --platform any --configuration any --name cite)" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ${{ steps.cache.outputs.path }}
           key: ${{ steps.cache.outputs.key }}
